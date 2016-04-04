@@ -8,11 +8,12 @@ public class SquareManager : MonoBehaviour {
 	List<Square> squares;
 
 	Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
-	static int BOARDSIZE = 5;
-	static int queueY = BOARDSIZE * -1;
-	Vector2 qpos1 = new Vector2((BOARDSIZE-4) * -1, (float) queueY);
-	Vector2 qpos2 = new Vector2((BOARDSIZE-3) * -1, (float) queueY);
-	Vector2 qpos3 = new Vector2((BOARDSIZE-2) * -1, (float) queueY);
+	static int BOARDSIZEX = 24;
+	static int BOARDSIZEY = 16;
+	static int queueY = -2;
+	Vector2 qpos1 = new Vector2(-5f, (float) queueY);
+	Vector2 qpos2 = new Vector2(-4f, (float) queueY);
+	Vector2 qpos3 = new Vector2(-3f, (float) queueY);
 	Square[,] board;
 
 
@@ -41,16 +42,34 @@ public class SquareManager : MonoBehaviour {
 	}
 
 	public void initBoard(){
-		board = new Square[BOARDSIZE, BOARDSIZE];
+		board = new Square[BOARDSIZEX, BOARDSIZEY];
 		//initialize level w/ ground squares (read from text file?)
+		for (int i = 0; i < BOARDSIZEX; i++) {
+			Square s = addSquare (new Vector2(i,0), true);
+//			s.init (new Vector2 (i, 0), -1, true);
+			board [i, 0] = s;
 
+		}
 	}
 
 	//dequeues square and places it at pos, then updates queue
 	public void placeSquare(Vector2 pos){
-		Square square = queue.Dequeue ();
-		square.setPosition (pos);
-		updateQueue();
+		if (checkBounds (pos) && board [(int) pos.x, (int)pos.y] == null) {
+			Square square = queue.Dequeue ();
+			square.setPosition (pos);
+			board [(int)pos.x, (int)pos.y] = square;
+			updateQueue ();
+		} else {
+			print ("nO");
+		}
+
+	}
+
+	public bool checkBounds(Vector2 pos){
+		if ((pos.x >= 0 && pos.x < BOARDSIZEX) && (pos.y >= 0 && pos.y < BOARDSIZEY)) {
+			return true;
+		}
+		return false;
 
 	}
 
@@ -59,7 +78,7 @@ public class SquareManager : MonoBehaviour {
 		Queue<Square> newq = new Queue<Square> ();
 		while (queue.Count > 0) {
 			Square s = queue.Dequeue ();
-			s.setPosition (new Vector2(s.getPosition ().x + 1f, queueY));
+			s.setPosition (new Vector2(s.getPosition ().x - 1f, queueY));
 			newq.Enqueue (s);
 		}
 		queue = newq;
@@ -75,7 +94,11 @@ public class SquareManager : MonoBehaviour {
 
 		square.transform.parent = squareFolder.transform;
 		square.transform.position = new Vector3 (pos.x, pos.y, 0);
-		square.init (pos, getColor (), isGround);
+		if (isGround) {
+			square.init (pos, -1, true);
+		} else {
+			square.init (pos, getColor (), false);
+		}
 
 		squares.Add (square);
 		square.name = "Square " + squares.Count;

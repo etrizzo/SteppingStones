@@ -12,23 +12,23 @@ public class SquareModel : MonoBehaviour
 
 		this.owner = owner;
 		transform.parent = owner.transform;					// Set the model's parent to the gem.
-		transform.localPosition = new Vector3(0,0,0);		// Center the model on the parent.
+		transform.localPosition = new Vector3(.5f,-.5f,0);		// Center the model on the parent.
 		name = "Square Model";									// Name the object.
 		mat = GetComponent<Renderer>().material;								// Get the material component of this quad object.
 		mat.shader = Shader.Find("Sprites/Default"); 
 		mat.mainTexture = Resources.Load<Texture2D>("Textures/tileBlank");	// Set the texture.  Must be in Resources folder.
 		switch(owner.getColor()){
 			case 0:
-				mat.color = Color.red;											// Set the color (easy way to tint things).
+			mat.color = Color.cyan;											// Set the color (easy way to tint things).
 				break;
 			case 1:
-				mat.color = Color.green;
+				mat.color = Color.magenta;
 				break;
 			case 2:
-				mat.color = Color.blue;
+				mat.color = Color.yellow;
 				break;
 			default:
-				mat.color = Color.white;
+				mat.color = Color.black;
 				break;
 		}
 	}

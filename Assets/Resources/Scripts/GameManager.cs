@@ -11,7 +11,8 @@ public class GameManager : MonoBehaviour {
 	SquareManager sqman;
 
 	void Start () {
-		sqman = new SquareManager ();
+		GameObject sqmanObject = new GameObject ();
+		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.init ();
 	}
 

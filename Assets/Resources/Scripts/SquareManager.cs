@@ -16,6 +16,8 @@ public class SquareManager : MonoBehaviour {
 	Vector2 qpos3 = new Vector2(-3f, (float) queueY);
 	Square[,] board;
 
+	float counter = 0f;
+
 
 	public void init(){
 		squareFolder = new GameObject();
@@ -36,9 +38,11 @@ public class SquareManager : MonoBehaviour {
 		Square s1 = addSquare(qpos1, false);
 		Square s2 = addSquare (qpos2, false);
 		Square s3 = addSquare (qpos3, false);
+
 		queue.Enqueue (s1);
 		queue.Enqueue (s2);
 		queue.Enqueue (s3);
+
 	}
 
 	public void initBoard(){
@@ -59,11 +63,32 @@ public class SquareManager : MonoBehaviour {
 			square.setPosition (pos);
 			board [(int)pos.x, (int)pos.y] = square;
 			updateQueue ();
+			settleSquare (square);
+
 		} else {
 			print ("nO");
 		}
 
 	}
+
+	public void settleSquare(Square s){
+
+		Vector2 pos = s.getPosition ();
+		Square below = board [(int)pos.x, (int)(pos.y - 1)];
+		if (below == null) {
+			counter = 0f;
+			print ("Square is at: " + s.getPosition ());
+
+			board [(int)pos.x, (int)pos.y] = null;
+			board [(int)pos.x, (int)pos.y - 1] = s;
+			s.setPosition (new Vector2 (pos.x, pos.y - 1));
+			print ("Square is at: " + s.getPosition ());
+
+			settleSquare (s);
+		}
+
+	}
+
 
 	public bool checkBounds(Vector2 pos){
 		if ((pos.x >= 0 && pos.x < BOARDSIZEX) && (pos.y >= 0 && pos.y < BOARDSIZEY)) {

@@ -7,6 +7,7 @@ public class SquareModel : MonoBehaviour
 	//private float clock;		// Keep track of time since creation for animation.
 	private Square owner;			// Pointer to the parent object.
 	private Material mat;		// Material for setting/changing texture and color.
+//	public Rigidbody2D rb;
 
 	public void init(Square owner) {
 
@@ -14,6 +15,9 @@ public class SquareModel : MonoBehaviour
 		transform.parent = owner.transform;					// Set the model's parent to the gem.
 		transform.localPosition = new Vector3(.5f,-.5f,0);		// Center the model on the parent.
 		name = "Square Model";									// Name the object.
+
+
+
 		mat = GetComponent<Renderer>().material;								// Get the material component of this quad object.
 		mat.shader = Shader.Find("Sprites/Default"); 
 		mat.mainTexture = Resources.Load<Texture2D>("Textures/tileBlank");	// Set the texture.  Must be in Resources folder.
@@ -31,6 +35,8 @@ public class SquareModel : MonoBehaviour
 				mat.color = Color.black;
 				break;
 		}
+
+
 	}
 
 

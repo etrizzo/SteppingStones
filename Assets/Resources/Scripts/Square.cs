@@ -6,13 +6,17 @@ public class Square : MonoBehaviour {
 	private SquareModel model;
 	private int color;		//0-r,1-g,2-b
 	private Vector2 pos;
-	private bool isGround;
+	private bool ground;
+//	private bool inqueue;
+
+	private bool isFalling;
 
 
 
 	public void init(Vector2 pos, int color, bool isGround){
 		this.pos = pos;
 		this.color = color;
+		this.ground = isGround;
 
 		var modelObject = GameObject.CreatePrimitive (PrimitiveType.Quad);
 		model = modelObject.AddComponent<SquareModel> ();
@@ -46,5 +50,10 @@ public class Square : MonoBehaviour {
 		//check for conflicts and return the conflicting square
 		return this;
 	}
+
+	public bool isGround(){
+		return ground;
+	}
+
 
 }

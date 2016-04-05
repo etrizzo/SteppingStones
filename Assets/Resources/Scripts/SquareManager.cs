@@ -64,7 +64,7 @@ public class SquareManager : MonoBehaviour {
 			board [(int)pos.x, (int)pos.y] = square;
 			updateQueue ();
 			settleSquare (square);
-
+			checkConflicts (square);
 		} else {
 			print ("nO");
 		}
@@ -77,16 +77,69 @@ public class SquareManager : MonoBehaviour {
 		Square below = board [(int)pos.x, (int)(pos.y - 1)];
 		if (below == null) {
 			counter = 0f;
-			print ("Square is at: " + s.getPosition ());
+			//("Square is at: " + s.getPosition ());
 
 			board [(int)pos.x, (int)pos.y] = null;
 			board [(int)pos.x, (int)pos.y - 1] = s;
 			s.setPosition (new Vector2 (pos.x, pos.y - 1));
-			print ("Square is at: " + s.getPosition ());
+			//("Square is at: " + s.getPosition ());
 
 			settleSquare (s);
 		}
+	}
 
+	public void checkConflicts(Square s){
+		Vector2 pos = s.getPosition ();
+		Square below = board [(int)pos.x, (int)(pos.y - 1)];
+		Square left = board [(int)(pos.x-1), (int)pos.y];
+		Square right = board [(int)(pos.x+1), (int)pos.y];
+		if (below.getColor () == s.getColor ()) {
+			resolveConflict (s, below);
+		}
+		if (left != null && left.getColor () == s.getColor ()) {
+			resolveConflict (s, left);
+		}
+		if (right != null && right.getColor () == s.getColor ()) {
+			resolveConflict (s, right);
+		}
+	}
+
+	public void resolveConflict (Square s, Square c){
+		Vector2 sPos = s.getPosition ();
+		Vector2 cPos = c.getPosition ();
+		board [(int)sPos.x, (int)sPos.y] = null;
+		board [(int)cPos.x, (int)cPos.y] = null;
+		Destroy (s.gameObject);
+		Destroy (c.gameObject);
+
+		s = board [(int)sPos.x, (int)(sPos.y + 1)];
+		c = board [(int)cPos.x, (int)(cPos.y + 1)];
+		resolveConflictHelper (s);
+		resolveConflictHelper (c);
+		/*while (s != null) {
+			sPos = s.getPosition ();
+			Square sAbove = board [(int)sPos.x, (int)(sPos.y + 1)];
+			settleSquare (s);
+			checkConflicts (s);
+			s = sAbove;
+		}
+		while (c != null) {
+			cPos = c.getPosition ();
+			Square cAbove = board [(int)cPos.x, (int)(cPos.y + 1)];
+			settleSquare (c);
+			checkConflicts (c);
+			c = cAbove;
+		}*/
+	}
+
+	public void resolveConflictHelper(Square s){
+		while (s != null) {
+			Vector2 sPos = s.getPosition ();
+			Square sAbove = board [(int)sPos.x, (int)(sPos.y + 1)];
+			settleSquare (s);
+			checkConflicts (s);
+			s = sAbove;
+		}
 	}
 
 

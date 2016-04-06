@@ -9,7 +9,7 @@ public class Square : MonoBehaviour {
 	private bool ground;
 //	private bool inqueue;
 
-	private bool isFalling;
+	private bool falling;
 
 
 
@@ -53,6 +53,14 @@ public class Square : MonoBehaviour {
 
 	public bool isGround(){
 		return ground;
+	}
+
+	public bool isFalling(){
+		return falling;
+	}
+
+	public void setFalling(bool f){
+		falling = f;
 	}
 
 

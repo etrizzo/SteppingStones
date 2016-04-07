@@ -44,7 +44,7 @@ public class SquareModel : MonoBehaviour
 
 		switch(owner.getColor()){
 			case 0:
-			mat.color = Color.cyan;											// Set the color (easy way to tint things).
+				mat.color = Color.cyan;											// Set the color (easy way to tint things).
 				break;
 			case 1:
 				mat.color = Color.magenta;

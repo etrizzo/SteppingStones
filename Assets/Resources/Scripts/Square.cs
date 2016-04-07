@@ -9,14 +9,15 @@ public class Square : MonoBehaviour {
 	private bool ground;
 //	private bool inqueue;
 
-	private bool isFalling;
+	private int type; 	//0-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow
 
 
 
-	public void init(Vector2 pos, int color, bool isGround){
+	public void init(Vector2 pos, int color, bool isGround = false, int type = 0){
 		this.pos = pos;
 		this.color = color;
 		this.ground = isGround;
+		this.type = type;
 
 		var modelObject = GameObject.CreatePrimitive (PrimitiveType.Quad);
 		model = modelObject.AddComponent<SquareModel> ();
@@ -31,8 +32,22 @@ public class Square : MonoBehaviour {
 		return color;
 	}
 
+	public int getType(){
+		return type;
+	}
+
+	public int setType(int t){
+		this.type = t;
+		return this.type;
+	}
+
 	public int setColor(int c){
-		color = c;
+		this.color = c;
+		return color;
+	}
+
+	public int setModelColor(float c){
+		model.mat.color = model.mat.color * c;
 		return color;
 	}
 
@@ -53,6 +68,12 @@ public class Square : MonoBehaviour {
 
 	public bool isGround(){
 		return ground;
+	}
+
+	public void destroy(){
+		DestroyImmediate (this.model);
+		DestroyImmediate (this.gameObject);
+
 	}
 
 

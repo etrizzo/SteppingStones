@@ -4,12 +4,13 @@ using System.Collections.Generic;
 
 public class Square : MonoBehaviour {
 	private SquareModel model;
-	private int color;		//0-r,1-g,2-b
+	private int color;		//0-c,1-m,2-y,-1-k
 	private Vector2 pos;
 	private bool ground;
 //	private bool inqueue;
 
 	private int type; 	//0-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow
+	private bool falling;
 
 
 
@@ -69,11 +70,18 @@ public class Square : MonoBehaviour {
 	public bool isGround(){
 		return ground;
 	}
-
+		
 	public void destroy(){
 		DestroyImmediate (this.model);
 		DestroyImmediate (this.gameObject);
+	}
 
+	public bool isFalling(){
+		return falling;
+	}
+
+	public void setFalling(bool f){
+		falling = f;
 	}
 
 

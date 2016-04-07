@@ -71,6 +71,7 @@ public class SquareManager : MonoBehaviour {
 
 	//dequeues square and places it at pos, then updates queue
 	public void placeSquare(Vector2 pos){
+//<<<<<<< HEAD
 		if (checkBounds (pos)) {		//check to make sure clicking in the board
 				Square atPos = board [(int)pos.x, (int)pos.y];
 			if (atPos == null) {			//check if clicking on an existing block
@@ -80,17 +81,15 @@ public class SquareManager : MonoBehaviour {
 					square.setPosition (pos);
 					board [(int)pos.x, (int)pos.y] = square;
 					updateQueue ();
-					settleSquare (square);
-					if (square.getType () > 1) {
-						activate (square);
-					}
+					StartCoroutine(settleSquare (square));
+
 				} else {						//if placing a movable block, place the moving block
 					Vector2 oldpos = moving.getPosition ();
 					board [(int)oldpos.x, (int)oldpos.y] = null;
 					moving.setPosition (pos);
 					moving.setModelColor (2f);
 					board [(int)pos.x, (int)pos.y] = moving;
-					settleSquare (moving);
+					StartCoroutine(settleSquare (moving));
 					moving = null;
 					chainSettle (oldpos);
 
@@ -100,6 +99,14 @@ public class SquareManager : MonoBehaviour {
 				clickOnBlock (atPos, pos);
 			}
 
+//=======
+//		if (checkBounds (pos) && board [(int) pos.x, (int)pos.y] == null) {
+//			Square square = queue.Dequeue ();
+//			square.setPosition (pos);
+//			board [(int)pos.x, (int)pos.y] = square;
+//			updateQueue ();
+//			StartCoroutine(settleSquare (square));
+//>>>>>>> 73897d6ca961dd270b83a659362f37ccb315c8ec
 		} else {
 			print ("nO");
 		}
@@ -131,27 +138,30 @@ public class SquareManager : MonoBehaviour {
 	public void activate(Square s){
 		int type = s.getType ();
 		Vector2 pos = s.getPosition ();
-		if (type == 2) {			//erase one below
-			Square below = board [(int)pos.x, (int)pos.y - 1];
-			if (!below.isGround ()) {
-				below.destroy ();
-			}
-			s.destroy ();
-		} else if (type == 3) {			//booomb
-			for (int i = -1; i < 2; i++) {
-				for (int j = 1; j > -2; j--) {
-					int newx =(int) pos.x + i;
-					int newy = (int) pos.y + j;
-					if (newx < BOARDSIZEX && newx >= 0 && newy < BOARDSIZEY && newy >= 0) {
-						Square neighbor = board [newx, newy];
-						if (neighbor != null && !neighbor.isGround()) {
-							neighbor.destroy ();
-							chainSettle (new Vector2 (newx, newy));
+		Square below = board [(int)pos.x, (int)pos.y - 1];
+		if (below != null) {
+			if (type == 2) {			//erase one below
+				
+				if (!below.isGround ()) {
+					below.destroy ();
+				}
+				s.destroy ();
+			} else if (type == 3) {			//booomb
+				for (int i = -1; i < 2; i++) {
+					for (int j = 1; j > -2; j--) {
+						int newx = (int)pos.x + i;
+						int newy = (int)pos.y + j;
+						if (newx < BOARDSIZEX && newx >= 0 && newy < BOARDSIZEY && newy >= 0) {
+							Square neighbor = board [newx, newy];
+							if (neighbor != null && !neighbor.isGround ()) {
+								neighbor.destroy ();
+								chainSettle (new Vector2 (newx, newy));
+							}
 						}
 					}
 				}
-			}
 
+			}
 		}
 
 
@@ -161,14 +171,15 @@ public class SquareManager : MonoBehaviour {
 		if (pos.y < BOARDSIZEY - 1) {
 			Square above = board [(int)pos.x, (int)pos.y + 1];
 			if (above != null) {
-				settleSquare (above);
+				StartCoroutine(settleSquare (above));
 			}
 		}
 
 	}
 
-	public void settleSquare(Square s){
-
+	IEnumerator settleSquare(Square s){
+		Debug.Log("Settling square!");
+		yield return new WaitForSeconds (.25f);
 		Vector2 pos = s.getPosition ();
 		Square below = board [(int)pos.x, (int)(pos.y - 1)];
 		Square above = null;
@@ -177,19 +188,67 @@ public class SquareManager : MonoBehaviour {
 		}
 		if (below == null) {
 			counter = 0f;
-//			print ("Square is at: " + s.getPosition ());
-
 			board [(int)pos.x, (int)pos.y] = null;
 			board [(int)pos.x, (int)pos.y - 1] = s;
 			s.setPosition (new Vector2 (pos.x, pos.y - 1));
-//			print ("Square is at: " + s.getPosition ());
-
-			settleSquare (s);
+//<<<<<<< HEAD
+////			print ("Square is at: " + s.getPosition ());
+//
+//			StartCoroutine(settleSquare (s));
 			if (above != null) {
-				settleSquare (above);
+				StartCoroutine(settleSquare (above));
+			}
+//=======
+			yield return new WaitForSeconds (.25f);
+			//("Square is at: " + s.getPosition ());
+			StartCoroutine (settleSquare (s));
+		} else {
+			Debug.Log("Checking conflicts!");
+			checkConflicts (s);
+			if (s.getType () > 1) {
+				activate (s);
 			}
 		}
+	}
 
+	public void checkConflicts(Square s){
+		Vector2 pos = s.getPosition ();
+		Square below = board [(int)pos.x, (int)(pos.y - 1)];
+		Square left = board [(int)(pos.x-1), (int)pos.y];
+		Square right = board [(int)(pos.x+1), (int)pos.y];
+		if (below != null && below.getColor () == s.getColor ()) {
+			resolveConflict (s, below);
+		}
+		if (left != null && left.getColor () == s.getColor ()) {
+			resolveConflict (s, left);
+		}
+		if (right != null && right.getColor () == s.getColor ()) {
+			resolveConflict (s, right);
+		}
+	}
+
+	public void resolveConflict (Square s, Square c){
+		Vector2 sPos = s.getPosition ();
+		Vector2 cPos = c.getPosition ();
+		board [(int)sPos.x, (int)sPos.y] = null;
+		board [(int)cPos.x, (int)cPos.y] = null;
+		Destroy (s.gameObject);
+		Destroy (c.gameObject);
+
+		s = board [(int)sPos.x, (int)(sPos.y + 1)];
+		c = board [(int)cPos.x, (int)(cPos.y + 1)];
+		resolveConflictHelper (s);
+		resolveConflictHelper (c);
+	}
+
+	public void resolveConflictHelper(Square s){
+		while (s != null) {
+			Vector2 sPos = s.getPosition ();
+			Square sAbove = board [(int)sPos.x, (int)(sPos.y + 1)];
+			StartCoroutine(settleSquare (s));
+			checkConflicts (s);
+			s = sAbove;
+		}
 	}
 
 

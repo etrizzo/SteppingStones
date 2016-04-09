@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 public class SquareManager : MonoBehaviour {
 	
-	GameObject squareFolder;
-	List<Square> squares;
+	public GameObject squareFolder;
+	public List<Square> squares;
 
 	Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
 	static int BOARDSIZEX = 24;
@@ -39,7 +39,8 @@ public class SquareManager : MonoBehaviour {
 	public int getSquareType(){
 		float r = Random.value;
 		if (r < .4) {
-			return (int)Mathf.Floor (r * 10);
+//			return (int)Mathf.Floor (r * 10);
+			return 5;
 		} 
 		return 0;
 	}
@@ -71,17 +72,21 @@ public class SquareManager : MonoBehaviour {
 
 	//dequeues square and places it at pos, then updates queue
 	public void placeSquare(Vector2 pos){
-//<<<<<<< HEAD
 		if (checkBounds (pos)) {		//check to make sure clicking in the board
 				Square atPos = board [(int)pos.x, (int)pos.y];
 			if (atPos == null) {			//check if clicking on an existing block
 				if (moving == null) {			//if not moving a movable block, try to place from queue
-					
 					Square square = queue.Dequeue ();
-					square.setPosition (pos);
-					board [(int)pos.x, (int)pos.y] = square;
-					updateQueue ();
-					StartCoroutine(settleSquare (square));
+					if (square.isAnchor ()) {
+						// do rigid stuff
+						square.rigid.grow ();
+					} else {
+						// Place it like normal if it's not an anchor
+						square.setPosition (pos);
+						board [(int)pos.x, (int)pos.y] = square;
+						updateQueue ();
+						StartCoroutine (settleSquare (square));
+					}
 
 				} else {						//if placing a movable block, place the moving block
 					Vector2 oldpos = moving.getPosition ();
@@ -98,15 +103,6 @@ public class SquareManager : MonoBehaviour {
 			} else {		//if clicking on an existing block
 				clickOnBlock (atPos, pos);
 			}
-
-//=======
-//		if (checkBounds (pos) && board [(int) pos.x, (int)pos.y] == null) {
-//			Square square = queue.Dequeue ();
-//			square.setPosition (pos);
-//			board [(int)pos.x, (int)pos.y] = square;
-//			updateQueue ();
-//			StartCoroutine(settleSquare (square));
-//>>>>>>> 73897d6ca961dd270b83a659362f37ccb315c8ec
 		} else {
 			print ("nO");
 		}
@@ -286,6 +282,11 @@ public class SquareManager : MonoBehaviour {
 		} else {
 			int type = getSquareType ();
 			square.init (pos, getColor (type), false, type);
+
+			if (type == 5) {
+				RigidShape rs = new RigidShape ();
+				rs.init (square, board, this); // initeedededddd
+			}
 		}
 
 		squares.Add (square);

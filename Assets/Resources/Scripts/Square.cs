@@ -11,6 +11,8 @@ public class Square : MonoBehaviour {
 
 	private int type; 	//0-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow
 	private bool falling;
+	private bool anchor;
+	public RigidShape rigid;
 
 
 
@@ -84,5 +86,12 @@ public class Square : MonoBehaviour {
 		falling = f;
 	}
 
+	// Rigid Class Stuff
+	public bool isAnchor(){
+		return anchor;
+	}
 
+	public void setAnchor(bool a){
+		anchor = a;
+	}
 }

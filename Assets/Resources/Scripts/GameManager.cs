@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 		GameObject sqmanObject = new GameObject ();
 		sqman = sqmanObject.AddComponent<SquareManager> ();
+		sqman.name = "Square Manager";
 		sqman.init ();
 	}
 

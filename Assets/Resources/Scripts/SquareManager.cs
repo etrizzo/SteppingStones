@@ -6,6 +6,8 @@ public class SquareManager : MonoBehaviour {
 	
 	public GameObject squareFolder;
 	public List<Square> squares;
+	public GameObject rsFolder;
+	public List<RigidShape> rigidshapes;
 
 	Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
 	static int BOARDSIZEX = 24;
@@ -23,7 +25,11 @@ public class SquareManager : MonoBehaviour {
 
 	public void init(){
 		squareFolder = new GameObject();
+		squareFolder.name = "Squares";
 		squares = new List<Square> ();
+		rsFolder = new GameObject ();
+		rsFolder.name = "Rigid Shapes";
+		rigidshapes = new List<RigidShape> ();
 		initQueue ();		//initialize queue w/ 3 initial blocks
 		initBoard();
 	}
@@ -284,8 +290,7 @@ public class SquareManager : MonoBehaviour {
 			square.init (pos, getColor (type), false, type);
 
 			if (type == 5) {
-				RigidShape rs = new RigidShape ();
-				rs.init (square, board, this); // initeedededddd
+				RigidShape rs = makeRigidShape(square);
 			}
 		}
 
@@ -294,6 +299,17 @@ public class SquareManager : MonoBehaviour {
 
 		return square;
 
+	}
+
+	public RigidShape makeRigidShape(Square square){
+		GameObject rsObject = new GameObject ();
+		RigidShape rs = rsObject.AddComponent<RigidShape> ();
+		rs.transform.parent = rsFolder.transform;
+		rs.transform.position = square.transform.position;
+		rigidshapes.Add (rs);
+		rs.name = "Rigid Shape " + rigidshapes.Count;
+		rs.init (square, board, this); // initeedededddd
+		return rs;
 	}
 }
 

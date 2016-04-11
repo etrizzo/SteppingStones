@@ -8,6 +8,10 @@ public class SquareManager : MonoBehaviour {
 	public List<Square> squares;
 	public GameObject rsFolder;
 	public List<RigidShape> rigidshapes;
+	public AudioSource settleAudio;
+	public AudioClip settleClip;
+	public AudioSource conflictAudio;
+	public AudioClip conflictClip;
 
 	Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
 	static int BOARDSIZEX = 24;
@@ -33,9 +37,22 @@ public class SquareManager : MonoBehaviour {
 		rigidshapes = new List<RigidShape> ();
 		initBoard();
 		initQueue ();		//initialize queue w/ 3 initial blocks
-
+		initSound ();
 	}
 
+	void initSound(){
+		settleAudio = this.gameObject.AddComponent<AudioSource> ();
+		settleAudio.loop = false;
+		settleAudio.playOnAwake = false;
+		settleClip = Resources.Load<AudioClip> ("Audio/Blocks Settle");
+		settleAudio.clip = settleClip;
+
+		conflictAudio = this.gameObject.AddComponent<AudioSource> ();
+		conflictAudio.loop = false;
+		conflictAudio.playOnAwake = false;
+		conflictClip = Resources.Load<AudioClip> ("Audio/Block Colors Match");
+		conflictAudio.clip = conflictClip;
+	}
 
 	public int getColor(int type){
 		if (type <= 1) {
@@ -184,7 +201,6 @@ public class SquareManager : MonoBehaviour {
 
 	IEnumerator settleSquare(Square s){
 		//Debug.Log("Settling square!");
-		yield return new WaitForSeconds (.25f);
 		Vector2 pos = s.getPosition ();
 		Square below = board [(int)pos.x, (int)(pos.y - 1)];
 		Square above = null;
@@ -192,6 +208,7 @@ public class SquareManager : MonoBehaviour {
 			above = board [(int)pos.x, (int)(pos.y + 1)];
 		}
 		if (below == null) {
+			yield return new WaitForSeconds (.5f);
 			counter = 0f;
 			board [(int)pos.x, (int)pos.y] = null;
 			board [(int)pos.x, (int)pos.y - 1] = s;
@@ -199,31 +216,38 @@ public class SquareManager : MonoBehaviour {
 			if (above != null) {
 				StartCoroutine(settleSquare (above));
 			}
-			yield return new WaitForSeconds (.25f);
 			//("Square is at: " + s.getPosition ());
 			StartCoroutine (settleSquare (s));
 		} else {
 			//Debug.Log("Checking conflicts!");
-			checkConflicts (s);
-			if (s.getType () > 1) {
-				activate (s);
-			}
+			settleAudio.Play();
+			StartCoroutine(checkConflicts (s));
 		}
 	}
 
-	public void checkConflicts(Square s){
+	IEnumerator checkConflicts(Square s){
+		yield return new WaitForSeconds (.25f);
 		Vector2 pos = s.getPosition ();
 		Square below = board [(int)pos.x, (int)(pos.y - 1)];
 		Square left = board [(int)(pos.x-1), (int)pos.y];
 		Square right = board [(int)(pos.x+1), (int)pos.y];
 		if (below != null && below.getColor () == s.getColor ()) {
+			yield return new WaitForSeconds (.25f);
+			conflictAudio.Play();
 			resolveConflict (s, below);
 		}
 		if (left != null && left.getColor () == s.getColor ()) {
+			yield return new WaitForSeconds (.25f);
+			conflictAudio.Play();
 			resolveConflict (s, left);
 		}
 		if (right != null && right.getColor () == s.getColor ()) {
+			yield return new WaitForSeconds (.25f);
+			conflictAudio.Play();
 			resolveConflict (s, right);
+		}
+		if (s.getType () > 1) {
+			activate (s);
 		}
 	}
 

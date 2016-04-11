@@ -113,6 +113,8 @@ public class RigidShape : MonoBehaviour {
 		sm.squares.Add (square);
 		square.name = "Square " + sm.squares.Count;
 
+		board [(int)pos.x, (int)pos.y] = square;
+
 		return square;
 
 	}
@@ -155,6 +157,9 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	void checkConflicts(){
+		foreach(Square s in squares){
+			StartCoroutine (sm.checkConflicts (s));
+		}
 	}
 
 	public Color getColor(int c){

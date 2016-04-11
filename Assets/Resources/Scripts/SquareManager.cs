@@ -225,7 +225,7 @@ public class SquareManager : MonoBehaviour {
 		}
 	}
 
-	IEnumerator checkConflicts(Square s){
+	public IEnumerator checkConflicts(Square s){
 		yield return new WaitForSeconds (.25f);
 		Vector2 pos = s.getPosition ();
 		Square below = board [(int)pos.x, (int)(pos.y - 1)];
@@ -256,12 +256,16 @@ public class SquareManager : MonoBehaviour {
 		Vector2 cPos = c.getPosition ();
 		board [(int)sPos.x, (int)sPos.y] = null;
 		board [(int)cPos.x, (int)cPos.y] = null;
+		if (c.rigid != null) {
+//			print ("breaking " + c.rigid);
+			breakShape (c.rigid);
+		}
 		if (s.rigid != null) {
-			print ("breaking " + s.rigid);
+			//			print ("breaking " + c.rigid);
 			breakShape (s.rigid);
 		}
-		Destroy (s.gameObject);
-		Destroy (c.gameObject);
+		DestroyImmediate (s.gameObject);
+		DestroyImmediate (c.gameObject);
 
 		s = board [(int)sPos.x, (int)(sPos.y + 1)];
 		c = board [(int)cPos.x, (int)(cPos.y + 1)];
@@ -275,7 +279,6 @@ public class SquareManager : MonoBehaviour {
 			Vector2 sPos = s.getPosition ();
 			Square sAbove = board [(int)sPos.x, (int)(sPos.y + 1)];
 			StartCoroutine(settleSquare (s));
-			checkConflicts (s);
 			s = sAbove;
 		}
 	}

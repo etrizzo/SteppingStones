@@ -9,7 +9,7 @@ public class Square : MonoBehaviour {
 	private bool ground;
 //	private bool inqueue;
 
-	private int type; 	//0-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow, 5-shape
+	private int type; 	//-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow, 5-shape
 	private bool falling;
 	public bool anchor;
 	public RigidShape rigid;
@@ -62,13 +62,7 @@ public class Square : MonoBehaviour {
 	public Vector2 getPosition(){
 		return pos;
 	}
-
-
-	public Square checkConflicts(){
-		//check for conflicts and return the conflicting square
-		return this;
-	}
-
+		
 	public bool isGround(){
 		return ground;
 	}

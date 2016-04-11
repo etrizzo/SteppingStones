@@ -7,8 +7,9 @@ public class RigidShape : MonoBehaviour {
 	// 0 = _
 	// 1 = l
 	int shapeType = -1;
-	int color1;
-	int color2;
+	Color color1;
+	Color color2;
+	int c1, c2;
 	Square[] squares = new Square[5];
 	Square anchor;
 	Square[,] board;
@@ -22,11 +23,14 @@ public class RigidShape : MonoBehaviour {
 		board = b;
 		this.sm = sm;
 		shapeType = generateTypeProbability();
-		color1 = getColor ();
-		color2 = color1;
-		while (color2 == color1) {
-			color2 = getColor ();
+		c1 = getColorInt ();
+		c2 = getColorInt ();
+		while (c1 == c2) {
+			c2 = getColorInt ();
 		}
+		color1 = getColor (c1);
+		color2 = getColor(c2);
+
 		squares [0] = anchor;
 
 		updateModel ();
@@ -36,12 +40,14 @@ public class RigidShape : MonoBehaviour {
 
 	private void updateModel() {
 		// Do stuff to update model MANUALLY UGH
-		for (int i = 0; i < 5; i++) {
-			Square s = squares [i];
-			if (s != null) {
-				//update model
-			}
+		Mesh mesh = anchor.model.GetComponent<MeshFilter>().mesh;
+		Vector2[] uv = mesh.uv;
+		Color[] colors = new Color[uv.Length];
+		for (var i = 0; i < uv.Length; i++) {
+			colors [i] = Color.Lerp (color1, color2, uv [i].x);
 		}
+		mesh.colors = colors;
+
 	}
 
 
@@ -67,9 +73,16 @@ public class RigidShape : MonoBehaviour {
 	private void grow__() {
 		Vector2 pos = anchor.getPosition ();
 		Vector2 new_pos;
+		anchor.model.GetComponent<MeshFilter> ().mesh.Clear ();
+		anchor.setColor (c1);
+		anchor.model.mat.color = color1;
 		for (int i = 1; i <= 4; i++) {
 			new_pos = new Vector2 (pos.x + i, pos.y);
-			squares [i] = addSquare (new_pos);
+			if (i % 2 == 0) {
+				squares [i] = addSquare (new_pos, c1);
+			} else {
+				squares [i] = addSquare (new_pos, c2);
+			}
 		}
 	}
 
@@ -79,13 +92,13 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	// ---
-	public Square addSquare(Vector2 pos){
+	public Square addSquare(Vector2 pos, int c){
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
 		square.transform.parent = sm.squareFolder.transform;
 		square.transform.position = new Vector3 (pos.x, pos.y, 0);
-		square.init (pos, 4, false, 5);
+		square.init (pos, 4, false, c);
 		square.rigid = this;
 
 		sm.squares.Add (square);
@@ -124,6 +137,7 @@ public class RigidShape : MonoBehaviour {
 		for (int i = 0; i < 5; i++) {
 			s = squares [i];
 			pos = s.getPosition ();
+			print (pos);
 			below = board [(int)pos.x, (int)(pos.y - 1)];
 			if (below != null && below.rigid != s.rigid) {
 				return false;
@@ -135,7 +149,26 @@ public class RigidShape : MonoBehaviour {
 	void checkConflicts(){
 	}
 
-	public int getColor(){
+	public Color getColor(int c){
+		switch (c) {
+		case 0:
+			return Color.cyan;
+			break;
+		case 1:
+			return Color.magenta;
+			break;
+		case 2:
+			return Color.yellow;
+			break;
+		default:
+			return Color.white;
+			break;
+		}
+	}
+
+	public int getColorInt(){
 		return Random.Range (0, 3);
 	}
+
+	
 }

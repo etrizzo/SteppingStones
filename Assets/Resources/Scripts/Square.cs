@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Square : MonoBehaviour {
-	private SquareModel model;
+	public SquareModel model;
 	private int color;		//0-c,1-m,2-y,-1-k
 	private Vector2 pos;
 	private bool ground;

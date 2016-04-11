@@ -275,7 +275,6 @@ public class SquareManager : MonoBehaviour {
 			Vector2 sPos = s.getPosition ();
 			Square sAbove = board [(int)sPos.x, (int)(sPos.y + 1)];
 			StartCoroutine(settleSquare (s));
-			checkConflicts (s);
 			s = sAbove;
 		}
 	}

@@ -118,11 +118,9 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	public IEnumerator settleShape(){
-		Debug.Log("Settling shape!");
 		Vector2 pos;
-		yield return new WaitForSeconds (.25f);
 		bool settle = checkSettle ();
-
+		Debug.Log("Settling shape! " +settle);
 		if (settle) {
 			foreach(Square s in squares){
 				pos = s.getPosition ();
@@ -130,11 +128,12 @@ public class RigidShape : MonoBehaviour {
 				board [(int)pos.x, (int)pos.y - 1] = s;
 				s.setPosition (new Vector2 (pos.x, pos.y - 1));
 			}
-			yield return new WaitForSeconds (.25f);
+			yield return new WaitForSeconds (.5f);
 			StartCoroutine (settleShape ());
 		}
 		else {
 			//Debug.Log("Checking conflicts!");
+			sm.settleAudio.Play();
 			checkConflicts ();
 		}
 	}

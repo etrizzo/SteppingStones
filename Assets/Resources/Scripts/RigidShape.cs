@@ -65,7 +65,7 @@ public class RigidShape : MonoBehaviour {
 
 		switch (shapeType) {
 		case 0:
-			grow__();
+			StartCoroutine(grow__());
 			break;
 
 		default:
@@ -74,7 +74,7 @@ public class RigidShape : MonoBehaviour {
 		}
 	}
 
-	private void grow__() {
+	private IEnumerator grow__() {
 		Vector2 pos = anchor.getPosition ();
 		Vector2 new_pos;
 		Mesh mesh = anchor.model.GetComponent<MeshFilter> ().mesh;
@@ -87,12 +87,15 @@ public class RigidShape : MonoBehaviour {
 		anchor.model.mat.color = color1;
 		for (int i = 1; i <= 4; i++) {
 			new_pos = new Vector2 (pos.x + i, pos.y);
+			yield return new WaitForSeconds (.25f);
 			if (i % 2 == 0) {
 				squares [i] = addSquare (new_pos, c1);
 			} else {
 				squares [i] = addSquare (new_pos, c2);
 			}
 		}
+		yield return new WaitForSeconds (.25f);
+		StartCoroutine (settleShape ());
 	}
 
 
@@ -185,6 +188,10 @@ public class RigidShape : MonoBehaviour {
 
 	public Square[] getSquares(){
 		return squares;
+	}
+
+	public bool checkValidGrow(Vector2 pos){
+		return true;
 	}
 
 

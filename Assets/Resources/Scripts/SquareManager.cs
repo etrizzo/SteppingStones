@@ -101,17 +101,28 @@ public class SquareManager : MonoBehaviour {
 				Square atPos = board [(int)pos.x, (int)pos.y];
 			if (atPos == null) {			//check if clicking on an existing block
 				if (moving == null) {			//if not moving a movable block, try to place from queue
-					Square square = queue.Dequeue ();
-					square.setPosition (pos);
-					board [(int)pos.x, (int)pos.y] = square;
-					updateQueue ();
-					if (square.isAnchor ()) {
-						// do rigid stuff
-						square.rigid.grow ();
-						StartCoroutine (square.rigid.settleShape ());
-					} else {
-						// Place it like normal if it's not an anchor
-						StartCoroutine (settleSquare (square));
+					bool place = true;
+					Square next = queue.Peek();
+					if (next.isAnchor ()) {
+						place = false;
+						if (next.rigid.checkValidGrow (pos)) {
+							place = true;
+						}
+					}
+
+					if (place) {
+						Square square = queue.Dequeue ();
+						square.setPosition (pos);
+						board [(int)pos.x, (int)pos.y] = square;
+						updateQueue ();
+						if (square.isAnchor ()) {
+							// do rigid stuff
+							square.rigid.grow ();
+
+						} else {
+							// Place it like normal if it's not an anchor
+							StartCoroutine (settleSquare (square));
+						}
 					}
 
 				} else {						//if placing a movable block, place the moving block
@@ -133,7 +144,7 @@ public class SquareManager : MonoBehaviour {
 			print ("nO");
 		}
 	}
-
+		
 
 	//performs actions when clicking on an existing block depending on the block type
 	public void clickOnBlock(Square atPos, Vector2 pos){
@@ -201,27 +212,31 @@ public class SquareManager : MonoBehaviour {
 
 	IEnumerator settleSquare(Square s){
 		//Debug.Log("Settling square!");
-		Vector2 pos = s.getPosition ();
-		Square below = board [(int)pos.x, (int)(pos.y - 1)];
-		Square above = null;
-		if (pos.y < BOARDSIZEY - 1) {
-			above = board [(int)pos.x, (int)(pos.y + 1)];
-		}
-		if (below == null) {
-			yield return new WaitForSeconds (.5f);
-			counter = 0f;
-			board [(int)pos.x, (int)pos.y] = null;
-			board [(int)pos.x, (int)pos.y - 1] = s;
-			s.setPosition (new Vector2 (pos.x, pos.y - 1));
-			if (above != null) {
-				StartCoroutine(settleSquare (above));
+		if (s.rigid == null) {
+			Vector2 pos = s.getPosition ();
+			Square below = board [(int)pos.x, (int)(pos.y - 1)];
+			Square above = null;
+			if (pos.y < BOARDSIZEY - 1) {
+				above = board [(int)pos.x, (int)(pos.y + 1)];
 			}
-			//("Square is at: " + s.getPosition ());
-			StartCoroutine (settleSquare (s));
+			if (below == null) {
+				yield return new WaitForSeconds (.5f);
+				counter = 0f;
+				board [(int)pos.x, (int)pos.y] = null;
+				board [(int)pos.x, (int)pos.y - 1] = s;
+				s.setPosition (new Vector2 (pos.x, pos.y - 1));
+				if (above != null) {
+					StartCoroutine (settleSquare (above));
+				}
+				//("Square is at: " + s.getPosition ());
+				StartCoroutine (settleSquare (s));
+			} else {
+				//Debug.Log("Checking conflicts!");
+				settleAudio.Play ();
+				StartCoroutine (checkConflicts (s));
+			}
 		} else {
-			//Debug.Log("Checking conflicts!");
-			settleAudio.Play();
-			StartCoroutine(checkConflicts (s));
+			StartCoroutine(s.rigid.settleShape ());
 		}
 	}
 
@@ -231,23 +246,34 @@ public class SquareManager : MonoBehaviour {
 		Square below = board [(int)pos.x, (int)(pos.y - 1)];
 		Square left = board [(int)(pos.x-1), (int)pos.y];
 		Square right = board [(int)(pos.x+1), (int)pos.y];
+		Square above = board [(int)(pos.x), (int)pos.y+1];
+		bool conflict = false;
 		if (below != null && below.getColor () == s.getColor ()) {
-			yield return new WaitForSeconds (.25f);
+			conflict = true;
 			conflictAudio.Play();
 			resolveConflict (s, below);
 		}
 		if (left != null && left.getColor () == s.getColor ()) {
-			yield return new WaitForSeconds (.25f);
+			conflict = true;
 			conflictAudio.Play();
 			resolveConflict (s, left);
 		}
 		if (right != null && right.getColor () == s.getColor ()) {
-			yield return new WaitForSeconds (.25f);
+			conflict = true;
 			conflictAudio.Play();
 			resolveConflict (s, right);
 		}
+		if (above != null && right.getColor () == s.getColor ()) {
+			conflict = true;
+			conflictAudio.Play();
+			resolveConflict (s, above);
+		}
 		if (s.getType () > 1) {
 			activate (s);
+		}
+		if (conflict) {
+			Destroy (s.gameObject);
+			yield return new WaitForSeconds (.25f);
 		}
 	}
 
@@ -264,8 +290,8 @@ public class SquareManager : MonoBehaviour {
 			//			print ("breaking " + c.rigid);
 			breakShape (s.rigid);
 		}
-		DestroyImmediate (s.gameObject);
-		DestroyImmediate (c.gameObject);
+
+		Destroy (c.gameObject);
 
 		s = board [(int)sPos.x, (int)(sPos.y + 1)];
 		c = board [(int)cPos.x, (int)(cPos.y + 1)];

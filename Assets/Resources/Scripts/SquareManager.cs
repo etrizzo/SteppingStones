@@ -31,8 +31,9 @@ public class SquareManager : MonoBehaviour {
 		rsFolder = new GameObject ();
 		rsFolder.name = "Rigid Shapes";
 		rigidshapes = new List<RigidShape> ();
-		initQueue ();		//initialize queue w/ 3 initial blocks
 		initBoard();
+		initQueue ();		//initialize queue w/ 3 initial blocks
+
 	}
 
 
@@ -231,6 +232,10 @@ public class SquareManager : MonoBehaviour {
 		Vector2 cPos = c.getPosition ();
 		board [(int)sPos.x, (int)sPos.y] = null;
 		board [(int)cPos.x, (int)cPos.y] = null;
+		if (s.rigid != null) {
+			print ("breaking " + s.rigid);
+			breakShape (s.rigid);
+		}
 		Destroy (s.gameObject);
 		Destroy (c.gameObject);
 
@@ -238,6 +243,7 @@ public class SquareManager : MonoBehaviour {
 		c = board [(int)cPos.x, (int)(cPos.y + 1)];
 		resolveConflictHelper (s);
 		resolveConflictHelper (c);
+
 	}
 
 	public void resolveConflictHelper(Square s){
@@ -313,5 +319,16 @@ public class SquareManager : MonoBehaviour {
 		rs.init (square, board, this); // initeedededddd
 		return rs;
 	}
+
+	public void breakShape(RigidShape rs){
+		foreach (Square s in rs.getSquares()) {
+			s.rigid = null;
+			StartCoroutine(settleSquare (s));
+		}
+		DestroyImmediate (rs);
+	}
+
 }
+
+
 

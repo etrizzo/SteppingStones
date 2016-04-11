@@ -13,6 +13,7 @@ public class RigidShape : MonoBehaviour {
 	Square[] squares = new Square[5];
 	Square anchor;
 	Square[,] board;
+	Color[] acolors;
 
 	SquareManager sm;
 
@@ -38,6 +39,8 @@ public class RigidShape : MonoBehaviour {
 		//Debug.Log ("Rigid Shape inited!");
 	}
 
+
+
 	private void updateModel() {
 		// Do stuff to update model MANUALLY UGH
 		Mesh mesh = anchor.model.GetComponent<MeshFilter>().mesh;
@@ -46,6 +49,7 @@ public class RigidShape : MonoBehaviour {
 		for (var i = 0; i < uv.Length; i++) {
 			colors [i] = Color.Lerp (color1, color2, uv [i].x);
 		}
+		acolors = mesh.colors;
 		mesh.colors = colors;
 
 	}
@@ -73,7 +77,12 @@ public class RigidShape : MonoBehaviour {
 	private void grow__() {
 		Vector2 pos = anchor.getPosition ();
 		Vector2 new_pos;
-		anchor.model.GetComponent<MeshFilter> ().mesh.Clear ();
+		Mesh mesh = anchor.model.GetComponent<MeshFilter> ().mesh;
+//		Color[] colors = new Color[mesh.uv.Length];
+//		for (var i = 0; i < mesh.uv.Length; i++) {
+//			colors [i] = color1;
+//		}
+		mesh.colors = acolors;
 		anchor.setColor (c1);
 		anchor.model.mat.color = color1;
 		for (int i = 1; i <= 4; i++) {
@@ -88,7 +97,7 @@ public class RigidShape : MonoBehaviour {
 
 
 	private void grow_l() {
-		
+		//stuff
 	}
 
 	// ---
@@ -98,7 +107,7 @@ public class RigidShape : MonoBehaviour {
 
 		square.transform.parent = sm.squareFolder.transform;
 		square.transform.position = new Vector3 (pos.x, pos.y, 0);
-		square.init (pos, 4, false, c);
+		square.init (pos, c, false, 0);
 		square.rigid = this;
 
 		sm.squares.Add (square);
@@ -137,7 +146,6 @@ public class RigidShape : MonoBehaviour {
 		for (int i = 0; i < 5; i++) {
 			s = squares [i];
 			pos = s.getPosition ();
-			print (pos);
 			below = board [(int)pos.x, (int)(pos.y - 1)];
 			if (below != null && below.rigid != s.rigid) {
 				return false;
@@ -169,6 +177,14 @@ public class RigidShape : MonoBehaviour {
 	public int getColorInt(){
 		return Random.Range (0, 3);
 	}
+
+
+	public Square[] getSquares(){
+		return squares;
+	}
+
+
+
 
 	
 }

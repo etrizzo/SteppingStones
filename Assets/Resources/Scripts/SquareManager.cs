@@ -83,14 +83,15 @@ public class SquareManager : MonoBehaviour {
 			if (atPos == null) {			//check if clicking on an existing block
 				if (moving == null) {			//if not moving a movable block, try to place from queue
 					Square square = queue.Dequeue ();
+					square.setPosition (pos);
+					board [(int)pos.x, (int)pos.y] = square;
+					updateQueue ();
 					if (square.isAnchor ()) {
 						// do rigid stuff
 						square.rigid.grow ();
+						StartCoroutine (square.rigid.settleShape ());
 					} else {
 						// Place it like normal if it's not an anchor
-						square.setPosition (pos);
-						board [(int)pos.x, (int)pos.y] = square;
-						updateQueue ();
 						StartCoroutine (settleSquare (square));
 					}
 
@@ -180,7 +181,7 @@ public class SquareManager : MonoBehaviour {
 	}
 
 	IEnumerator settleSquare(Square s){
-		Debug.Log("Settling square!");
+		//Debug.Log("Settling square!");
 		yield return new WaitForSeconds (.25f);
 		Vector2 pos = s.getPosition ();
 		Square below = board [(int)pos.x, (int)(pos.y - 1)];
@@ -193,19 +194,14 @@ public class SquareManager : MonoBehaviour {
 			board [(int)pos.x, (int)pos.y] = null;
 			board [(int)pos.x, (int)pos.y - 1] = s;
 			s.setPosition (new Vector2 (pos.x, pos.y - 1));
-//<<<<<<< HEAD
-////			print ("Square is at: " + s.getPosition ());
-//
-//			StartCoroutine(settleSquare (s));
 			if (above != null) {
 				StartCoroutine(settleSquare (above));
 			}
-//=======
 			yield return new WaitForSeconds (.25f);
 			//("Square is at: " + s.getPosition ());
 			StartCoroutine (settleSquare (s));
 		} else {
-			Debug.Log("Checking conflicts!");
+			//Debug.Log("Checking conflicts!");
 			checkConflicts (s);
 			if (s.getType () > 1) {
 				activate (s);

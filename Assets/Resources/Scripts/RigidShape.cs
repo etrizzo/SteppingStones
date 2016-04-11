@@ -123,7 +123,7 @@ public class RigidShape : MonoBehaviour {
 		Square below;
 		for (int i = 0; i < 5; i++) {
 			s = squares [i];
-			pos = s.getPosition ();	
+			pos = s.getPosition ();
 			below = board [(int)pos.x, (int)(pos.y - 1)];
 			if (below != null && below.rigid != s.rigid) {
 				return false;

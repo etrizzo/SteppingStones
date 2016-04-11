@@ -20,6 +20,7 @@ public class SquareManager : MonoBehaviour {
 
 	float counter = 0f;
 	public Square moving = null;
+	public bool firstSquare = true;
 //	float randFreq = .2;
 
 
@@ -283,6 +284,11 @@ public class SquareManager : MonoBehaviour {
 			square.init (pos, -1, true);
 		} else {
 			int type = getSquareType ();
+			//hardcode normal square for first square
+			if (firstSquare) {
+				type = 0;
+				firstSquare = false;
+			}
 			square.init (pos, getColor (type), false, type);
 
 			if (type == 5) {

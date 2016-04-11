@@ -14,8 +14,8 @@ public class SquareManager : MonoBehaviour {
 	public AudioClip conflictClip;
 
 	Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
-	static int BOARDSIZEX = 24;
-	static int BOARDSIZEY = 16;
+	public int BOARDSIZEX = 24;
+	public int BOARDSIZEY = 16;
 	static int queueY = -2;
 	Vector2 qpos1 = new Vector2(-5f, (float) queueY);
 	Vector2 qpos2 = new Vector2(-4f, (float) queueY);
@@ -25,6 +25,8 @@ public class SquareManager : MonoBehaviour {
 	float counter = 0f;
 	public Square moving = null;
 	public bool firstSquare = true;
+	public Square destination;		//TODO: TEMPORARY :O
+
 //	float randFreq = .2;
 
 
@@ -93,6 +95,28 @@ public class SquareManager : MonoBehaviour {
 			board [i, 0] = s;
 
 		}
+
+
+		destination = makeDestination ();
+	}
+
+	public Square makeDestination(){
+		int y = Random.Range (4, BOARDSIZEY);
+
+
+		GameObject squareObject = new GameObject ();
+		Square square = squareObject.AddComponent<Square> ();
+
+//		square.transform.parent = squareFolder.transform;
+		square.transform.position = new Vector3 (BOARDSIZEX, y, 0);
+		square.init(new Vector2((float)(BOARDSIZEX), (float)y), 4, false);
+
+		square.name = "DESTINATION";
+
+		return square;
+
+
+
 	}
 
 	//dequeues square and places it at pos, then updates queue
@@ -105,7 +129,7 @@ public class SquareManager : MonoBehaviour {
 					Square next = queue.Peek();
 					if (next.isAnchor ()) {
 						place = false;
-						if (next.rigid.checkValidGrow (pos)) {
+						if (next.rigid.checkValidGrow (pos, 0, 5)) {	//TODO: figure out for different shapes 
 							place = true;
 						}
 					}
@@ -263,7 +287,7 @@ public class SquareManager : MonoBehaviour {
 			conflictAudio.Play();
 			resolveConflict (s, right);
 		}
-		if (above != null && right.getColor () == s.getColor ()) {
+		if (above != null && above.getColor () == s.getColor ()) {
 			conflict = true;
 			conflictAudio.Play();
 			resolveConflict (s, above);

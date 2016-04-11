@@ -20,6 +20,7 @@ public class SquareModel : MonoBehaviour
 
 		mat = GetComponent<Renderer>().material;								// Get the material component of this quad object.
 		mat.shader = Shader.Find("Sprites/Default"); 
+
 		switch (owner.getType ()) {	//0-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow
 
 			case 1: 
@@ -53,6 +54,9 @@ public class SquareModel : MonoBehaviour
 				mat.color = Color.yellow;
 				break;
 			case 3:
+				mat.color = Color.white;
+				break;
+			case 4:
 				mat.color = Color.white;
 				break;
 			default:

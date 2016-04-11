@@ -160,7 +160,9 @@ public class RigidShape : MonoBehaviour {
 
 	void checkConflicts(){
 		foreach(Square s in squares){
-			StartCoroutine (sm.checkConflicts (s));
+			if (s != null) {
+				StartCoroutine (sm.checkConflicts (s));
+			}
 		}
 	}
 
@@ -190,9 +192,28 @@ public class RigidShape : MonoBehaviour {
 		return squares;
 	}
 
-	public bool checkValidGrow(Vector2 pos){
-		return true;
+	public bool checkValidGrow(Vector2 pos, int height, int width){
+		if (pos.x + width < sm.BOARDSIZEX && pos.y < sm.BOARDSIZEY) {		//anchor should always be bottom left
+			for (int i = 0; i < height; i++) {
+				if (board [(int)pos.x, (int)(pos.y + i)] != null) {
+					print ("invalid place");
+					return false;
+				}
+			}
+			for (int i = 0; i < width; i++) {
+				if (board [(int)(pos.x + i), (int)pos.y] != null) {
+					print ("invalid place");
+					return false;
+				}
+			}
+			return true;
+		}
+		print ("off edge of board");
+		return false;
 	}
+
+
+
 
 
 

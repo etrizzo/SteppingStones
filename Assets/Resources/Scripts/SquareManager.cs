@@ -405,7 +405,44 @@ public class SquareManager : MonoBehaviour {
 		DestroyImmediate (rs);
 	}
 
+	public bool boardSolved() {
+		// Short circuit, because if the last column's block 1 below the destination isn't a square, then there's no point running the alg.
+		if (destinationClose() && pathValid()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private bool destinationClose() {
+		bool ret;
+		if (board[BOARDSIZEX - 1, (int) destination.getPosition().y - 1] != null) {
+			ret = true;
+		} else {
+			ret = false;
+		}
+
+		print ("destinationClose turned out to be " + ret);
+		return ret;
+	}
+
+	private bool pathValid() {
+		// TODO: Lol this is not real code! Validate paths
+		if (true) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// -------------
+	// All GUI code down here, basically just because lol
+	void OnGUI() {
+		if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
+			boardSolved ();
+		}
+
+	}
+
 }
-
-
 

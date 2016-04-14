@@ -10,7 +10,7 @@ public class Square : MonoBehaviour {
 //	private bool inqueue;
 
 	private int type; 	//-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow, 5-shape
-	private bool falling;
+	public bool falling;
 	public bool anchor;
 	public RigidShape rigid;
 

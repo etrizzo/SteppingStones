@@ -63,11 +63,19 @@ public class SquareManager : MonoBehaviour {
 		return 3;
 	}
 
-	public int getSquareType(){
+	////-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow, 5-shape
+	public int getSquareType(){		
 		float r = Random.value;
-		if (r < .4) {
-//			return (int)Mathf.Floor (r * 10);
-			return 5;
+		if (r < .3) {
+			float type = Random.value;
+			if (type < .2) {
+				return Random.Range (2, 4);
+			} else if (type < .5) {
+				return 1;
+			} else {
+				return Random.Range (4, 6);
+			}
+//			return Random.Range(1,6);
 		} 
 		return 0;
 	}
@@ -122,8 +130,9 @@ public class SquareManager : MonoBehaviour {
 	//dequeues square and places it at pos, then updates queue
 	public void placeSquare(Vector2 pos){
 		if (checkBounds (pos)) {		//check to make sure clicking in the board
-				Square atPos = board [(int)pos.x, (int)pos.y];
-			if (atPos == null) {			//check if clicking on an existing block
+			Square atPos = board [(int)pos.x, (int)pos.y];
+			Square above = board [(int)pos.x, (int)pos.y + 1];
+			if (atPos == null && above == null) {			//check if clicking on an existing block
 				if (moving == null) {			//if not moving a movable block, try to place from queue
 					bool place = true;
 					Square next = queue.Peek();
@@ -135,7 +144,9 @@ public class SquareManager : MonoBehaviour {
 					}
 
 					if (place) {
+						
 						Square square = queue.Dequeue ();
+						square.setFalling (true);
 						square.setPosition (pos);
 						board [(int)pos.x, (int)pos.y] = square;
 						updateQueue ();
@@ -162,7 +173,9 @@ public class SquareManager : MonoBehaviour {
 
 				}
 			} else {		//if clicking on an existing block
-				clickOnBlock (atPos, pos);
+				if (atPos != null) {
+					clickOnBlock (atPos, pos);
+				}
 			}
 		} else {
 			print ("nO");
@@ -172,21 +185,23 @@ public class SquareManager : MonoBehaviour {
 
 	//performs actions when clicking on an existing block depending on the block type
 	public void clickOnBlock(Square atPos, Vector2 pos){
-		if (atPos.getType () == 1) {		// if it's a movable block, move it.
-			if (atPos != moving) {
-				if (moving != null) {
-					moving.setModelColor (2);
+		if (!atPos.isFalling()) {
+			if (atPos.getType () == 1) {		// if it's a movable block, move it.
+				if (atPos != moving) {
+					if (moving != null) {
+						moving.setModelColor (2);
+					}
+					moving = atPos;
+					moving.setModelColor (.5f);
 				}
-				moving = atPos;
-				moving.setModelColor (.5f);
-			}
-		} else {
-			Square next = queue.Peek ();		//if next block in the queue is eraser,
-			if (next.getType () == 2) {			//erase the block clicked on
-				queue.Dequeue ().destroy ();
-				atPos.destroy ();
-				updateQueue ();
-				chainSettle (pos);
+			} else {
+				Square next = queue.Peek ();		//if next block in the queue is eraser,
+				if (next.getType () == 2) {			//erase the block clicked on
+					queue.Dequeue ().destroy ();
+					atPos.destroy ();
+					updateQueue ();
+					chainSettle (pos);
+				}
 			}
 		}
 	}
@@ -243,6 +258,8 @@ public class SquareManager : MonoBehaviour {
 			if (pos.y < BOARDSIZEY - 1) {
 				above = board [(int)pos.x, (int)(pos.y + 1)];
 			}
+
+				
 			if (below == null) {
 				yield return new WaitForSeconds (.5f);
 				counter = 0f;
@@ -255,9 +272,16 @@ public class SquareManager : MonoBehaviour {
 				//("Square is at: " + s.getPosition ());
 				StartCoroutine (settleSquare (s));
 			} else {
-				//Debug.Log("Checking conflicts!");
-				settleAudio.Play ();
-				StartCoroutine (checkConflicts (s));
+				if (below != null && below.isFalling ()) {
+					yield return new WaitForSeconds (.25f);
+					StartCoroutine (settleSquare (s));
+				} else {
+					//Debug.Log("Checking conflicts!");
+					print(s + " has landed on " + below);
+					s.setFalling(false);
+					settleAudio.Play ();
+					StartCoroutine (checkConflicts (s));
+				}
 			}
 		} else {
 			StartCoroutine(s.rigid.settleShape ());
@@ -399,8 +423,11 @@ public class SquareManager : MonoBehaviour {
 
 	public void breakShape(RigidShape rs){
 		foreach (Square s in rs.getSquares()) {
-			s.rigid = null;
-			StartCoroutine(settleSquare (s));
+			if (s != null) {
+				s.rigid = null;
+				s.setFalling (true);
+				StartCoroutine (settleSquare (s));
+			}
 		}
 		DestroyImmediate (rs);
 	}

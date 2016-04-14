@@ -75,6 +75,7 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	private IEnumerator grow__() {
+		anchor.setFalling (true);
 		Vector2 pos = anchor.getPosition ();
 		Vector2 new_pos;
 		Mesh mesh = anchor.model.GetComponent<MeshFilter> ().mesh;
@@ -117,7 +118,7 @@ public class RigidShape : MonoBehaviour {
 		square.name = "Square " + sm.squares.Count;
 
 		board [(int)pos.x, (int)pos.y] = square;
-
+		square.setFalling (true);
 		return square;
 
 	}
@@ -125,7 +126,7 @@ public class RigidShape : MonoBehaviour {
 	public IEnumerator settleShape(){
 		Vector2 pos;
 		bool settle = checkSettle ();
-		Debug.Log("Settling shape! " +settle);
+//		Debug.Log("Settling shape! " +settle);
 		if (settle) {
 			foreach(Square s in squares){
 				pos = s.getPosition ();
@@ -137,9 +138,19 @@ public class RigidShape : MonoBehaviour {
 			StartCoroutine (settleShape ());
 		}
 		else {
+			setShapeFalling (false);
 			//Debug.Log("Checking conflicts!");
 			sm.settleAudio.Play();
 			checkConflicts ();
+		}
+	}
+
+	public void setShapeFalling(bool b){
+		foreach (Square s in squares) {
+			Vector2 pos = s.getPosition ();
+			Square below = board [(int)(pos.x), (int)(pos.y - 1)];
+			print(s + " has landed on " + below);
+			s.setFalling (b);
 		}
 	}
 
@@ -151,7 +162,7 @@ public class RigidShape : MonoBehaviour {
 			s = squares [i];
 			pos = s.getPosition ();
 			below = board [(int)pos.x, (int)(pos.y - 1)];
-			if (below != null && below.rigid != s.rigid) {
+			if (below != null && below.rigid != s.rigid && !below.isFalling()) {
 				return false;
 			}
 		}

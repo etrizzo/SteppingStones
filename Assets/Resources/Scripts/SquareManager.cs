@@ -26,6 +26,7 @@ public class SquareManager : MonoBehaviour {
 	public Square moving = null;
 	public bool firstSquare = true;
 	public Square destination;		//TODO: TEMPORARY :O
+	public Square beginning;		//TODO: TEMPORARY :O
 
 //	float randFreq = .2;
 
@@ -97,26 +98,29 @@ public class SquareManager : MonoBehaviour {
 		}
 
 
-		destination = makeDestination ();
+		destination = makeExtremeSquare ("destination");
+		beginning = makeExtremeSquare ("beginning");
 	}
 
-	public Square makeDestination(){
+	public Square makeExtremeSquare(string type){
+		int x = 0;
+		if (type == "beginning") {
+			x = 0;
+		} else if (type == "destination") {
+			x = BOARDSIZEX;
+		}
 		int y = Random.Range (4, BOARDSIZEY);
-
 
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
 //		square.transform.parent = squareFolder.transform;
-		square.transform.position = new Vector3 (BOARDSIZEX, y, 0);
-		square.init(new Vector2((float)(BOARDSIZEX), (float)y), 4, false);
+		square.transform.position = new Vector3 (x, y, 0);
+		square.init(new Vector2((float) x, (float) y), 4, false);
 
-		square.name = "DESTINATION";
+		square.name = type;
 
 		return square;
-
-
-
 	}
 
 	//dequeues square and places it at pos, then updates queue
@@ -406,12 +410,15 @@ public class SquareManager : MonoBehaviour {
 	}
 
 	public bool boardSolved() {
+		bool solved;
 		// Short circuit, because if the last column's block 1 below the destination isn't a square, then there's no point running the alg.
 		if (destinationClose() && pathValid()) {
-			return true;
+			solved = true;
 		} else {
-			return false;
+			solved = false;
 		}
+		Debug.Log ("Did you solve the board? : " + solved);
+		return solved;
 	}
 
 	private bool destinationClose() {
@@ -433,6 +440,33 @@ public class SquareManager : MonoBehaviour {
 		} else {
 			return false;
 		}
+	}
+
+	private Square getNextSquare(Square sq) {
+		Square twoUp = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y + 1];
+		Square[] possibleNextSquares = new Square[3];
+		possibleNextSquares[0] = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y - 1];
+		possibleNextSquares[1] = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y];
+		possibleNextSquares[2] = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y + 1];
+
+		// Check the cases of these!
+
+		// First, return false if we don't have a clearance of two spaces!
+		bool clear = twoUp == null;
+		if (!clear) {
+			// Don't meet clearance, return that fact.
+			return null;
+		}
+
+		// Check next possible squares to touch
+		foreach (Square possibleNext in possibleNextSquares) {
+			if (possibleNext != null) {
+				return possibleNext;
+			}
+		}
+
+		// If we make it here, return null to indicate that there's more than a two difference
+		return null;
 	}
 
 	// -------------

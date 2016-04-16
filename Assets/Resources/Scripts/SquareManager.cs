@@ -16,11 +16,12 @@ public class SquareManager : MonoBehaviour {
 	Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
 	public int BOARDSIZEX = 24;
 	public int BOARDSIZEY = 16;
-	static int queueY = -2;
-	Vector2 qpos1 = new Vector2(-5f, (float) queueY);
-	Vector2 qpos2 = new Vector2(-4f, (float) queueY);
-	Vector2 qpos3 = new Vector2(-3f, (float) queueY);
+	static int queueY = -1;
+	Vector2 qpos1 = new Vector2(-4f, (float) queueY);
+	Vector2 qpos2 = new Vector2(-3f, (float) queueY);
+	Vector2 qpos3 = new Vector2(-2f, (float) queueY);
 	Square[,] board;
+	int[] q;
 
 	float counter = 0f;
 	public Square moving = null;
@@ -31,14 +32,18 @@ public class SquareManager : MonoBehaviour {
 //	float randFreq = .2;
 
 
-	public void init(){
+	public void init(Square[,] board, int[] q){
 		squareFolder = new GameObject();
 		squareFolder.name = "Squares";
 		squares = new List<Square> ();
 		rsFolder = new GameObject ();
 		rsFolder.name = "Rigid Shapes";
 		rigidshapes = new List<RigidShape> ();
-		initBoard();
+//		initBoard();
+		this.board = board;
+		this.q = q;
+		this.BOARDSIZEX = board.GetLength (0);
+		this.BOARDSIZEY = board.GetLength(1);
 		initQueue ();		//initialize queue w/ 3 initial blocks
 		initSound ();
 	}
@@ -66,19 +71,8 @@ public class SquareManager : MonoBehaviour {
 
 	////-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow, 5-shape
 	public int getSquareType(){		
-		float r = Random.value;
-		if (r < .3) {
-			float type = Random.value;
-			if (type < .2) {
-				return Random.Range (2, 4);
-			} else if (type < .5) {
-				return 1;
-			} else {
-				return Random.Range (4, 6);
-			}
-//			return Random.Range(1,6);
-		} 
-		return 0;
+		int r = Random.Range(0,10);
+		return q [r];
 	}
 
 
@@ -95,25 +89,12 @@ public class SquareManager : MonoBehaviour {
 
 	}
 
-	public void initBoard(){
-		board = new Square[BOARDSIZEX, BOARDSIZEY];
-		//initialize level w/ ground squares (read from text file?)
-		for (int i = 0; i < BOARDSIZEX; i++) {
-			Square s = addSquare (new Vector2(i,0), true);
-//			s.init (new Vector2 (i, 0), -1, true);
-			board [i, 0] = s;
 
-		}
-
-
-		destination = makeExtremeSquare ("destination");
-		beginning = makeExtremeSquare ("beginning");
-	}
 
 	public Square makeExtremeSquare(string type){
 		int x = 0;
 		if (type == "beginning") {
-			x = 0;
+			x = -1;
 		} else if (type == "destination") {
 			x = BOARDSIZEX;
 		}
@@ -130,6 +111,9 @@ public class SquareManager : MonoBehaviour {
 
 		return square;
 	}
+
+
+
 
 	//dequeues square and places it at pos, then updates queue
 	public void placeSquare(Vector2 pos){

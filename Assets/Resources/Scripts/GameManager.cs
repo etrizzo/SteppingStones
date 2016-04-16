@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour {
 
 
 	public void initBoard(){
-		StreamReader sr = new StreamReader ("Assets/Resources/Levels/" + getLevelName ());	//TODO: change this to import a specific level
+		StreamReader sr = new StreamReader ("Assets/Resources/Levels/" + getLevelName ());
 		string line = "";
 		line = sr.ReadLine ();
 		w = int.Parse (line);
@@ -162,7 +162,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public string getLevelName(){		//TODO: make it good
-		return "LTest3.txt";
+		return "LTest.txt";
 
 	}
 }

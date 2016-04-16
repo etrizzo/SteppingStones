@@ -120,7 +120,7 @@ public class SquareManager : MonoBehaviour {
 		if (checkBounds (pos)) {		//check to make sure clicking in the board
 			Square atPos = board [(int)pos.x, (int)pos.y];
 			Square above = board [(int)pos.x, (int)pos.y + 1];
-			if (atPos == null && above == null) {			//check if clicking on an existing block
+			if (atPos == null && (above == null || !above.isFalling())) {			//check if clicking on an existing block
 				if (moving == null) {			//if not moving a movable block, try to place from queue
 					bool place = true;
 					Square next = queue.Peek();
@@ -279,10 +279,22 @@ public class SquareManager : MonoBehaviour {
 	public IEnumerator checkConflicts(Square s){
 		yield return new WaitForSeconds (.25f);
 		Vector2 pos = s.getPosition ();
-		Square below = board [(int)pos.x, (int)(pos.y - 1)];
-		Square left = board [(int)(pos.x-1), (int)pos.y];
-		Square right = board [(int)(pos.x+1), (int)pos.y];
-		Square above = board [(int)(pos.x), (int)pos.y+1];
+		Square below = null;
+		Square left = null;
+		Square right = null;
+		Square above = null;
+		if(!(pos.y-1 < 0)){
+			below = board [(int)pos.x, (int)(pos.y - 1)];
+		}
+		if (!(pos.x - 1 < 0)) {
+			left = board [(int)(pos.x - 1), (int)pos.y];
+		}
+		if(!(pos.x + 1 >= BOARDSIZEX)){
+			right = board [(int)(pos.x+1), (int)pos.y];
+		}
+		if(!(pos.y +1 >= BOARDSIZEY)){
+			above = board [(int)(pos.x), (int)pos.y+1];
+		}
 		bool conflict = false;
 		if (below != null && below.getColor () == s.getColor ()) {
 			conflict = true;

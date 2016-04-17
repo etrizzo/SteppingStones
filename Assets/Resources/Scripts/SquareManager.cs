@@ -12,6 +12,10 @@ public class SquareManager : MonoBehaviour {
 	public AudioClip settleClip;
 	public AudioSource conflictAudio;
 	public AudioClip conflictClip;
+	public AudioSource movOnAudio;
+	public AudioClip movOnClip;
+	public AudioSource movOffAudio;
+	public AudioClip movOffClip;
 
 	Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
 	public int BOARDSIZEX = 24;
@@ -52,6 +56,7 @@ public class SquareManager : MonoBehaviour {
 		settleAudio = this.gameObject.AddComponent<AudioSource> ();
 		settleAudio.loop = false;
 		settleAudio.playOnAwake = false;
+		settleAudio.time = 1.0f;
 		settleClip = Resources.Load<AudioClip> ("Audio/Blocks Settle");
 		settleAudio.clip = settleClip;
 
@@ -60,7 +65,20 @@ public class SquareManager : MonoBehaviour {
 		conflictAudio.playOnAwake = false;
 		conflictClip = Resources.Load<AudioClip> ("Audio/Block Colors Match");
 		conflictAudio.clip = conflictClip;
+
+		movOnAudio = this.gameObject.AddComponent<AudioSource> ();
+		movOnAudio.loop = false;
+		movOnAudio.playOnAwake = false;
+		movOnClip = Resources.Load<AudioClip> ("Audio/Special Blocks/Movable - Pick Up");
+		movOnAudio.clip = movOnClip;
+
+		movOffAudio = this.gameObject.AddComponent<AudioSource> ();
+		movOffAudio.loop = false;
+		movOffAudio.playOnAwake = false;
+		movOffClip = Resources.Load<AudioClip> ("Audio/Special Blocks/Movable - Put Down");
+		movOffAudio.clip = movOffClip;
 	}
+
 
 	public int getColor(int type){
 		if (type <= 1) {
@@ -126,8 +144,20 @@ public class SquareManager : MonoBehaviour {
 					Square next = queue.Peek();
 					if (next.isAnchor ()) {
 						place = false;
-						if (next.rigid.checkValidGrow (pos, 0, 5)) {	//TODO: figure out for different shapes 
-							place = true;
+						switch(next.rigid.shapeType){
+							case 0: // _
+								if (next.rigid.checkValidGrow (pos, 0, 5)) {	//TODO: figure out for different shapes 
+									place = true;
+								}
+								break;
+							case 1: // l
+								if (next.rigid.checkValidGrow (pos, 5, 0)) {
+									place = true;
+								}
+								break;
+							default:
+								place = false;
+								break;
 						}
 					}
 
@@ -154,6 +184,7 @@ public class SquareManager : MonoBehaviour {
 					moving.setPosition (pos);
 					moving.setModelColor (2f);
 					board [(int)pos.x, (int)pos.y] = moving;
+					movOffAudio.Play ();
 					StartCoroutine(settleSquare (moving));
 					moving = null;
 					chainSettle (oldpos);
@@ -181,6 +212,7 @@ public class SquareManager : MonoBehaviour {
 					}
 					moving = atPos;
 					moving.setModelColor (.5f);
+					movOnAudio.Play ();
 				}
 			} else {
 				Square next = queue.Peek ();		//if next block in the queue is eraser,
@@ -424,6 +456,7 @@ public class SquareManager : MonoBehaviour {
 	public void breakShape(RigidShape rs){
 		foreach (Square s in rs.getSquares()) {
 			if (s != null) {
+				s.anchor = false;
 				s.rigid = null;
 				s.setFalling (true);
 				StartCoroutine (settleSquare (s));

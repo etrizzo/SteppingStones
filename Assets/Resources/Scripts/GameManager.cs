@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour {
 	public int h;
 	Square[,] board;
 	int[] q;
+	int[] rsq;
 
 	public GameObject groundSquareFolder;
 	public List<Square> groundSquares;
@@ -26,7 +27,6 @@ public class GameManager : MonoBehaviour {
 		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.name = "Square Manager";
 		sqman.init (board, q);
-
 
 		initSound ();
 	}
@@ -71,10 +71,12 @@ public class GameManager : MonoBehaviour {
 		int destHeight = int.Parse (line);
 		makeDestination (destHeight);
 		q = new int[10];
+		int prob = 0;
+		int start = 0;
 		if (int.Parse (sr.ReadLine()) == 1) {
-			int start = 0;
+			
 			for (int i = 0; i < 6; i++) {
-				int prob = int.Parse (sr.ReadLine ());
+				prob = int.Parse (sr.ReadLine ());
 				for (int j = 0; j < prob; j++) {
 					q [j + start] = i;
 				}
@@ -82,6 +84,14 @@ public class GameManager : MonoBehaviour {
 			}
 
 		}
+		rsq = new int[10];
+		int rsprob;
+		if (prob != 0){			//using rigid shapes
+			
+			rsprob = int.Parse(sr.ReadLine());
+			for (int j = 0; j < rsprob; j++){
+				q[
+
 	}
 
 	public void fixCamera(){

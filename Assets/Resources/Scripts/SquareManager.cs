@@ -89,32 +89,6 @@ public class SquareManager : MonoBehaviour {
 
 	}
 
-
-
-	public Square makeExtremeSquare(string type){
-		int x = 0;
-		if (type == "beginning") {
-			x = -1;
-		} else if (type == "destination") {
-			x = BOARDSIZEX;
-		}
-		int y = Random.Range (4, BOARDSIZEY);
-
-		GameObject squareObject = new GameObject ();
-		Square square = squareObject.AddComponent<Square> ();
-
-//		square.transform.parent = squareFolder.transform;
-		square.transform.position = new Vector3 (x, y, 0);
-		square.init(new Vector2((float) x, (float) y), 4, false);
-
-		square.name = type;
-
-		return square;
-	}
-
-
-
-
 	//dequeues square and places it at pos, then updates queue
 	public void placeSquare(Vector2 pos){
 		if (checkBounds (pos)) {		//check to make sure clicking in the board
@@ -265,7 +239,7 @@ public class SquareManager : MonoBehaviour {
 					StartCoroutine (settleSquare (s));
 				} else {
 					//Debug.Log("Checking conflicts!");
-					print(s + " has landed on " + below);
+//					print(s + " has landed on " + below);
 					s.setFalling(false);
 					settleAudio.Play ();
 					StartCoroutine (checkConflicts (s));
@@ -435,7 +409,7 @@ public class SquareManager : MonoBehaviour {
 	public bool boardSolved() {
 		bool solved;
 		// Short circuit, because if the last column's block 1 below the destination isn't a square, then there's no point running the alg.
-		if (destinationClose() && pathValid()) {
+		if (destinationClose() && pathValid(beginning)) {
 			solved = true;
 		} else {
 			solved = false;
@@ -456,40 +430,85 @@ public class SquareManager : MonoBehaviour {
 		return ret;
 	}
 
-	private bool pathValid() {
-		// TODO: Lol this is not real code! Validate paths
-		if (true) {
-			return true;
-		} else {
-			return false;
+	private bool pathValid(Square curSquare) {
+		if (curSquare != null) {
+			Vector2 pos = curSquare.getPosition ();
+			Debug.Log ("Got a square @: " + pos.x + ", " + pos.y + ")");
+			if (curSquare.getPosition() == destination.getPosition()) {
+				Debug.Log("Destination's position:" + destination.getPosition().x + ", " + destination.getPosition().y);
+				return true;
+			} else {
+				return pathValid (getNextSquare(curSquare));
+			}
 		}
+		return false;
 	}
 
 	private Square getNextSquare(Square sq) {
+		// If the square is the last one in the column, return
+		if (sq == board[BOARDSIZEX - 1, (int) destination.getPosition().y - 1]) {
+			Debug.Log (sq);
+			StartCoroutine(sq.tempHighlight ());
+			return destination;
+		}
 		Square twoUp = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y + 1];
 		Square[] possibleNextSquares = new Square[3];
-		possibleNextSquares[0] = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y - 1];
-		possibleNextSquares[1] = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y];
-		possibleNextSquares[2] = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y + 1];
+
+		for (int i = 0; i <= 2; i++) {
+			getNextPossibleSquare(i, possibleNextSquares, sq);
+			Debug.Log ("pns @ " + i + ": " + possibleNextSquares[i]);
+		}
 
 		// Check the cases of these!
 
-		// First, return false if we don't have a clearance of two spaces!
-		bool clear = twoUp == null;
-		if (!clear) {
-			// Don't meet clearance, return that fact.
-			return null;
-		}
+		// First, return null if we don't have a clearance of two spaces!
+
+		// TODO Temporarily disable this for the test boards lol
+//		bool clear = (twoUp == null);
+//		if (!clear) {
+//			// Don't meet clearance, return that fact.
+//			return null;
+//		}
 
 		// Check next possible squares to touch
 		foreach (Square possibleNext in possibleNextSquares) {
 			if (possibleNext != null) {
+				Debug.Log ("Getting square @::: " + possibleNext.getPosition().x + ", " + possibleNext.getPosition().y);
+				StartCoroutine(sq.tempHighlight ());
+//				possibleNext.printColor ();
 				return possibleNext;
 			}
 		}
 
 		// If we make it here, return null to indicate that there's more than a two difference
+		// Note, it's downward here!
 		return null;
+	}
+
+	private void getNextPossibleSquare(int i, Square[] possibleNextSquares, Square sq) {
+		int y_inc = 0;
+		switch (i) {
+		case 0:
+			y_inc = 1;
+			break;
+		case 1:
+			y_inc = 0;
+			break;
+		case 2:
+			y_inc = -1;
+			break;
+		default:
+			print ("Damn, you fool! Inaccessible possible square.");
+			break;
+		}
+
+		if (!((y_inc == -1 && sq.getPosition().y <= 0) | sq.getPosition().y >= BOARDSIZEY)) {
+			possibleNextSquares[i] = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y + y_inc];
+//			Debug.Log ("Y_inc loop: letting square @: " + possibleNextSquares[i].getPosition().x + ", " + possibleNextSquares[i].getPosition().y);
+		}
+		else {
+			Debug.Log("Square wasn't on the board!");
+		}
 	}
 
 	// -------------

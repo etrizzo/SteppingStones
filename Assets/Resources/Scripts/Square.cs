@@ -88,4 +88,12 @@ public class Square : MonoBehaviour {
 	public void setAnchor(){
 		anchor = true;
 	}
+
+	public IEnumerator tempHighlight() {
+		Color originalColor = (Color) this.model.mat.color;
+		this.model.mat.color = Color.green;
+		yield return new WaitForSeconds(0.5f);
+		this.model.mat.color = originalColor;
+//		yield return null;
+	}
 }

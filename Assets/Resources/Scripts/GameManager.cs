@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour {
 	public GameObject groundSquareFolder;
 	public List<Square> groundSquares;
 
+	public Square destination;
+	public Square beginning;
+
 	void Start () {
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
@@ -27,6 +30,8 @@ public class GameManager : MonoBehaviour {
 		sqman.name = "Square Manager";
 		sqman.init (board, q);
 
+		sqman.beginning = beginning;
+		sqman.destination = destination;
 
 		initSound ();
 	}
@@ -66,10 +71,10 @@ public class GameManager : MonoBehaviour {
 		}
 		line = sr.ReadLine ();
 		int beginHeight = int.Parse (line);
-		makeBeginning (beginHeight);
+		beginning = makeBeginning (beginHeight);
 		line = sr.ReadLine();
 		int destHeight = int.Parse (line);
-		makeDestination (destHeight);
+		destination = makeDestination (destHeight);
 		q = new int[10];
 		if (int.Parse (sr.ReadLine()) == 1) {
 			int start = 0;
@@ -99,7 +104,7 @@ public class GameManager : MonoBehaviour {
 	public void addColumn(int height, int x){
 		for (int i = 0; i <= height; i++) {
 			Square s = addSquare (new Vector2 (x, i), true); 
-			print (s == null);
+//			print (s == null);
 			s.init (new Vector2 (x, i), -1, true);
 			board [x, i] = s;
 		}
@@ -142,6 +147,7 @@ public class GameManager : MonoBehaviour {
 		square.init(new Vector2((float) w, (float) height), 4, false);
 
 		square.name = "Destination";
+//		sqman.destination = square;
 
 		return square;
 	}
@@ -162,7 +168,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public string getLevelName(){		//TODO: make it good
-		return "LTest.txt";
+		return "LTest2.txt";
 
 	}
 }

@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour {
 	Square[,] board;
 	int[] q;
 	int[] rsq;
+	string levelName;
 
 	public GameObject groundSquareFolder;
 	public List<Square> groundSquares;
@@ -293,8 +294,12 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public string getLevelName(){		//TODO: make it good
-		return "LTest2.txt";
+		return levelName;
 
+	}
+
+	void setLevelName(string name){
+		levelName = name;
 	}
 
 	/************************ Start Gui Stuff ****************************/
@@ -333,7 +338,16 @@ public class GameManager : MonoBehaviour {
 		if (!go && !done) {
 			xpos = ((Screen.width) - (60)) / 2;
 			ypos = ((Screen.height) / 2);
-			if (GUI.Button (new Rect (xpos, ypos, 60, 90), "START")) {
+			if (GUI.Button (new Rect (xpos-100, ypos, 100, 90), "Test Level 1")) {
+				setLevelName ("LTest1.txt");
+				state.mode = 1;
+			}
+			if (GUI.Button (new Rect (xpos, ypos, 100, 90), "Test Level 2")) {
+				setLevelName ("LTest2.txt");
+				state.mode = 1;
+			}
+			if (GUI.Button (new Rect (xpos+100, ypos, 100, 90), "Test Level 3")) {
+				setLevelName ("LTest3.txt");
 				state.mode = 1;
 			}
 		}

@@ -12,6 +12,10 @@ public class SquareManager : MonoBehaviour {
 	public AudioClip settleClip;
 	public AudioSource conflictAudio;
 	public AudioClip conflictClip;
+	public AudioSource movOnAudio;
+	public AudioClip movOnClip;
+	public AudioSource movOffAudio;
+	public AudioClip movOffClip;
 
 	Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
 	public int BOARDSIZEX = 24;
@@ -22,6 +26,8 @@ public class SquareManager : MonoBehaviour {
 	Vector2 qpos3 = new Vector2(-2f, (float) queueY);
 	Square[,] board;
 	int[] q;
+	public int[] rsq;
+	public int height;
 
 	float counter = 0f;
 	public Square moving = null;
@@ -32,7 +38,7 @@ public class SquareManager : MonoBehaviour {
 //	float randFreq = .2;
 
 
-	public void init(Square[,] board, int[] q){
+	public void init(Square[,] board, int[] q, int[] rsq = null){
 		squareFolder = new GameObject();
 		squareFolder.name = "Squares";
 		squares = new List<Square> ();
@@ -42,16 +48,19 @@ public class SquareManager : MonoBehaviour {
 //		initBoard();
 		this.board = board;
 		this.q = q;
+		this.rsq = rsq;
 		this.BOARDSIZEX = board.GetLength (0);
 		this.BOARDSIZEY = board.GetLength(1);
 		initQueue ();		//initialize queue w/ 3 initial blocks
 		initSound ();
+		//getHeight ();
 	}
 
 	void initSound(){
 		settleAudio = this.gameObject.AddComponent<AudioSource> ();
 		settleAudio.loop = false;
 		settleAudio.playOnAwake = false;
+		settleAudio.time = 1.0f;
 		settleClip = Resources.Load<AudioClip> ("Audio/Blocks Settle");
 		settleAudio.clip = settleClip;
 
@@ -60,6 +69,32 @@ public class SquareManager : MonoBehaviour {
 		conflictAudio.playOnAwake = false;
 		conflictClip = Resources.Load<AudioClip> ("Audio/Block Colors Match");
 		conflictAudio.clip = conflictClip;
+
+		movOnAudio = this.gameObject.AddComponent<AudioSource> ();
+		movOnAudio.loop = false;
+		movOnAudio.playOnAwake = false;
+		movOnClip = Resources.Load<AudioClip> ("Audio/Special Blocks/Movable - Pick Up");
+		movOnAudio.clip = movOnClip;
+
+		movOffAudio = this.gameObject.AddComponent<AudioSource> ();
+		movOffAudio.loop = false;
+		movOffAudio.playOnAwake = false;
+		movOffClip = Resources.Load<AudioClip> ("Audio/Special Blocks/Movable - Put Down");
+		movOffAudio.clip = movOffClip;
+	}
+
+	void Update(){
+		getHeight ();
+	}
+
+	private void getHeight (){
+		int tallest = 0;
+		foreach (Square s in squares) {
+			if ((int)s.getPosition ().y > tallest) {
+				tallest = (int)s.getPosition ().y;
+			}
+		}
+		height = tallest;
 	}
 
 	public int getColor(int type){
@@ -100,8 +135,20 @@ public class SquareManager : MonoBehaviour {
 					Square next = queue.Peek();
 					if (next.isAnchor ()) {
 						place = false;
-						if (next.rigid.checkValidGrow (pos, 0, 5)) {	//TODO: figure out for different shapes 
-							place = true;
+						switch(next.rigid.shapeType){
+							case 0: // _
+								if (next.rigid.checkValidGrow (pos, 0, 5)) {	//TODO: figure out for different shapes 
+									place = true;
+								}
+								break;
+							case 1: // l
+								if (next.rigid.checkValidGrow (pos, 5, 0)) {
+									place = true;
+								}
+								break;
+							default:
+								place = false;
+								break;
 						}
 					}
 
@@ -128,6 +175,7 @@ public class SquareManager : MonoBehaviour {
 					moving.setPosition (pos);
 					moving.setModelColor (2f);
 					board [(int)pos.x, (int)pos.y] = moving;
+					movOffAudio.Play ();
 					StartCoroutine(settleSquare (moving));
 					moving = null;
 					chainSettle (oldpos);
@@ -155,6 +203,7 @@ public class SquareManager : MonoBehaviour {
 					}
 					moving = atPos;
 					moving.setModelColor (.5f);
+					movOnAudio.Play ();
 				}
 			} else {
 				Square next = queue.Peek ();		//if next block in the queue is eraser,
@@ -248,6 +297,7 @@ public class SquareManager : MonoBehaviour {
 		} else {
 			StartCoroutine(s.rigid.settleShape ());
 		}
+		//getHeight ();
 	}
 
 	public IEnumerator checkConflicts(Square s){
@@ -297,6 +347,7 @@ public class SquareManager : MonoBehaviour {
 			Destroy (s.gameObject);
 			yield return new WaitForSeconds (.25f);
 		}
+		//getHeight (); //TODO: should this be here?
 	}
 
 	public void resolveConflict (Square s, Square c){
@@ -319,7 +370,6 @@ public class SquareManager : MonoBehaviour {
 		c = board [(int)cPos.x, (int)(cPos.y + 1)];
 		resolveConflictHelper (s);
 		resolveConflictHelper (c);
-
 	}
 
 	public void resolveConflictHelper(Square s){
@@ -398,6 +448,7 @@ public class SquareManager : MonoBehaviour {
 	public void breakShape(RigidShape rs){
 		foreach (Square s in rs.getSquares()) {
 			if (s != null) {
+				s.anchor = false;
 				s.rigid = null;
 				s.setFalling (true);
 				StartCoroutine (settleSquare (s));
@@ -517,7 +568,10 @@ public class SquareManager : MonoBehaviour {
 		if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
 			boardSolved ();
 		}
+		if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
+			Application.LoadLevel (Application.loadedLevel);
 
+		}
 	}
 
 }

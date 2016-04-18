@@ -6,7 +6,7 @@ public class RigidShape : MonoBehaviour {
 	// Starting with _
 	// 0 = _
 	// 1 = l
-	int shapeType = -1;
+	public int shapeType = -1; // 0-_, 1-l
 	Color color1;
 	Color color2;
 	int c1, c2;
@@ -14,6 +14,8 @@ public class RigidShape : MonoBehaviour {
 	Square anchor;
 	Square[,] board;
 	Color[] acolors;
+	public AudioSource rsAudio;
+	public AudioClip rsClip;
 
 	SquareManager sm;
 
@@ -34,12 +36,19 @@ public class RigidShape : MonoBehaviour {
 
 		squares [0] = anchor;
 
+		initSound ();
 		updateModel ();
 
 		//Debug.Log ("Rigid Shape inited!");
 	}
 
-
+	void initSound(){
+		rsAudio = this.gameObject.AddComponent<AudioSource> ();
+		rsAudio.loop = false;
+		rsAudio.playOnAwake = false;
+		rsClip = Resources.Load<AudioClip> ("Audio/Special Blocks/Grow 5");
+		rsAudio.clip = rsClip;
+	}
 
 	private void updateModel() {
 		// Do stuff to update model MANUALLY UGH
@@ -52,22 +61,39 @@ public class RigidShape : MonoBehaviour {
 		acolors = mesh.colors;
 		mesh.colors = colors;
 
+		switch (shapeType) {	//0-_l, 1-l
+
+		case 0: 
+			anchor.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/tile__");
+			break;
+		case 1:
+			anchor.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/tile_l");
+			break;
+		default:
+			anchor.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileBlank");	// Set the texture.  Must be in Resources folder.
+			break;
+		}
+
 	}
 
 
 	private int generateTypeProbability() {
 		// Should be adjusted depending on level????????????????????????????????????????????????
-		return (int) Random.Range(0,0);
+		int r = Random.Range(0,10);
+		return sm.rsq [r];
 	}
 
 	public void grow() {
 		// you know, grow and stuff .....
-
+		anchor.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileBlank");
+		rsAudio.Play ();
 		switch (shapeType) {
 		case 0:
 			StartCoroutine(grow__());
 			break;
-
+		case 1:
+			StartCoroutine (grow_l ());
+			break;
 		default:
 			print ("Whoopsies! you hit the default shape case, line 42");
 			break;
@@ -88,7 +114,7 @@ public class RigidShape : MonoBehaviour {
 		anchor.model.mat.color = color1;
 		for (int i = 1; i <= 4; i++) {
 			new_pos = new Vector2 (pos.x + i, pos.y);
-			yield return new WaitForSeconds (.25f);
+			yield return new WaitForSeconds (.08f);
 			if (i % 2 == 0) {
 				squares [i] = addSquare (new_pos, c1);
 			} else {
@@ -100,8 +126,29 @@ public class RigidShape : MonoBehaviour {
 	}
 
 
-	private void grow_l() {
-		//stuff
+	private IEnumerator grow_l() {
+		anchor.setFalling (true);
+		Vector2 pos = anchor.getPosition ();
+		Vector2 new_pos;
+		Mesh mesh = anchor.model.GetComponent<MeshFilter> ().mesh;
+		//		Color[] colors = new Color[mesh.uv.Length];
+		//		for (var i = 0; i < mesh.uv.Length; i++) {
+		//			colors [i] = color1;
+		//		}
+		mesh.colors = acolors;
+		anchor.setColor (c1);
+		anchor.model.mat.color = color1;
+		for (int i = 1; i <= 4; i++) {
+			new_pos = new Vector2 (pos.x, pos.y+i);
+			yield return new WaitForSeconds (.08f);
+			if (i % 2 == 0) {
+				squares [i] = addSquare (new_pos, c1);
+			} else {
+				squares [i] = addSquare (new_pos, c2);
+			}
+		}
+		yield return new WaitForSeconds (.25f);
+		StartCoroutine (settleShape ());
 	}
 
 	// ---
@@ -207,12 +254,14 @@ public class RigidShape : MonoBehaviour {
 		if (pos.x + width < sm.BOARDSIZEX && pos.y < sm.BOARDSIZEY) {		//anchor should always be bottom left
 			for (int i = 0; i < height; i++) {
 				if (board [(int)pos.x, (int)(pos.y + i)] != null) {
+//				if (!checkSpot((int)(pos.x), (int) (pos.y + i))){
 					print ("invalid place");
 					return false;
 				}
 			}
 			for (int i = 0; i < width; i++) {
 				if (board [(int)(pos.x + i), (int)pos.y] != null) {
+//				if (!checkSpot((int)(pos.x + i), (int) (pos.y))){
 					print ("invalid place");
 					return false;
 				}
@@ -221,6 +270,19 @@ public class RigidShape : MonoBehaviour {
 		}
 		print ("off edge of board");
 		return false;
+	}
+
+
+	public bool checkSpot(int x, int y){
+		if (board [x, y] != null) {
+			return false;
+		} else if (y + 1 < sm.BOARDSIZEY) {
+			if (board [x, y] != null && board [x, y].falling) {
+				return false;
+			}
+		}
+		return true;
+
 	}
 
 

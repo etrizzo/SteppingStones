@@ -7,12 +7,25 @@ public class GameManager : MonoBehaviour {
 
 
 	SquareManager sqman;
-	public AudioSource gameAudio;
-	public AudioClip gameClip;
+	public AudioSource gameAudio1;
+	public AudioClip gameClip1;
+	public AudioSource gameAudio2;
+	public AudioClip gameClip2;
+	public AudioSource gameAudio3;
+	public AudioClip gameClip3;
+	public AudioSource gameAudio4;
+	public AudioClip gameClip4;
+	public AudioSource gameAudio5;
+	public AudioClip gameClip5;
+	public AudioSource gameAudio6;
+	public AudioClip gameClip6;
+	public AudioSource gameAudio7;
+	public AudioClip gameClip7;
 	public int w;
 	public int h;
 	Square[,] board;
 	int[] q;
+	int[] rsq;
 
 	public GameObject groundSquareFolder;
 	public List<Square> groundSquares;
@@ -24,33 +37,131 @@ public class GameManager : MonoBehaviour {
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
 		groundSquares = new List<Square> ();
-		GameObject sqmanObject = new GameObject ();
-		initBoard ();
-		sqman = sqmanObject.AddComponent<SquareManager> ();
-		sqman.name = "Square Manager";
-		sqman.init (board, q);
-
-		sqman.beginning = beginning;
-		sqman.destination = destination;
 
 		initSound ();
 	}
 
 	void initSound(){
-		gameAudio = this.gameObject.AddComponent<AudioSource> ();
-		gameAudio.loop = true;
-		gameAudio.playOnAwake = false;
-		gameClip = Resources.Load<AudioClip> ("Audio/Soundtrack Draft 1");
-		gameAudio.clip = gameClip;
-		gameAudio.Play ();
+		gameAudio1 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio1.loop = true;
+		gameAudio1.playOnAwake = false;
+		gameClip1 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 1");
+		gameAudio1.clip = gameClip1;
+		gameAudio1.Play ();
+
+		gameAudio2 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio2.loop = true;
+		gameAudio2.playOnAwake = false;
+		gameClip2 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 2");
+		gameAudio2.clip = gameClip2;
+		gameAudio2.Play ();
+		gameAudio2.mute = true;
+
+		gameAudio3 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio3.loop = true;
+		gameAudio3.playOnAwake = false;
+		gameClip3 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 3");
+		gameAudio3.clip = gameClip3;
+		gameAudio3.Play ();
+		gameAudio3.mute = true;
+
+		gameAudio4 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio4.loop = true;
+		gameAudio4.playOnAwake = false;
+		gameClip4 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 4");
+		gameAudio4.clip = gameClip4;
+		gameAudio4.Play ();
+		gameAudio4.mute = true;
+
+		gameAudio5 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio5.loop = true;
+		gameAudio5.playOnAwake = false;
+		gameClip5 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 5");
+		gameAudio5.clip = gameClip5;
+		gameAudio5.Play ();
+		gameAudio5.mute = true;
+
+		gameAudio6 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio6.loop = true;
+		gameAudio6.playOnAwake = false;
+		gameClip6 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 6");
+		gameAudio6.clip = gameClip6;
+		gameAudio6.Play ();
+		gameAudio6.mute = true;
+
+		gameAudio7 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio7.loop = true;
+		gameAudio7.playOnAwake = false;
+		gameClip7 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 7");
+		gameAudio7.clip = gameClip7;
+		gameAudio7.Play ();
+		gameAudio7.mute = true;
 	}
 
 	void Update(){
-		if (Input.GetMouseButtonUp(0)) {
-			Vector3 worldPos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-			int mousex = (int) Mathf.Floor(worldPos.x);
-			int mousey = (int) Mathf.Ceil(worldPos.y);
-			sqman.placeSquare(new Vector2((float)mousex, (float)mousey));
+		if (state.mode == 1 && sqman != null) {		//if the game is playing
+			if (Input.GetMouseButtonUp (0)) {
+				Vector3 worldPos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+				int mousex = (int)Mathf.Floor (worldPos.x);
+				int mousey = (int)Mathf.Ceil (worldPos.y);
+				sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
+			}
+			if (sqman.height < 4) {
+				gameAudio2.mute = true;
+				gameAudio3.mute = true;
+				gameAudio4.mute = true;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 4) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = true;
+				gameAudio4.mute = true;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 6) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = false;
+				gameAudio4.mute = true;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 8) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = false;
+				gameAudio4.mute = false;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 10) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = false;
+				gameAudio4.mute = false;
+				gameAudio5.mute = false;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 12) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = false;
+				gameAudio4.mute = false;
+				gameAudio5.mute = false;
+				gameAudio6.mute = false;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 14) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = false;
+				gameAudio4.mute = false;
+				gameAudio5.mute = false;
+				gameAudio6.mute = false;
+				gameAudio7.mute = false;
+			}
 		}
 
 	}
@@ -76,10 +187,12 @@ public class GameManager : MonoBehaviour {
 		int destHeight = int.Parse (line);
 		destination = makeDestination (destHeight);
 		q = new int[10];
+		int prob = 0;
+		int start = 0;
 		if (int.Parse (sr.ReadLine()) == 1) {
-			int start = 0;
+			
 			for (int i = 0; i < 6; i++) {
-				int prob = int.Parse (sr.ReadLine ());
+				prob = int.Parse (sr.ReadLine ());
 				for (int j = 0; j < prob; j++) {
 					q [j + start] = i;
 				}
@@ -87,6 +200,18 @@ public class GameManager : MonoBehaviour {
 			}
 
 		}
+		rsq = new int[10];
+		int rsprob;
+		if (prob != 0) {			//using rigid shapes
+			start = 0;
+			for (int i = 0; i < 2; i++) {		//number of rigid shapes
+				rsprob = int.Parse (sr.ReadLine ());
+				for (int j = 0; j < rsprob; j++) {
+					rsq [j + start] = i;
+				}
+			}
+		}
+
 	}
 
 	public void fixCamera(){
@@ -170,5 +295,57 @@ public class GameManager : MonoBehaviour {
 	public string getLevelName(){		//TODO: make it good
 		return "LTest2.txt";
 
+	}
+
+	/************************ Start Gui Stuff ****************************/
+	bool go = false;
+	bool done = false;
+	public struct GuiState
+	{
+		public int mode;
+	}
+
+	public GuiState state;
+	// Start button that disappears once clicked (and triggers the start of the game)
+	void OnGUI ()
+	{
+
+		switch (state.mode) {
+		case 0:
+			menuScreen ();
+			break;
+		case 1:
+			if (!go) {			//only initialize the board once
+				startGame ();
+			}
+			break;
+		}
+	}
+
+	private void menuScreen(){
+		int xpos;
+		int ypos;
+		if (!go && !done) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2 - ((Screen.height / 3)-(Screen.height/10));
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "Stepping Stones");
+		}
+		if (!go && !done) {
+			xpos = ((Screen.width) - (60)) / 2;
+			ypos = ((Screen.height) / 2);
+			if (GUI.Button (new Rect (xpos, ypos, 60, 90), "START")) {
+				state.mode = 1;
+			}
+		}
+	}
+
+	private void startGame(){
+		GameObject sqmanObject = new GameObject ();
+		initBoard ();
+
+		sqman = sqmanObject.AddComponent<SquareManager> ();
+		sqman.name = "Square Manager";
+		sqman.init (board, q, rsq);
+		go = true;
 	}
 }

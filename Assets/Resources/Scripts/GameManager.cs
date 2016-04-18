@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour {
 		sqman.name = "Square Manager";
 		sqman.init (board, q, rsq);
 
+
 		initSound ();
 	}
 
@@ -178,5 +179,54 @@ public class GameManager : MonoBehaviour {
 	public string getLevelName(){		//TODO: make it good
 		return "LTest2.txt";
 
+	}
+
+	/************************ Start Gui Stuff ****************************/
+	bool go = false;
+	bool done = false;
+	public struct GuiState
+	{
+		public int mode;
+	}
+
+	public GuiState state;
+	// Start button that disappears once clicked (and triggers the start of the game)
+	void OnGUI ()
+	{
+
+		switch (state.mode) {
+		case 0:
+			menuScreen ();
+			break;
+		case 1:
+			startGame ();
+			break;
+		}
+	}
+
+	private void menuScreen(){
+		int xpos;
+		int ypos;
+		if (!go && !done) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2 - ((Screen.height / 3)-(Screen.height/10));
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "Stepping Stones");
+		}
+		if (!go && !done) {
+			xpos = ((Screen.width) - (60)) / 2;
+			ypos = ((Screen.height) / 2);
+			if (GUI.Button (new Rect (xpos, ypos, 60, 90), "START")) {
+				state.mode = 1;
+			}
+		}
+	}
+
+	private void startGame(){
+		go = true;
+		initBoard ();
+		GameObject sqmanObject = new GameObject ();
+		sqman = sqmanObject.AddComponent<SquareManager> ();
+		sqman.name = "Square Manager";
+		sqman.init (board, q);
 	}
 }

@@ -27,6 +27,7 @@ public class SquareManager : MonoBehaviour {
 	Square[,] board;
 	int[] q;
 	public int[] rsq;
+	public int height;
 
 	float counter = 0f;
 	public Square moving = null;
@@ -52,6 +53,7 @@ public class SquareManager : MonoBehaviour {
 		this.BOARDSIZEY = board.GetLength(1);
 		initQueue ();		//initialize queue w/ 3 initial blocks
 		initSound ();
+		//getHeight ();
 	}
 
 	void initSound(){
@@ -81,6 +83,19 @@ public class SquareManager : MonoBehaviour {
 		movOffAudio.clip = movOffClip;
 	}
 
+	void Update(){
+		getHeight ();
+	}
+
+	private void getHeight (){
+		int tallest = 0;
+		foreach (Square s in squares) {
+			if ((int)s.getPosition ().y > tallest) {
+				tallest = (int)s.getPosition ().y;
+			}
+		}
+		height = tallest;
+	}
 
 	public int getColor(int type){
 		if (type <= 1) {
@@ -308,6 +323,7 @@ public class SquareManager : MonoBehaviour {
 		} else {
 			StartCoroutine(s.rigid.settleShape ());
 		}
+		//getHeight ();
 	}
 
 	public IEnumerator checkConflicts(Square s){
@@ -357,6 +373,7 @@ public class SquareManager : MonoBehaviour {
 			Destroy (s.gameObject);
 			yield return new WaitForSeconds (.25f);
 		}
+		//getHeight (); //TODO: should this be here?
 	}
 
 	public void resolveConflict (Square s, Square c){
@@ -379,7 +396,6 @@ public class SquareManager : MonoBehaviour {
 		c = board [(int)cPos.x, (int)(cPos.y + 1)];
 		resolveConflictHelper (s);
 		resolveConflictHelper (c);
-
 	}
 
 	public void resolveConflictHelper(Square s){
@@ -527,13 +543,18 @@ public class SquareManager : MonoBehaviour {
 		return null;
 	}
 
+
+
 	// -------------
 	// All GUI code down here, basically just because lol
 	void OnGUI() {
 		if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
 			boardSolved ();
 		}
+		if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
+			Application.LoadLevel (Application.loadedLevel);
 
+		}
 	}
 
 }

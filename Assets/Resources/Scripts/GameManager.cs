@@ -7,8 +7,20 @@ public class GameManager : MonoBehaviour {
 
 
 	SquareManager sqman;
-	public AudioSource gameAudio;
-	public AudioClip gameClip;
+	public AudioSource gameAudio1;
+	public AudioClip gameClip1;
+	public AudioSource gameAudio2;
+	public AudioClip gameClip2;
+	public AudioSource gameAudio3;
+	public AudioClip gameClip3;
+	public AudioSource gameAudio4;
+	public AudioClip gameClip4;
+	public AudioSource gameAudio5;
+	public AudioClip gameClip5;
+	public AudioSource gameAudio6;
+	public AudioClip gameClip6;
+	public AudioSource gameAudio7;
+	public AudioClip gameClip7;
 	public int w;
 	public int h;
 	Square[,] board;
@@ -35,12 +47,60 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void initSound(){
-		gameAudio = this.gameObject.AddComponent<AudioSource> ();
-		gameAudio.loop = true;
-		gameAudio.playOnAwake = false;
-		gameClip = Resources.Load<AudioClip> ("Audio/Soundtrack Draft 1");
-		gameAudio.clip = gameClip;
-		gameAudio.Play ();
+		gameAudio1 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio1.loop = true;
+		gameAudio1.playOnAwake = false;
+		gameClip1 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 1");
+		gameAudio1.clip = gameClip1;
+		gameAudio1.Play ();
+
+		gameAudio2 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio2.loop = true;
+		gameAudio2.playOnAwake = false;
+		gameClip2 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 2");
+		gameAudio2.clip = gameClip2;
+		gameAudio2.Play ();
+		gameAudio2.mute = true;
+
+		gameAudio3 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio3.loop = true;
+		gameAudio3.playOnAwake = false;
+		gameClip3 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 3");
+		gameAudio3.clip = gameClip3;
+		gameAudio3.Play ();
+		gameAudio3.mute = true;
+
+		gameAudio4 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio4.loop = true;
+		gameAudio4.playOnAwake = false;
+		gameClip4 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 4");
+		gameAudio4.clip = gameClip4;
+		gameAudio4.Play ();
+		gameAudio4.mute = true;
+
+		gameAudio5 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio5.loop = true;
+		gameAudio5.playOnAwake = false;
+		gameClip5 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 5");
+		gameAudio5.clip = gameClip5;
+		gameAudio5.Play ();
+		gameAudio5.mute = true;
+
+		gameAudio6 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio6.loop = true;
+		gameAudio6.playOnAwake = false;
+		gameClip6 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 6");
+		gameAudio6.clip = gameClip6;
+		gameAudio6.Play ();
+		gameAudio6.mute = true;
+
+		gameAudio7 = this.gameObject.AddComponent<AudioSource> ();
+		gameAudio7.loop = true;
+		gameAudio7.playOnAwake = false;
+		gameClip7 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 7");
+		gameAudio7.clip = gameClip7;
+		gameAudio7.Play ();
+		gameAudio7.mute = true;
 	}
 
 	void Update(){
@@ -50,6 +110,62 @@ public class GameManager : MonoBehaviour {
 				int mousex = (int)Mathf.Floor (worldPos.x);
 				int mousey = (int)Mathf.Ceil (worldPos.y);
 				sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
+			}
+			if (sqman.height < 4) {
+				gameAudio2.mute = true;
+				gameAudio3.mute = true;
+				gameAudio4.mute = true;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 4) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = true;
+				gameAudio4.mute = true;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 6) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = false;
+				gameAudio4.mute = true;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 8) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = false;
+				gameAudio4.mute = false;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 10) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = false;
+				gameAudio4.mute = false;
+				gameAudio5.mute = false;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 12) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = false;
+				gameAudio4.mute = false;
+				gameAudio5.mute = false;
+				gameAudio6.mute = false;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 14) {
+				gameAudio2.mute = false;
+				gameAudio3.mute = false;
+				gameAudio4.mute = false;
+				gameAudio5.mute = false;
+				gameAudio6.mute = false;
+				gameAudio7.mute = false;
 			}
 		}
 

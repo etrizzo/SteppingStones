@@ -26,6 +26,7 @@ public class SquareManager : MonoBehaviour {
 	Vector2 qpos3 = new Vector2(-2f, (float) queueY);
 	Square[,] board;
 	int[] q;
+	public int[] rsq;
 
 	float counter = 0f;
 	public Square moving = null;
@@ -36,7 +37,7 @@ public class SquareManager : MonoBehaviour {
 //	float randFreq = .2;
 
 
-	public void init(Square[,] board, int[] q){
+	public void init(Square[,] board, int[] q, int[] rsq = null){
 		squareFolder = new GameObject();
 		squareFolder.name = "Squares";
 		squares = new List<Square> ();
@@ -46,6 +47,7 @@ public class SquareManager : MonoBehaviour {
 //		initBoard();
 		this.board = board;
 		this.q = q;
+		this.rsq = rsq;
 		this.BOARDSIZEX = board.GetLength (0);
 		this.BOARDSIZEY = board.GetLength(1);
 		initQueue ();		//initialize queue w/ 3 initial blocks
@@ -297,7 +299,7 @@ public class SquareManager : MonoBehaviour {
 					StartCoroutine (settleSquare (s));
 				} else {
 					//Debug.Log("Checking conflicts!");
-					print(s + " has landed on " + below);
+//					print(s + " has landed on " + below);
 					s.setFalling(false);
 					settleAudio.Play ();
 					StartCoroutine (checkConflicts (s));

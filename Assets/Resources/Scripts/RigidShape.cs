@@ -79,7 +79,8 @@ public class RigidShape : MonoBehaviour {
 
 	private int generateTypeProbability() {
 		// Should be adjusted depending on level????????????????????????????????????????????????
-		return Random.Range(0,2);
+		int r = Random.Range(0,10);
+		return sm.rsq [r];
 	}
 
 	public void grow() {
@@ -252,13 +253,15 @@ public class RigidShape : MonoBehaviour {
 	public bool checkValidGrow(Vector2 pos, int height, int width){
 		if (pos.x + width < sm.BOARDSIZEX && pos.y < sm.BOARDSIZEY) {		//anchor should always be bottom left
 			for (int i = 0; i < height; i++) {
-				if (board [(int)pos.x, (int)(pos.y + i)] != null) {
+//				if (board [(int)pos.x, (int)(pos.y + i)] != null) {
+				if (!checkSpot((int)(pos.x), (int) (pos.y + i))){
 					print ("invalid place");
 					return false;
 				}
 			}
 			for (int i = 0; i < width; i++) {
-				if (board [(int)(pos.x + i), (int)pos.y] != null) {
+//				if (board [(int)(pos.x + i), (int)pos.y] != null) {
+				if (!checkSpot((int)(pos.x + i), (int) (pos.y))){
 					print ("invalid place");
 					return false;
 				}
@@ -267,6 +270,19 @@ public class RigidShape : MonoBehaviour {
 		}
 		print ("off edge of board");
 		return false;
+	}
+
+
+	public bool checkSpot(int x, int y){
+		if (board [x, y] != null) {
+			return false;
+		} else if (y + 1 < sm.BOARDSIZEY) {
+			if (board [x, y] != null && board [x, y].falling) {
+				return false;
+			}
+		}
+		return true;
+
 	}
 
 

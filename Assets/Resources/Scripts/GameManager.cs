@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour {
 		initBoard ();
 		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.name = "Square Manager";
-		sqman.init (board, q);
+		sqman.init (board, q, rsq);
 
 		initSound ();
 	}
@@ -86,11 +86,15 @@ public class GameManager : MonoBehaviour {
 		}
 		rsq = new int[10];
 		int rsprob;
-		if (prob != 0){			//using rigid shapes
-			
-			rsprob = int.Parse(sr.ReadLine());
-			for (int j = 0; j < rsprob; j++){
-				q[
+		if (prob != 0) {			//using rigid shapes
+			start = 0;
+			for (int i = 0; i < 2; i++) {		//number of rigid shapes
+				rsprob = int.Parse (sr.ReadLine ());
+				for (int j = 0; j < rsprob; j++) {
+					rsq [j + start] = i;
+				}
+			}
+		}
 
 	}
 
@@ -172,7 +176,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public string getLevelName(){		//TODO: make it good
-		return "LTest.txt";
+		return "LTest2.txt";
 
 	}
 }

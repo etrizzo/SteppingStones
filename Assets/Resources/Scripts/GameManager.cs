@@ -346,6 +346,8 @@ public class GameManager : MonoBehaviour {
 		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.name = "Square Manager";
 		sqman.init (board, q, rsq);
+		sqman.destination = destination;
+		sqman.beginning = beginning;
 		go = true;
 	}
 }

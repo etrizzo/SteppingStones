@@ -22,12 +22,14 @@ public class GameManager : MonoBehaviour {
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
 		groundSquares = new List<Square> ();
-		GameObject sqmanObject = new GameObject ();
-		initBoard ();
-		sqman = sqmanObject.AddComponent<SquareManager> ();
-		sqman.name = "Square Manager";
-		sqman.init (board, q, rsq);
-
+//<<<<<<< HEAD
+//		GameObject sqmanObject = new GameObject ();
+//		initBoard ();
+//		sqman = sqmanObject.AddComponent<SquareManager> ();
+//		sqman.name = "Square Manager";
+//		sqman.init (board, q, rsq);
+//=======
+//>>>>>>> 1806047d7ce5c17fce5522234c60162ca3536d80
 
 		initSound ();
 	}
@@ -42,11 +44,13 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Update(){
-		if (Input.GetMouseButtonUp(0)) {
-			Vector3 worldPos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-			int mousex = (int) Mathf.Floor(worldPos.x);
-			int mousey = (int) Mathf.Ceil(worldPos.y);
-			sqman.placeSquare(new Vector2((float)mousex, (float)mousey));
+		if (state.mode == 1 && sqman != null) {		//if the game is playing
+			if (Input.GetMouseButtonUp (0)) {
+				Vector3 worldPos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+				int mousex = (int)Mathf.Floor (worldPos.x);
+				int mousey = (int)Mathf.Ceil (worldPos.y);
+				sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
+			}
 		}
 
 	}
@@ -177,7 +181,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public string getLevelName(){		//TODO: make it good
-		return "LTest2.txt";
+		return "LTest.txt";
 
 	}
 
@@ -199,7 +203,9 @@ public class GameManager : MonoBehaviour {
 			menuScreen ();
 			break;
 		case 1:
-			startGame ();
+			if (!go) {			//only initialize the board once
+				startGame ();
+			}
 			break;
 		}
 	}
@@ -222,11 +228,12 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void startGame(){
-		go = true;
-		initBoard ();
 		GameObject sqmanObject = new GameObject ();
+		initBoard ();
+
 		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.name = "Square Manager";
-		sqman.init (board, q);
+		sqman.init (board, q, rsq);
+		go = true;
 	}
 }

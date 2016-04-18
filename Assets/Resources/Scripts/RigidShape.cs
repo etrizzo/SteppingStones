@@ -253,15 +253,15 @@ public class RigidShape : MonoBehaviour {
 	public bool checkValidGrow(Vector2 pos, int height, int width){
 		if (pos.x + width < sm.BOARDSIZEX && pos.y < sm.BOARDSIZEY) {		//anchor should always be bottom left
 			for (int i = 0; i < height; i++) {
-//				if (board [(int)pos.x, (int)(pos.y + i)] != null) {
-				if (!checkSpot((int)(pos.x), (int) (pos.y + i))){
+				if (board [(int)pos.x, (int)(pos.y + i)] != null) {
+//				if (!checkSpot((int)(pos.x), (int) (pos.y + i))){
 					print ("invalid place");
 					return false;
 				}
 			}
 			for (int i = 0; i < width; i++) {
-//				if (board [(int)(pos.x + i), (int)pos.y] != null) {
-				if (!checkSpot((int)(pos.x + i), (int) (pos.y))){
+				if (board [(int)(pos.x + i), (int)pos.y] != null) {
+//				if (!checkSpot((int)(pos.x + i), (int) (pos.y))){
 					print ("invalid place");
 					return false;
 				}

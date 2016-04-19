@@ -56,7 +56,9 @@ public class Square : MonoBehaviour {
 
 	public void setPosition(Vector2 newpos){
 		this.pos = newpos;
-		this.transform.position = newpos;
+		if (this != null) {
+			this.transform.position = newpos;
+		}
 	}
 
 	public Vector2 getPosition(){

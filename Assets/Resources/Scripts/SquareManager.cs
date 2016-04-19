@@ -344,7 +344,9 @@ public class SquareManager : MonoBehaviour {
 			activate (s);
 		}
 		if (conflict) {
-			Destroy (s.gameObject);
+			if (s != null) {
+				DestroyImmediate (s.gameObject);
+			}
 			yield return new WaitForSeconds (.25f);
 		}
 		//getHeight (); //TODO: should this be here?
@@ -416,10 +418,10 @@ public class SquareManager : MonoBehaviour {
 		} else {
 			int type = getSquareType ();
 			//hardcode normal square for first square
-			if (firstSquare) {
+			/*if (firstSquare) {
 				type = 0;
 				firstSquare = false;
-			}
+			}*/
 			square.init (pos, getColor (type), false, type);
 
 			if (type == 5) {

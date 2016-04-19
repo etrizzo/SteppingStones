@@ -182,7 +182,9 @@ public class RigidShape : MonoBehaviour {
 				s.setPosition (new Vector2 (pos.x, pos.y - 1));
 			}
 			yield return new WaitForSeconds (.5f);
-			StartCoroutine (settleShape ());
+			if (this != null) {
+				StartCoroutine (settleShape ());
+			}
 		}
 		else {
 			setShapeFalling (false);
@@ -196,7 +198,7 @@ public class RigidShape : MonoBehaviour {
 		foreach (Square s in squares) {
 			Vector2 pos = s.getPosition ();
 			Square below = board [(int)(pos.x), (int)(pos.y - 1)];
-			print(s + " has landed on " + below);
+			Debug.Log(s + "at position"+s.getPosition().x+", "+s.getPosition().y+" has landed on " + below+" at position"+below.getPosition().x+", "+below.getPosition().y);
 			s.setFalling (b);
 		}
 	}

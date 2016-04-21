@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Square : MonoBehaviour {
+	private float clock = 0;
+    private float speed = 0.5f;
 	public SquareModel model;
 	private int color;		//0-c,1-m,2-y,-1-k
 	private Vector2 pos;
@@ -98,4 +100,18 @@ public class Square : MonoBehaviour {
 		this.model.mat.color = originalColor;
 //		yield return null;
 	}
+
+	public void Update() {
+		clock += Time.deltaTime;
+
+		if (isFalling()) {
+			fall();
+		}
+	}
+
+	public void fall() {
+		// Move down and stuff?j
+		pos.y -= speed;
+	}
+
 }

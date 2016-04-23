@@ -24,7 +24,7 @@ public class SquareManager : MonoBehaviour {
 	Vector2 qpos1 = new Vector2(-4f, (float) queueY);
 	Vector2 qpos2 = new Vector2(-3f, (float) queueY);
 	Vector2 qpos3 = new Vector2(-2f, (float) queueY);
-	Square[,] board;
+	public Square[,] board;
 	int[] q;
 	public int[] rsq;
 	public int height;
@@ -165,7 +165,7 @@ public class SquareManager : MonoBehaviour {
 
 						} else {
 							// Place it like normal if it's not an anchor
-							StartCoroutine (settleSquare (square));
+//							StartCoroutine (settleSquare (square));
 						}
 					}
 
@@ -175,8 +175,9 @@ public class SquareManager : MonoBehaviour {
 					moving.setPosition (pos);
 					moving.setModelColor (2f);
 					board [(int)pos.x, (int)pos.y] = moving;
+					moving.setFalling (true);
 					movOffAudio.Play ();
-					StartCoroutine(settleSquare (moving));
+//					StartCoroutine(settleSquare (moving));
 					moving = null;
 					chainSettle (oldpos);
 
@@ -254,7 +255,8 @@ public class SquareManager : MonoBehaviour {
 		if (pos.y < BOARDSIZEY - 1) {
 			Square above = board [(int)pos.x, (int)pos.y + 1];
 			if (above != null) {
-				StartCoroutine(settleSquare (above));
+//				StartCoroutine(settleSquare (above));
+				above.setFalling (true);
 			}
 		}
 
@@ -278,14 +280,14 @@ public class SquareManager : MonoBehaviour {
 				board [(int)pos.x, (int)pos.y - 1] = s;
 				s.setPosition (new Vector2 (pos.x, pos.y - 1));
 				if (above != null) {
-					StartCoroutine (settleSquare (above));
+//					StartCoroutine (settleSquare (above));
 				}
 				//("Square is at: " + s.getPosition ());
-				StartCoroutine (settleSquare (s));
+//				StartCoroutine (settleSquare (s));
 			} else {
 				if (below != null && below.isFalling ()) {
 					yield return new WaitForSeconds (.25f);
-					StartCoroutine (settleSquare (s));
+//					StartCoroutine (settleSquare (s));
 				} else {
 					//Debug.Log("Checking conflicts!");
 //					print(s + " has landed on " + below);
@@ -378,7 +380,7 @@ public class SquareManager : MonoBehaviour {
 		while (s != null) {
 			Vector2 sPos = s.getPosition ();
 			Square sAbove = board [(int)sPos.x, (int)(sPos.y + 1)];
-			StartCoroutine(settleSquare (s));
+//			StartCoroutine(settleSquare (s));
 			s = sAbove;
 		}
 	}
@@ -423,6 +425,7 @@ public class SquareManager : MonoBehaviour {
 				firstSquare = false;
 			}*/
 			square.init (pos, getColor (type), false, type);
+			square.addSqman (this);
 
 			if (type == 5) {
 				RigidShape rs = makeRigidShape(square);
@@ -453,7 +456,7 @@ public class SquareManager : MonoBehaviour {
 				s.anchor = false;
 				s.rigid = null;
 				s.setFalling (true);
-				StartCoroutine (settleSquare (s));
+//				StartCoroutine (settleSquare (s));
 			}
 		}
 		DestroyImmediate (rs);

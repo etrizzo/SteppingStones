@@ -286,12 +286,4 @@ public class RigidShape : MonoBehaviour {
 		return true;
 
 	}
-
-
-
-
-
-
-
-	
 }

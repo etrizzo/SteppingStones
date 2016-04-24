@@ -204,6 +204,9 @@ public class SquareManager : MonoBehaviour {
 					moving = atPos;
 					moving.setModelColor (.5f);
 					movOnAudio.Play ();
+				} else {					// if you click on the moving block again, drop it
+					moving.setModelColor (2f);
+					moving = null;
 				}
 			} else {
 				Square next = queue.Peek ();		//if next block in the queue is eraser,

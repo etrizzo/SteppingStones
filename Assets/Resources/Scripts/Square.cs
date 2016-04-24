@@ -192,6 +192,7 @@ public class Square : MonoBehaviour {
 				conflictAudio.Play (); //we need more time???
 			}
 		}
+		sqman.chainSettle (this.getPosition());
 
 		GameObject self = this.gameObject;
 

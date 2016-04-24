@@ -88,7 +88,7 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	public void grow() {
-		anchor.setFalling (true);
+//		anchor.setFalling (true);
 		growing = true;
 		// you know, grow and stuff .....
 		anchor.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileBlank");

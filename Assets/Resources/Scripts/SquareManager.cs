@@ -128,7 +128,10 @@ public class SquareManager : MonoBehaviour {
 	public void placeSquare(Vector2 pos){
 		if (checkBounds (pos)) {		//check to make sure clicking in the board
 			Square atPos = board [(int)pos.x, (int)pos.y];
-			Square above = board [(int)pos.x, (int)pos.y + 1];
+			Square above = null;
+			if (pos.y + 1 < BOARDSIZEY) {
+				above = board [(int)pos.x, (int)pos.y + 1];
+			}
 			if (atPos == null && (above == null || !above.isFalling())) {			//check if clicking on an existing block
 				if (moving == null) {			//if not moving a movable block, try to place from queue
 					bool place = true;

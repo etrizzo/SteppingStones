@@ -108,9 +108,13 @@ public class Square : MonoBehaviour {
 
 	public void Update() {
 		if (wait) {
-			conflictCounter += Time.deltaTime * speed;
-			if (conflictCounter >= 1) {
-				checkConflicts ();
+			if (type != 4) {
+				conflictCounter += Time.deltaTime * speed;
+				if (conflictCounter >= 1) {
+					checkConflicts ();
+				}
+			} else {
+				wait = false;
 			}
 		}
 		if (isFalling()) {
@@ -123,7 +127,10 @@ public class Square : MonoBehaviour {
 
 	public void checkFall() {
 		// Move down and stuff?j
-		Square above = board[(int) pos.x, (int) pos.y + 1];
+		Square above = null;
+		if (pos.y + 1 < sqman.BOARDSIZEY) {
+			above = board [(int)pos.x, (int)pos.y + 1];
+		}
 		Square below = board[(int) pos.x, (int) pos.y - 1];
 
 
@@ -150,15 +157,28 @@ public class Square : MonoBehaviour {
 		setPosition (new Vector2 (pos.x, pos.y - 1));
 	}
 
-	public void checkConflicts() {
-		wait = false; conflictCounter = 0;
-		bool conflicted = false;
+	public Square[] getNeighbors(){
 		Square[] directedBlocks = new Square[4];
-		directedBlocks[0] = board[(int) pos.x, (int) pos.y + 1];
-		directedBlocks[1] = board[(int) pos.x + 1, (int) pos.y];
+		if (pos.y + 1 < sqman.BOARDSIZEY) {
+			directedBlocks [0] = board [(int)pos.x, (int)pos.y + 1];
+		}
+		if (pos.x + 1 < sqman.BOARDSIZEX) {
+			directedBlocks [1] = board [(int)pos.x + 1, (int)pos.y];
+		}
+		if(pos.y - 1 >= 0){
 		directedBlocks[2] = board[(int) pos.x, (int) pos.y - 1];
-		directedBlocks[3] = board[(int) pos.x - 1, (int) pos.y];
+		}
+		if (pos.x - 1 >= 0) {
+			directedBlocks [3] = board [(int)pos.x - 1, (int)pos.y];
+		}
+		return directedBlocks;
+	}
 
+	public void checkConflicts() {
+		wait = false; 
+		conflictCounter = 0;
+		bool conflicted = false;
+		Square[] directedBlocks = getNeighbors ();
 
 		foreach (Square sq in directedBlocks) {
 			if (sq != null && sq.getColor() == color) {

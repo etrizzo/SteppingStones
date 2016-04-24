@@ -162,7 +162,8 @@ public class RigidShape : MonoBehaviour {
 		square.name = "Square " + sm.squares.Count;
 
 		board [(int)pos.x, (int)pos.y] = square;
-		square.setFalling (true);
+//		square.setFalling (true);
+		square.addSqman(sm);
 		return square;
 
 	}

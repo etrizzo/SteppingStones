@@ -18,7 +18,7 @@ public class RigidShape : MonoBehaviour {
 	public AudioClip rsClip;
 
 	bool growing = false;
-	int speed = 3;
+	int speed = 10;
 	float growCounter = 0;
 
 	SquareManager sm;
@@ -139,11 +139,11 @@ public class RigidShape : MonoBehaviour {
 				break;
 			}
 		} else {
-			foreach (Square s in squares) {
+			/*foreach (Square s in squares) {
 				if (s != null) {
 					s.setFalling (true);
 				}
-			}
+			}*/
 		}
 
 	}

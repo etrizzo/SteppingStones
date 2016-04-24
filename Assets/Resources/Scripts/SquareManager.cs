@@ -57,7 +57,7 @@ public class SquareManager : MonoBehaviour {
 	}
 
 	void initSound(){
-		settleAudio = this.gameObject.AddComponent<AudioSource> ();
+		/*settleAudio = this.gameObject.AddComponent<AudioSource> ();
 		settleAudio.loop = false;
 		settleAudio.playOnAwake = false;
 		settleAudio.time = 1.0f;
@@ -68,7 +68,7 @@ public class SquareManager : MonoBehaviour {
 		conflictAudio.loop = false;
 		conflictAudio.playOnAwake = false;
 		conflictClip = Resources.Load<AudioClip> ("Audio/Block Colors Match");
-		conflictAudio.clip = conflictClip;
+		conflictAudio.clip = conflictClip;*/
 
 		movOnAudio = this.gameObject.AddComponent<AudioSource> ();
 		movOnAudio.loop = false;

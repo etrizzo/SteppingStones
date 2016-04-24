@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour {
 
 
 	SquareManager sqman;
+	public AudioSource menuAudio;
+	public AudioClip menuClip;
 	public AudioSource gameAudio1;
 	public AudioClip gameClip1;
 	public AudioSource gameAudio2;
@@ -43,12 +45,20 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void initSound(){
+		menuAudio = this.gameObject.AddComponent<AudioSource> ();
+		menuAudio.loop = true;
+		menuAudio.playOnAwake = false;
+		menuClip = Resources.Load<AudioClip> ("Audio/Soundtrack Draft 1");
+		menuAudio.clip = menuClip;
+		menuAudio.Play ();
+
 		gameAudio1 = this.gameObject.AddComponent<AudioSource> ();
 		gameAudio1.loop = true;
 		gameAudio1.playOnAwake = false;
 		gameClip1 = Resources.Load<AudioClip> ("Audio/Soundtrack Layers/Layer 1");
 		gameAudio1.clip = gameClip1;
 		gameAudio1.Play ();
+		gameAudio1.mute = true;
 
 		gameAudio2 = this.gameObject.AddComponent<AudioSource> ();
 		gameAudio2.loop = true;
@@ -108,6 +118,7 @@ public class GameManager : MonoBehaviour {
 				sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
 			}
 			if (sqman.height < 4) {
+				gameAudio1.mute = false;
 				gameAudio2.mute = true;
 				gameAudio3.mute = true;
 				gameAudio4.mute = true;
@@ -116,6 +127,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio7.mute = true;
 			}
 			if (sqman.height > 4) {
+				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = true;
 				gameAudio4.mute = true;
@@ -124,6 +136,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio7.mute = true;
 			}
 			if (sqman.height > 6) {
+				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
 				gameAudio4.mute = true;
@@ -132,6 +145,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio7.mute = true;
 			}
 			if (sqman.height > 8) {
+				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
 				gameAudio4.mute = false;
@@ -140,6 +154,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio7.mute = true;
 			}
 			if (sqman.height > 10) {
+				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
 				gameAudio4.mute = false;
@@ -148,6 +163,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio7.mute = true;
 			}
 			if (sqman.height > 12) {
+				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
 				gameAudio4.mute = false;
@@ -156,6 +172,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio7.mute = true;
 			}
 			if (sqman.height > 14) {
+				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
 				gameAudio4.mute = false;
@@ -163,8 +180,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = false;
 				gameAudio7.mute = false;
 			}
-		}
-
+		} 
 	}
 
 
@@ -328,8 +344,18 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void menuScreen(){
+		menuAudio.mute = false;
 		int xpos;
 		int ypos;
+
+		gameAudio1.Stop();
+		gameAudio2.Stop();
+		gameAudio3.Stop();
+		gameAudio4.Stop();
+		gameAudio5.Stop();
+		gameAudio6.Stop();
+		gameAudio7.Stop();
+
 		if (!go && !done) {
 			xpos = ((Screen.width) - (100)) / 2;
 			ypos = ((Screen.height) - (80)) / 2 - ((Screen.height / 3)-(Screen.height/10));
@@ -354,6 +380,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void startGame(){
+		menuAudio.mute = true;
 		GameObject sqmanObject = new GameObject ();
 		initBoard ();
 
@@ -363,5 +390,13 @@ public class GameManager : MonoBehaviour {
 		sqman.destination = destination;
 		sqman.beginning = beginning;
 		go = true;
+
+		gameAudio1.Play();
+		gameAudio2.Play();
+		gameAudio3.Play();
+		gameAudio4.Play();
+		gameAudio5.Play();
+		gameAudio6.Play();
+		gameAudio7.Play();
 	}
 }

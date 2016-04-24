@@ -21,6 +21,10 @@ public class Square : MonoBehaviour {
 	public bool wait = false;
 	public float conflictCounter = 0;
 
+	public AudioSource settleAudio;
+	public AudioClip settleClip;
+	public AudioSource conflictAudio;
+	public AudioClip conflictClip;
 
 
 	public void init(Vector2 pos, int color, bool isGround = false, int type = 0){
@@ -33,6 +37,23 @@ public class Square : MonoBehaviour {
 		model = modelObject.AddComponent<SquareModel> ();
 		model.init (this);
 
+		initSound ();
+
+	}
+
+	public void initSound(){
+		settleAudio = this.gameObject.AddComponent<AudioSource> ();
+		settleAudio.loop = false;
+		settleAudio.playOnAwake = false;
+		settleAudio.time = 1.0f;
+		settleClip = Resources.Load<AudioClip> ("Audio/Blocks Settle");
+		settleAudio.clip = settleClip;
+
+		conflictAudio = this.gameObject.AddComponent<AudioSource> ();
+		conflictAudio.loop = false;
+		conflictAudio.playOnAwake = false;
+		conflictClip = Resources.Load<AudioClip> ("Audio/Block Colors Match");
+		conflictAudio.clip = conflictClip;
 	}
 
 	public void addSqman(SquareManager sqman) {
@@ -106,24 +127,6 @@ public class Square : MonoBehaviour {
 //		yield return null;
 	}
 
-	public void Update() {
-		if (wait) {
-			if (type != 4) {
-				conflictCounter += Time.deltaTime * speed;
-				if (conflictCounter >= 1) {
-					checkConflicts ();
-				}
-			} else {
-				wait = false;
-			}
-		}
-		if (isFalling()) {
-			counter += Time.deltaTime * speed;
-			if (counter >= 1) {
-				checkFall();
-			}
-		}
-	}
 
 	public void checkFall() {
 		// Move down and stuff?j
@@ -143,6 +146,7 @@ public class Square : MonoBehaviour {
 			counter = 0f;
 		} else if (!below.isFalling ()) {
 			// & it's not falling ....
+			settleAudio.Play ();
 			falling = false;
 			counter = 0f;
 			wait = true;
@@ -185,6 +189,7 @@ public class Square : MonoBehaviour {
 				sqman.chainSettle (sq.getPosition());
 				Destroy (sq.gameObject);
 				conflicted = true;
+				conflictAudio.Play (); //we need more time???
 			}
 		}
 
@@ -192,6 +197,26 @@ public class Square : MonoBehaviour {
 
 		if (conflicted) {
 			Destroy (self);
+		}
+	}
+
+	public void Update() {
+		if (wait) {
+			if (type != 4) {
+				conflictCounter += Time.deltaTime * speed;
+				if (conflictCounter >= 1) {
+					
+					checkConflicts ();
+				}
+			} else {
+				wait = false;
+			}
+		}
+		if (isFalling()) {
+			counter += Time.deltaTime * speed;
+			if (counter >= 1) {
+				checkFall();
+			}
 		}
 	}
 }

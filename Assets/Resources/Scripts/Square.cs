@@ -200,6 +200,11 @@ public class Square : MonoBehaviour {
 		}
 	}
 
+
+	public void Destroy(GameObject s){
+		DestroyImmediate (s);
+	}
+
 	public void Update() {
 		if (wait) {
 			if (type != 4) {

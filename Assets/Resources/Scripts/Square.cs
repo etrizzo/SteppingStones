@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Square : MonoBehaviour {
 	private float counter = 0;
-	private float speed = 10; // Need a "GOOOT TTAA GUCKDSBLJKAF,.JH;  FAST" button
+	private float speed = 5; // Need a "GOOOT TTAA GUCKDSBLJKAF,.JH;  FAST" button
 	public SquareModel model;
 	private int color;		//0-c,1-m,2-y,-1-k
 	private Vector2 pos;
@@ -185,7 +185,7 @@ public class Square : MonoBehaviour {
 		Square[] directedBlocks = getNeighbors ();
 
 		foreach (Square sq in directedBlocks) {
-			if (sq != null && sq.getColor() == color) {
+			if (sq != null && sq.getColor() == color && !sq.isFalling()) {
 				sqman.chainSettle (sq.getPosition());
 				Destroy (sq.gameObject);
 				conflicted = true;

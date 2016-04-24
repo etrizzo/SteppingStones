@@ -256,12 +256,20 @@ public class SquareManager : MonoBehaviour {
 	//checks to see if the square above pos needs to be settled
 	public void chainSettle(Vector2 pos){
 		if (pos.y < BOARDSIZEY - 1) {
+			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
+				Square above = board [(int)pos.x, (int)pos.y + i];
+				if (above != null) {
+					above.setFalling (true);
+				}
+			}
+		}
+		/*if (pos.y < BOARDSIZEY - 1) {
 			Square above = board [(int)pos.x, (int)pos.y + 1];
 			if (above != null) {
 //				StartCoroutine(settleSquare (above));
 				above.setFalling (true);
 			}
-		}
+		}*/
 
 	}
 

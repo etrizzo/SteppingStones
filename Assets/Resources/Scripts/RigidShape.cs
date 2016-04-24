@@ -17,6 +17,10 @@ public class RigidShape : MonoBehaviour {
 	public AudioSource rsAudio;
 	public AudioClip rsClip;
 
+	bool growing = false;
+	int speed = 3;
+	float growCounter = 0;
+
 	SquareManager sm;
 
 	public void init(Square a, Square[,] b, SquareManager sm) {
@@ -84,71 +88,64 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	public void grow() {
+		anchor.setFalling (true);
+		growing = true;
 		// you know, grow and stuff .....
 		anchor.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileBlank");
 		rsAudio.Play ();
-		switch (shapeType) {
-		case 0:
-			StartCoroutine(grow__());
-			break;
-		case 1:
-			StartCoroutine (grow_l ());
-			break;
-		default:
-			print ("Whoopsies! you hit the default shape case, line 42");
-			break;
-		}
+
 	}
 
-	private IEnumerator grow__() {
-		anchor.setFalling (true);
-		Vector2 pos = anchor.getPosition ();
-		Vector2 new_pos;
-		Mesh mesh = anchor.model.GetComponent<MeshFilter> ().mesh;
-//		Color[] colors = new Color[mesh.uv.Length];
-//		for (var i = 0; i < mesh.uv.Length; i++) {
-//			colors [i] = color1;
-//		}
-		mesh.colors = acolors;
-		anchor.setColor (c1);
-		anchor.model.mat.color = color1;
-		for (int i = 1; i <= 4; i++) {
-			new_pos = new Vector2 (pos.x + i, pos.y);
-			yield return new WaitForSeconds (.08f);
-			if (i % 2 == 0) {
-				squares [i] = addSquare (new_pos, c1);
-			} else {
-				squares [i] = addSquare (new_pos, c2);
+	void Update(){
+		if (growing) {
+			growCounter += Time.deltaTime * speed;
+		}
+		if (growCounter >= 1) {
+			Vector2 pos = anchor.getPosition ();
+			Vector2 new_pos;
+			Mesh mesh = anchor.model.GetComponent<MeshFilter> ().mesh;
+			mesh.colors = acolors;
+			anchor.setColor (c1);
+			anchor.model.mat.color = color1;
+
+			switch (shapeType) {
+			case 0: // _
+				for (int i = 1; i <= 4; i++) {
+					new_pos = new Vector2 (pos.x + i, pos.y);
+					growCounter = 0;
+					if (i % 2 == 0) {
+						squares [i] = addSquare (new_pos, c1);
+					} else {
+						squares [i] = addSquare (new_pos, c2);
+					}
+				}
+				growCounter = 0;
+				//StartCoroutine (settleShape ());
+				break;
+			case 1: // l
+				for (int i = 1; i <= 4; i++) {
+					new_pos = new Vector2 (pos.x, pos.y + i);
+					growCounter = 0;
+					if (i % 2 == 0) {
+						squares [i] = addSquare (new_pos, c1);
+					} else {
+						squares [i] = addSquare (new_pos, c2);
+					}
+				}
+				growCounter = 0;
+				break;
+			default:
+				print ("Whoopsies! you hit the default shape case, line 42");
+				break;
+			}
+		} else {
+			foreach (Square s in squares) {
+				if (s != null) {
+					s.setFalling (true);
+				}
 			}
 		}
-		yield return new WaitForSeconds (.25f);
-		StartCoroutine (settleShape ());
-	}
 
-
-	private IEnumerator grow_l() {
-		anchor.setFalling (true);
-		Vector2 pos = anchor.getPosition ();
-		Vector2 new_pos;
-		Mesh mesh = anchor.model.GetComponent<MeshFilter> ().mesh;
-		//		Color[] colors = new Color[mesh.uv.Length];
-		//		for (var i = 0; i < mesh.uv.Length; i++) {
-		//			colors [i] = color1;
-		//		}
-		mesh.colors = acolors;
-		anchor.setColor (c1);
-		anchor.model.mat.color = color1;
-		for (int i = 1; i <= 4; i++) {
-			new_pos = new Vector2 (pos.x, pos.y+i);
-			yield return new WaitForSeconds (.08f);
-			if (i % 2 == 0) {
-				squares [i] = addSquare (new_pos, c1);
-			} else {
-				squares [i] = addSquare (new_pos, c2);
-			}
-		}
-		yield return new WaitForSeconds (.25f);
-		StartCoroutine (settleShape ());
 	}
 
 	// ---

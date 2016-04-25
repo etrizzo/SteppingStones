@@ -41,17 +41,32 @@ public class GameManager : MonoBehaviour {
 	public Square destination;
 	public Square beginning;
 
+	GUIStyle guiStyle;
+	GUIStyle guiStyle2;
+
 	void Start () {
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
 		groundSquares = new List<Square> ();
 
-		this.cam = Camera.main;
-		dist = (cam.transform.position).z;
-		x_coord = Camera.main.ViewportToWorldPoint (new Vector3 (1, 0, dist)).x;
-		y_coord = Camera.main.ViewportToWorldPoint (new Vector3 (0, 1, dist)).y;
-
 		initSound ();
+		initStyles ();
+	}
+
+	private void initStyles(){
+		//Cursor.SetCursor ((Texture2D)Resources.Load ("Textures/cursor"), new Vector2 (4, 4), CursorMode.Auto);
+
+		guiStyle = new GUIStyle ();
+		//guiStyle.font = (Font)Resources.Load("Fonts/Mathlete-Skinny");
+		guiStyle.alignment = TextAnchor.MiddleCenter;
+		guiStyle.font = (Font)Resources.Load ("Fonts/Mathlete-Skinny");
+
+		//HOME MENU
+		guiStyle2 = new GUIStyle ();
+		guiStyle2.fontSize = 100;
+		guiStyle2.alignment = TextAnchor.MiddleCenter;
+		guiStyle2.font = (Font)Resources.Load ("Fonts/Metrica");
+		guiStyle2.normal.textColor = new Color (1f, 1f, 1f, .9f);
 	}
 
 	void initSound(){
@@ -242,7 +257,12 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void fixCamera(){
-		Camera cam = Camera.main;
+
+		this.cam = Camera.main;
+		dist = (cam.transform.position).z;
+		x_coord = Camera.main.ViewportToWorldPoint (new Vector3 (1, 0, dist)).x;
+		y_coord = Camera.main.ViewportToWorldPoint (new Vector3 (0, 1, dist)).y;
+
 		int height = (int)(h / 2);
 		int width = (int)(w / 2);
 		cam.orthographicSize = height + 2;
@@ -294,12 +314,21 @@ public class GameManager : MonoBehaviour {
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
-		//		square.transform.parent = squareFolder.transform;
+		//square.transform.parent = squareFolder.transform;
 		square.transform.position = new Vector3 (w, height, 0);
 		square.init(new Vector2((float) w, (float) height), 4, false);
 
 		square.name = "Destination";
 //		sqman.destination = square;
+		square.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window");
+
+		GameObject towerObject = GameObject.CreatePrimitive (PrimitiveType.Quad);
+		Tower tower = towerObject.AddComponent<Tower> ();
+
+		tower.transform.position = new Vector3 (w, height, 0);
+		tower.init(new Vector2((float) w, (float) height), square, this);
+
+		tower.name = "Tower";
 
 		return square;
 	}
@@ -369,7 +398,7 @@ public class GameManager : MonoBehaviour {
 		if (!go && !done) {
 			xpos = ((Screen.width) - (100)) / 2;
 			ypos = ((Screen.height) - (80)) / 2 - ((Screen.height / 3)-(Screen.height/10));
-			GUI.Label (new Rect (xpos, ypos, 100, 50), "Stepping Stones");
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "Stepping Stones", guiStyle2);
 		}
 		if (!go && !done) {
 			xpos = ((Screen.width) - (60)) / 2;

@@ -17,7 +17,7 @@ public class SquareManager : MonoBehaviour {
 	public AudioSource movOffAudio;
 	public AudioClip movOffClip;
 
-	Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
+	public Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
 	public int BOARDSIZEX = 24;
 	public int BOARDSIZEY = 16;
 	static int queueY = -1;

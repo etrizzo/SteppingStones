@@ -147,7 +147,7 @@ public class Square : MonoBehaviour {
 		if (below == null) {
 			fall ();
 			if (above != null) {
-				if (above.rigid != null) {
+				if (above.rigid != null && rigid != null && above.rigid != rigid) {
 					above.rigid.settleShape ();
 				} else {
 					above.setFalling (true);
@@ -205,14 +205,14 @@ public class Square : MonoBehaviour {
 				}
 				Destroy (sq.gameObject);
 				conflicted = true;
-				conflictAudio.Play (); //we need more time???
+				//conflictAudio.Play (); //we need more time???
 
 			}
 		}
 
 
 		if (conflicted) {
-
+			sqman.conflict = true;
 			sqman.chainSettle (this.getPosition());
 			if (this.rigid != null) {
 				//			print ("breaking " + c.rigid);

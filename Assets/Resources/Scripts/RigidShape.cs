@@ -28,7 +28,7 @@ public class RigidShape : MonoBehaviour {
 
 	SquareManager sm;
 
-	bool falling = false;
+	public bool falling = false;
 
 	public void init(Square a, Square[,] b, SquareManager sm) {
 		anchor = a;
@@ -142,7 +142,6 @@ public class RigidShape : MonoBehaviour {
 //				}
 
 					growCounter = 0;
-				//StartCoroutine (settleShape ());
 					break;
 				case 1: // l
 //					for (int i = 1; i <= 4; i++) {
@@ -209,14 +208,10 @@ public class RigidShape : MonoBehaviour {
 				s.setPosition (new Vector2 (pos.x, pos.y - 1));
 			}
 			counter = 0;
-//			yield return new WaitForSeconds (.5f);
-//			if (this != null) {
-//				StartCoroutine (settleShape ());
-//			}
+			setShapeFalling (true);
 		}
 		else {
 			setShapeFalling (false);
-			falling = false;
 			//Debug.Log("Checking conflicts!");
 			checkConflicts ();
 
@@ -224,12 +219,13 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	public void setShapeFalling(bool b){
-		foreach (Square s in squares) {
+		falling = b;
+		/*foreach (Square s in squares) {
 			Vector2 pos = s.getPosition ();
 			Square below = board [(int)(pos.x), (int)(pos.y - 1)];
 //			Debug.Log(s + "at position"+s.getPosition().x+", "+s.getPosition().y+" has landed on " + below+" at position"+below.getPosition().x+", "+below.getPosition().y);
 			s.setFalling (b);
-		}
+		}*/
 	}
 
 	bool checkSettle(){

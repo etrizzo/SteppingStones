@@ -268,17 +268,18 @@ public class SquareManager : MonoBehaviour {
 	//checks to see if the square above pos needs to be settled
 	public void chainSettle(Vector2 pos){
 		if (pos.y < BOARDSIZEY - 1) {
-			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
-				Square above = board [(int)pos.x, (int)pos.y + i];
+//			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
+				Square above = board [(int)pos.x, (int)pos.y + 1];
 				if (above != null) {
 					if (above.rigid != null) {
+//						above.rigid.settleShape ();
 						above.rigid.setShapeFalling (true);
 					} else {
 						above.setFalling (true);
 					}
 				}
 			}
-		}
+//		}
 	}
 
 	public void resolveConflict (Square s, Square c){

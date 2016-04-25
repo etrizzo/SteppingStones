@@ -26,6 +26,9 @@ public class RigidShape : MonoBehaviour {
 	float counter = 0f;
 	int growIndex = 1;
 
+	bool wait = false;
+	float conflictCounter = 0f;
+
 	SquareManager sm;
 
 	public bool falling = false;
@@ -112,14 +115,21 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	void Update(){
+		if (wait) {
+			conflictCounter += Time.deltaTime * speed;
+			if (conflictCounter >= 1) {
+
+				checkConflicts ();
+			}
+		}
 		if (growing) {
-			growCounter += Time.deltaTime * speed*2;
+			growCounter += Time.deltaTime * speed * 2;
 		} else if (falling) {
 			counter += Time.deltaTime * speed;
 			if (counter >= 1) {
 				settleShape ();
 			}
-		}
+		} 
 		if (growCounter >= 1) {
 			Vector2 pos = anchor.getPosition ();
 			Vector2 new_pos;
@@ -211,15 +221,18 @@ public class RigidShape : MonoBehaviour {
 			setShapeFalling (true);
 		}
 		else {
+			wait = true;
 			setShapeFalling (false);
 			//Debug.Log("Checking conflicts!");
-			checkConflicts ();
+
+//			checkConflicts ();
 
 		}
 	}
 
 	public void setShapeFalling(bool b){
 		falling = b;
+		counter = 0;
 		/*foreach (Square s in squares) {
 			Vector2 pos = s.getPosition ();
 			Square below = board [(int)(pos.x), (int)(pos.y - 1)];
@@ -253,6 +266,8 @@ public class RigidShape : MonoBehaviour {
 
 	void checkConflicts(){
 		print ("WHYY");
+		conflictCounter = 0;
+		wait = false;
 		foreach(Square s in squares){
 			if (s != null) {
 				s.checkConflicts ();

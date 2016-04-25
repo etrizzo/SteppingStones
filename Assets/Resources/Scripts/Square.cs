@@ -148,7 +148,8 @@ public class Square : MonoBehaviour {
 			fall ();
 			if (above != null) {
 				if (above.rigid != null && rigid != null && above.rigid != rigid) {
-					above.rigid.settleShape ();
+//					above.rigid.settleShape ();
+					above.rigid.setShapeFalling(true);
 				} else {
 					above.setFalling (true);
 				}
@@ -158,7 +159,7 @@ public class Square : MonoBehaviour {
 			// & it's not falling ....
 			falling = false;
 			counter = 0f;
-			wait = true;
+			wait = true;		//wait for conflicts to check?
 		} else {
 			// Do nothing, wait for Update() to call checkFall again ;)))))))
 		}

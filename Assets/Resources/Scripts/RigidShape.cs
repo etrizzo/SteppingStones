@@ -21,6 +21,7 @@ public class RigidShape : MonoBehaviour {
 	int speed = 10;
 	float growCounter = 0;
 	float counter = 0f;
+	int growIndex = 1;
 
 	SquareManager sm;
 
@@ -102,7 +103,7 @@ public class RigidShape : MonoBehaviour {
 
 	void Update(){
 		if (growing) {
-			growCounter += Time.deltaTime * speed;
+			growCounter += Time.deltaTime * speed*2;
 		} else if (falling) {
 			counter += Time.deltaTime * speed;
 			if (counter >= 1) {
@@ -116,39 +117,46 @@ public class RigidShape : MonoBehaviour {
 			mesh.colors = acolors;
 			anchor.setColor (c1);
 			anchor.model.mat.color = color1;
+			if (growIndex <= 4) {
+				
+				switch (shapeType) {
+				case 0: // _
+//				for (int i = 1; i <= 4; i++) {
+					new_pos = new Vector2 (pos.x + growIndex, pos.y);
+//					growCounter = 0;
+					if (growIndex % 2 == 0) {
+						squares [growIndex] = addSquare (new_pos, c1);
+					} else {
+						squares [growIndex] = addSquare (new_pos, c2);
+					}
+//				}
 
-			switch (shapeType) {
-			case 0: // _
-				for (int i = 1; i <= 4; i++) {
-					new_pos = new Vector2 (pos.x + i, pos.y);
 					growCounter = 0;
-					if (i % 2 == 0) {
-						squares [i] = addSquare (new_pos, c1);
-					} else {
-						squares [i] = addSquare (new_pos, c2);
-					}
-				}
-				growCounter = 0;
 				//StartCoroutine (settleShape ());
-				break;
-			case 1: // l
-				for (int i = 1; i <= 4; i++) {
-					new_pos = new Vector2 (pos.x, pos.y + i);
+					break;
+				case 1: // l
+//					for (int i = 1; i <= 4; i++) {
+						new_pos = new Vector2 (pos.x, pos.y + growIndex);
+//						growCounter = 0;
+						if (growIndex % 2 == 0) {
+							squares [growIndex] = addSquare (new_pos, c1);
+						} else {
+							squares [growIndex] = addSquare (new_pos, c2);
+						}
+//					}
 					growCounter = 0;
-					if (i % 2 == 0) {
-						squares [i] = addSquare (new_pos, c1);
-					} else {
-						squares [i] = addSquare (new_pos, c2);
-					}
+					break;
+				default:
+					print ("Whoopsies! you hit the default shape case, line 42");
+					break;
 				}
+				growIndex++;
+			} else {
 				growCounter = 0;
-				break;
-			default:
-				print ("Whoopsies! you hit the default shape case, line 42");
-				break;
+				growing = false;
+				falling = true;
+//				setShapeFalling (true);
 			}
-			growing = false;
-			falling = true;
 		} else {
 			/*foreach (Square s in squares) {
 				if (s != null) {
@@ -173,7 +181,7 @@ public class RigidShape : MonoBehaviour {
 		square.name = "Square " + sm.squares.Count;
 
 		board [(int)pos.x, (int)pos.y] = square;
-//		square.setFalling (true);
+		square.setFalling (false);
 		square.addSqman(sm);
 		return square;
 
@@ -190,6 +198,7 @@ public class RigidShape : MonoBehaviour {
 				board [(int)pos.x, (int)pos.y - 1] = s;
 				s.setPosition (new Vector2 (pos.x, pos.y - 1));
 			}
+			counter = 0;
 //			yield return new WaitForSeconds (.5f);
 //			if (this != null) {
 //				StartCoroutine (settleShape ());
@@ -265,7 +274,7 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	public bool checkValidGrow(Vector2 pos, int height, int width){
-		if (pos.x + width < sm.BOARDSIZEX && pos.y < sm.BOARDSIZEY) {		//anchor should always be bottom left
+		if (pos.x + width <= sm.BOARDSIZEX && pos.y + height <= sm.BOARDSIZEY) {		//anchor should always be bottom left
 			for (int i = 0; i < height; i++) {
 				if (board [(int)pos.x, (int)(pos.y + i)] != null) {
 //				if (!checkSpot((int)(pos.x), (int) (pos.y + i))){

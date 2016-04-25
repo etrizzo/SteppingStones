@@ -141,7 +141,11 @@ public class Square : MonoBehaviour {
 		if (below == null) {
 			fall ();
 			if (above != null) {
-				above.setFalling (true);
+				if (above.rigid != null) {
+					above.rigid.settleShape ();
+				} else {
+					above.setFalling (true);
+				}
 			}
 			counter = 0f;
 		} else if (!below.isFalling ()) {
@@ -197,9 +201,11 @@ public class Square : MonoBehaviour {
 
 			}
 		}
-		sqman.chainSettle (this.getPosition());
+
 
 		if (conflicted) {
+
+			sqman.chainSettle (this.getPosition());
 			if (this.rigid != null) {
 				//			print ("breaking " + c.rigid);
 				breakShape (this.rigid);
@@ -243,7 +249,7 @@ public class Square : MonoBehaviour {
 				wait = false;
 			}
 		}
-		if (isFalling()) {
+		if (isFalling() && rigid == null) {
 			counter += Time.deltaTime * speed;
 			if (counter >= 1) {
 				checkFall();

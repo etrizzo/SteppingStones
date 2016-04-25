@@ -16,9 +16,11 @@ public class RigidShape : MonoBehaviour {
 	Color[] acolors;
 	public AudioSource rsAudio;
 	public AudioClip rsClip;
+	public AudioSource settleAudio;
+	public AudioClip settleClip;
 
 	bool growing = false;
-	int speed = 10;
+	int speed = 5;
 	float growCounter = 0;
 	float counter = 0f;
 	int growIndex = 1;
@@ -57,6 +59,13 @@ public class RigidShape : MonoBehaviour {
 		rsAudio.playOnAwake = false;
 		rsClip = Resources.Load<AudioClip> ("Audio/Special Blocks/Grow 5");
 		rsAudio.clip = rsClip;
+
+		settleAudio = this.gameObject.AddComponent<AudioSource> ();
+		settleAudio.loop = false;
+		settleAudio.playOnAwake = false;
+		settleAudio.time = 1.0f;
+		settleClip = Resources.Load<AudioClip> ("Audio/Blocks Settle");
+		settleAudio.clip = settleClip;
 	}
 
 	private void updateModel() {
@@ -209,7 +218,7 @@ public class RigidShape : MonoBehaviour {
 			falling = false;
 			//Debug.Log("Checking conflicts!");
 			checkConflicts ();
-			sm.settleAudio.Play();
+			settleAudio.Play();
 
 		}
 	}

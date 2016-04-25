@@ -131,10 +131,16 @@ public class Square : MonoBehaviour {
 	public void checkFall() {
 		// Move down and stuff?j
 		Square above = null;
+		Square belowbelow = null;
 		if (pos.y + 1 < sqman.BOARDSIZEY) {
 			above = board [(int)pos.x, (int)pos.y + 1];
 		}
+
 		Square below = board[(int) pos.x, (int) pos.y - 1];
+
+		if (pos.y - 2 >= 0) {
+			belowbelow = board [(int)pos.x, (int)pos.y - 2];
+		}
 
 
 		// If there's no square under you, fall!
@@ -150,12 +156,14 @@ public class Square : MonoBehaviour {
 			counter = 0f;
 		} else if (!below.isFalling ()) {
 			// & it's not falling ....
-			settleAudio.Play ();
 			falling = false;
 			counter = 0f;
 			wait = true;
 		} else {
 			// Do nothing, wait for Update() to call checkFall again ;)))))))
+		}
+		if (belowbelow != null && !belowbelow.isFalling () && falling && rigid == null) {
+			settleAudio.Play ();
 		}
 	}
 

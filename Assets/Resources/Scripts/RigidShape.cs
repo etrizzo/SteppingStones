@@ -19,6 +19,7 @@ public class RigidShape : MonoBehaviour {
 	public AudioSource settleAudio;
 	public AudioClip settleClip;
 
+	bool played = false;
 	bool growing = false;
 	int speed = 5;
 	float growCounter = 0;
@@ -218,7 +219,6 @@ public class RigidShape : MonoBehaviour {
 			falling = false;
 			//Debug.Log("Checking conflicts!");
 			checkConflicts ();
-			settleAudio.Play();
 
 		}
 	}
@@ -236,10 +236,18 @@ public class RigidShape : MonoBehaviour {
 		Square s;
 		Vector2 pos;
 		Square below;
+		Square belowbelow = null;
 		for (int i = 0; i < 5; i++) {
 			s = squares [i];
 			pos = s.getPosition ();
 			below = board [(int)pos.x, (int)(pos.y - 1)];
+			if (pos.y - 2 >= 0) {
+				belowbelow = board [(int)pos.x, (int)(pos.y - 2)];
+			}
+			if (belowbelow != null && belowbelow.rigid != s.rigid && !belowbelow.isFalling () && falling && !played) {
+				settleAudio.Play();
+				played = true;
+			}
 			if (below != null && below.rigid != s.rigid && !below.isFalling()) {
 				return false;
 			}

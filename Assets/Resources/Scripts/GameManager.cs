@@ -33,6 +33,11 @@ public class GameManager : MonoBehaviour {
 	public GameObject groundSquareFolder;
 	public List<Square> groundSquares;
 
+	public Camera cam;
+	float dist;
+	public Background bg;
+	public static float x_coord, y_coord;
+
 	public Square destination;
 	public Square beginning;
 
@@ -40,6 +45,11 @@ public class GameManager : MonoBehaviour {
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
 		groundSquares = new List<Square> ();
+
+		this.cam = Camera.main;
+		dist = (cam.transform.position).z;
+		x_coord = Camera.main.ViewportToWorldPoint (new Vector3 (1, 0, dist)).x;
+		y_coord = Camera.main.ViewportToWorldPoint (new Vector3 (0, 1, dist)).y;
 
 		initSound ();
 	}
@@ -379,6 +389,18 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	private void initBackground ()
+	{
+		//creates background tile
+		GameObject bg_object = new GameObject ();			
+		bg_object.name = "BG Object";
+		Background bg = bg_object.AddComponent<Background> ();	
+		bg.transform.position = new Vector3 (0, 0, 0);		
+		bg.init (0, 0, this);										
+		bg.name = "Background";
+		this.bg = bg;							
+	}
+
 	private void startGame(){
 		menuAudio.mute = true;
 		GameObject sqmanObject = new GameObject ();
@@ -389,6 +411,8 @@ public class GameManager : MonoBehaviour {
 		sqman.init (board, q, rsq);
 		sqman.destination = destination;
 		sqman.beginning = beginning;
+
+		initBackground ();
 		go = true;
 
 		gameAudio1.Play();

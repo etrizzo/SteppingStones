@@ -417,9 +417,9 @@ public class GameManager : MonoBehaviour {
 		initBackground ();
 		go = true;
 
-		GameObject hiObject = new GameObject ();
-		hi = hiObject.AddComponent<Highlight>();
-		hi.init (sqman.queue);
+//		GameObject hiObject = new GameObject ();
+//		hi = hiObject.AddComponent<Highlight>();
+//		hi.init (sqman.queue);
 
 		gameAudio1.Play();
 		gameAudio2.Play();

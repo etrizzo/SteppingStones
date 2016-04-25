@@ -158,7 +158,9 @@ public class SquareManager : MonoBehaviour {
 					if (place) {
 						
 						Square square = queue.Dequeue ();
-						square.setFalling (true);
+						if (!square.isAnchor ()) {
+							square.setFalling (true);
+						}
 						square.setPosition (pos);
 						board [(int)pos.x, (int)pos.y] = square;
 						updateQueue ();
@@ -276,45 +278,45 @@ public class SquareManager : MonoBehaviour {
 
 	}
 
-	IEnumerator settleSquare(Square s){
-		//Debug.Log("Settling square!");
-		if (s.rigid == null) {
-			Vector2 pos = s.getPosition ();
-			Square below = board [(int)pos.x, (int)(pos.y - 1)];
-			Square above = null;
-			if (pos.y < BOARDSIZEY - 1) {
-				above = board [(int)pos.x, (int)(pos.y + 1)];
-			}
-
-				
-			if (below == null) {
-				yield return new WaitForSeconds (.5f);
-				counter = 0f;
-				board [(int)pos.x, (int)pos.y] = null;
-				board [(int)pos.x, (int)pos.y - 1] = s;
-				s.setPosition (new Vector2 (pos.x, pos.y - 1));
-				if (above != null) {
-//					StartCoroutine (settleSquare (above));
-				}
-				//("Square is at: " + s.getPosition ());
-//				StartCoroutine (settleSquare (s));
-			} else {
-				if (below != null && below.isFalling ()) {
-					yield return new WaitForSeconds (.25f);
-//					StartCoroutine (settleSquare (s));
-				} else {
-					//Debug.Log("Checking conflicts!");
-//					print(s + " has landed on " + below);
-					s.setFalling(false);
-					settleAudio.Play ();
-					StartCoroutine (checkConflicts (s));
-				}
-			}
-		} else {
-			StartCoroutine(s.rigid.settleShape ());
-		}
-		//getHeight ();
-	}
+//	IEnumerator settleSquare(Square s){
+//		//Debug.Log("Settling square!");
+//		if (s.rigid == null) {
+//			Vector2 pos = s.getPosition ();
+//			Square below = board [(int)pos.x, (int)(pos.y - 1)];
+//			Square above = null;
+//			if (pos.y < BOARDSIZEY - 1) {
+//				above = board [(int)pos.x, (int)(pos.y + 1)];
+//			}
+//
+//				
+//			if (below == null) {
+//				yield return new WaitForSeconds (.5f);
+//				counter = 0f;
+//				board [(int)pos.x, (int)pos.y] = null;
+//				board [(int)pos.x, (int)pos.y - 1] = s;
+//				s.setPosition (new Vector2 (pos.x, pos.y - 1));
+//				if (above != null) {
+////					StartCoroutine (settleSquare (above));
+//				}
+//				//("Square is at: " + s.getPosition ());
+////				StartCoroutine (settleSquare (s));
+//			} else {
+//				if (below != null && below.isFalling ()) {
+//					yield return new WaitForSeconds (.25f);
+////					StartCoroutine (settleSquare (s));
+//				} else {
+//					//Debug.Log("Checking conflicts!");
+////					print(s + " has landed on " + below);
+//					s.setFalling(false);
+//					settleAudio.Play ();
+//					StartCoroutine (checkConflicts (s));
+//				}
+//			}
+//		} else {
+//			StartCoroutine(s.rigid.settleShape ());
+//		}
+//		//getHeight ();
+//	}
 
 	public IEnumerator checkConflicts(Square s){
 		yield return new WaitForSeconds (.25f);

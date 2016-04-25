@@ -187,12 +187,25 @@ public class Square : MonoBehaviour {
 		foreach (Square sq in directedBlocks) {
 			if (sq != null && sq.getColor() == color && !sq.isFalling()) {
 				sqman.chainSettle (sq.getPosition());
+				if (sq.rigid != null) {
+					//			print ("breaking " + c.rigid);
+					breakShape (sq.rigid);
+				}
 				Destroy (sq.gameObject);
 				conflicted = true;
 				conflictAudio.Play (); //we need more time???
+
 			}
 		}
 		sqman.chainSettle (this.getPosition());
+
+		if (conflicted) {
+			if (this.rigid != null) {
+				//			print ("breaking " + c.rigid);
+				breakShape (this.rigid);
+			}
+
+		}
 
 		GameObject self = this.gameObject;
 
@@ -204,6 +217,18 @@ public class Square : MonoBehaviour {
 
 	public void Destroy(GameObject s){
 		DestroyImmediate (s);
+	}
+
+	public void breakShape(RigidShape rs){
+		foreach (Square s in rs.getSquares()) {
+			if (s != null) {
+				s.anchor = false;
+				s.rigid = null;
+				s.setFalling (true);
+				//				StartCoroutine (settleSquare (s));
+			}
+		}
+		DestroyImmediate (rs);
 	}
 
 	public void Update() {

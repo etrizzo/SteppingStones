@@ -20,13 +20,17 @@ public class RigidShape : MonoBehaviour {
 	bool growing = false;
 	int speed = 10;
 	float growCounter = 0;
+	float counter = 0f;
 
 	SquareManager sm;
+
+	bool falling = false;
 
 	public void init(Square a, Square[,] b, SquareManager sm) {
 		anchor = a;
 		anchor.rigid = this;
 		anchor.setAnchor ();
+		anchor.setFalling (false);
 		board = b;
 		this.sm = sm;
 		shapeType = generateTypeProbability();
@@ -99,6 +103,11 @@ public class RigidShape : MonoBehaviour {
 	void Update(){
 		if (growing) {
 			growCounter += Time.deltaTime * speed;
+		} else if (falling) {
+			counter += Time.deltaTime * speed;
+			if (counter >= 1) {
+				settleShape ();
+			}
 		}
 		if (growCounter >= 1) {
 			Vector2 pos = anchor.getPosition ();
@@ -138,6 +147,8 @@ public class RigidShape : MonoBehaviour {
 				print ("Whoopsies! you hit the default shape case, line 42");
 				break;
 			}
+			growing = false;
+			falling = true;
 		} else {
 			/*foreach (Square s in squares) {
 				if (s != null) {
@@ -168,27 +179,29 @@ public class RigidShape : MonoBehaviour {
 
 	}
 
-	public IEnumerator settleShape(){
+	public void settleShape(){
 		Vector2 pos;
-		bool settle = checkSettle ();
+//		bool settle = checkSettle ();
 //		Debug.Log("Settling shape! " +settle);
-		if (settle) {
+		if (checkSettle()) {
 			foreach(Square s in squares){
 				pos = s.getPosition ();
 				board [(int)pos.x, (int)pos.y] = null;
 				board [(int)pos.x, (int)pos.y - 1] = s;
 				s.setPosition (new Vector2 (pos.x, pos.y - 1));
 			}
-			yield return new WaitForSeconds (.5f);
-			if (this != null) {
-				StartCoroutine (settleShape ());
-			}
+//			yield return new WaitForSeconds (.5f);
+//			if (this != null) {
+//				StartCoroutine (settleShape ());
+//			}
 		}
 		else {
 			setShapeFalling (false);
+			falling = false;
 			//Debug.Log("Checking conflicts!");
-			sm.settleAudio.Play();
 			checkConflicts ();
+			sm.settleAudio.Play();
+
 		}
 	}
 
@@ -196,7 +209,7 @@ public class RigidShape : MonoBehaviour {
 		foreach (Square s in squares) {
 			Vector2 pos = s.getPosition ();
 			Square below = board [(int)(pos.x), (int)(pos.y - 1)];
-			Debug.Log(s + "at position"+s.getPosition().x+", "+s.getPosition().y+" has landed on " + below+" at position"+below.getPosition().x+", "+below.getPosition().y);
+//			Debug.Log(s + "at position"+s.getPosition().x+", "+s.getPosition().y+" has landed on " + below+" at position"+below.getPosition().x+", "+below.getPosition().y);
 			s.setFalling (b);
 		}
 	}
@@ -217,9 +230,10 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	void checkConflicts(){
+		print ("WHYY");
 		foreach(Square s in squares){
 			if (s != null) {
-				StartCoroutine (sm.checkConflicts (s));
+				s.checkConflicts ();
 			}
 		}
 	}

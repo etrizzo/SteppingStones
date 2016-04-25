@@ -212,18 +212,18 @@ public class GameManager : MonoBehaviour {
 			}
 		} 
 
-		wave += Time.deltaTime * waveSpeed;
-		if (wave >= 3) {
-			destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
-			wave = -1;
-		}
-		else if (wave >= 2) {
-			destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
-		} else if (wave >= 1) {
-			destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
-		}
-		else{
-			destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+		if (destination != null) {
+			wave += Time.deltaTime * waveSpeed;
+			if (wave > 3) {
+				destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+				wave = -1;
+			} else if (wave > 2) {
+				destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
+			} else if (wave > 1) {
+				destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+			} else if(wave > 0) {
+				destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
+			}
 		}
 	}
 

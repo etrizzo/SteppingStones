@@ -41,8 +41,11 @@ public class GameManager : MonoBehaviour {
 	public Square destination;
 	public Square beginning;
 
+
 	GUIStyle guiStyle;
 	GUIStyle guiStyle2;
+
+	public Highlight hi;
 
 	void Start () {
 		groundSquareFolder = new GameObject();
@@ -135,11 +138,11 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Update(){
+		Vector3 worldPos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+		int mousex = (int)Mathf.Floor (worldPos.x);
+		int mousey = (int)Mathf.Ceil (worldPos.y);
 		if (state.mode == 1 && sqman != null) {		//if the game is playing
 			if (Input.GetMouseButtonUp (0)) {
-				Vector3 worldPos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-				int mousex = (int)Mathf.Floor (worldPos.x);
-				int mousey = (int)Mathf.Ceil (worldPos.y);
 				sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
 			}
 			if (sqman.height < 4) {
@@ -443,6 +446,10 @@ public class GameManager : MonoBehaviour {
 
 		initBackground ();
 		go = true;
+
+		GameObject hiObject = new GameObject ();
+		hi = hiObject.AddComponent<Highlight>();
+		hi.init (sqman.queue);
 
 		gameAudio1.Play();
 		gameAudio2.Play();

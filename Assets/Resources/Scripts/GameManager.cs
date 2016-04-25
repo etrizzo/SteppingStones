@@ -40,6 +40,8 @@ public class GameManager : MonoBehaviour {
 
 	public Square destination;
 	public Square beginning;
+	float wave = 0;
+	int waveSpeed = 3;
 
 
 	GUIStyle guiStyle;
@@ -209,6 +211,20 @@ public class GameManager : MonoBehaviour {
 				gameAudio7.mute = false;
 			}
 		} 
+
+		wave += Time.deltaTime * waveSpeed;
+		if (wave >= 3) {
+			destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+			wave = -1;
+		}
+		else if (wave >= 2) {
+			destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
+		} else if (wave >= 1) {
+			destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+		}
+		else{
+			destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+		}
 	}
 
 
@@ -323,15 +339,46 @@ public class GameManager : MonoBehaviour {
 
 		square.name = "Destination";
 //		sqman.destination = square;
-		square.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window");
+		square.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
 
-		GameObject towerObject = GameObject.CreatePrimitive (PrimitiveType.Quad);
+		GameObject towerTopObject1 = new GameObject ();
+		Square towerTopSquare1 = towerTopObject1.AddComponent<Square> ();
+		GameObject towerTopObject2 = new GameObject ();
+		Square towerTopSquare2 = towerTopObject2.AddComponent<Square> ();
+
+		towerTopSquare1.transform.position = new Vector3(w, height+1, 0);
+		towerTopSquare1.init(new Vector2((float) w, (float) height+1), 5, false);
+		towerTopSquare2.transform.position = new Vector3 (w + 1, height+1, 0);
+		towerTopSquare2.init(new Vector2((float) w+1, (float) height+1), 5, false);
+
+		towerTopSquare1.name = "Tower Top Square 1 ";
+		towerTopSquare2.name = "Tower Top Square 2 ";
+
+		towerTopSquare1.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/towerCornerL");
+		towerTopSquare2.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/towerCornerR");
+
+		for (int i = height; i >= 0; i--) {
+			GameObject towerObject1 = new GameObject ();
+			Square towerSquare1 = towerObject1.AddComponent<Square> ();
+			GameObject towerObject2 = new GameObject ();
+			Square towerSquare2 = towerObject2.AddComponent<Square> ();
+
+			towerSquare1.transform.position = new Vector3(w, i, 0);
+			towerSquare1.init(new Vector2((float) w, (float) i), 5, false);
+			towerSquare2.transform.position = new Vector3 (w + 1, i, 0);
+			towerSquare2.init(new Vector2((float) w+1, (float) i), 5, false);
+
+			towerSquare1.name = "Tower Square 1 " + i;
+			towerSquare2.name = "Tower Square 2 " + i;
+		}
+
+		/*GameObject towerObject = GameObject.CreatePrimitive (PrimitiveType.Quad);
 		Tower tower = towerObject.AddComponent<Tower> ();
 
 		tower.transform.position = new Vector3 (w, height, 0);
 		tower.init(new Vector2((float) w, (float) height), square, this);
 
-		tower.name = "Tower";
+		tower.name = "Tower";*/
 
 		return square;
 	}

@@ -58,6 +58,9 @@ public class SquareModel : MonoBehaviour
 			case 4:
 				mat.color = Color.white;
 				break;
+			case 5:
+				mat.color = Color.gray;
+				break;
 			default:
 				mat.color = Color.black;
 				break;

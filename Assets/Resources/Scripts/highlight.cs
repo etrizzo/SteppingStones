@@ -12,10 +12,10 @@ public class Highlight : MonoBehaviour {
 	Queue<Square> queue;
 	SquareModel model;
 
-	Square dummy;
 	Square made;
 
-	public void init(Queue<Square> q) {
+	public void init(Queue<Square> q, SquareManager sqm) {
+		sqman = sqm;
 		lastMousePos = new Vector2 (-1, 1);
 		queue = q;
 
@@ -46,25 +46,18 @@ public class Highlight : MonoBehaviour {
 	void updateModel() {
 		if (mouseMoved()) {
 			Debug.Log ("Got the queue, it looks like: " + queue.Count);
-			Square next = queue.Peek ();
+			Square next = sqman.queue.Peek ();
 			int type = next.getType ();
 			Debug.Log ("Next queued block is of type: " + type);
 			if (type < 5) {
+				// TODO: Note mouse.y, but a new variable that causes it to be the block it woud
+				// acutally land on, so something like 'lowestPossibleY' ????
 				made.transform.position = new Vector3(mouse.x, mouse.y, 0);
-	//			dummy = new Square ();
-	//			dummy.init (new Vector2 (mousex, mousey), 0, false, 0);
-	//			// It's just a square :)
-	//			var modelObject = GameObject.CreatePrimitive (PrimitiveType.Quad);
-	//			model = modelObject.AddComponent<SquareModel> ();
-	//			model.init (dummy);
-
-
 			} else if (type == 5) {
-				// Change dummy or something???? Spawn dummy with different x and y values;
 				RigidShape rs = next.rigid;
 				int shapeType = rs.shapeType;
 				if (shapeType == 0) {
-					// it's _
+					// it's _, spawn some additional shapes!
 
 				} else {
 					// it's I vertical!

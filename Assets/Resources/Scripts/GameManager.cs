@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour {
 	public Square beginning;
 
 	public Hero hero;
+	public bool success = false;
 
 	float wave = 0;
 	int waveSpeed = 3;
@@ -150,7 +151,16 @@ public class GameManager : MonoBehaviour {
 			if (Input.GetMouseButtonUp (0)) {
 				sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
 			}
-			if (sqman.height < 4) {
+			if (success) {
+				gameAudio1.mute = true;
+				gameAudio2.mute = true;
+				gameAudio3.mute = true;
+				gameAudio4.mute = true;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height < 4 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = true;
 				gameAudio3.mute = true;
@@ -159,7 +169,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 4) {
+			if (sqman.height > 4 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = true;
@@ -168,7 +178,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 6) {
+			if (sqman.height > 6 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -177,7 +187,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 8) {
+			if (sqman.height > 8 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -186,7 +196,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 10) {
+			if (sqman.height > 10 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -195,7 +205,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 12) {
+			if (sqman.height > 12 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -204,7 +214,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = false;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 14) {
+			if (sqman.height > 14 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -506,7 +516,7 @@ public class GameManager : MonoBehaviour {
 
 		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.name = "Square Manager";
-		sqman.init (board, q, rsq);
+		sqman.init (this, board, q, rsq);
 		sqman.destination = destination;
 		sqman.beginning = beginning;
 

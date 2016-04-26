@@ -8,8 +8,8 @@ public class SquareManager : MonoBehaviour {
 	public List<Square> squares;
 	public GameObject rsFolder;
 	public List<RigidShape> rigidshapes;
-	public AudioSource settleAudio;
-	public AudioClip settleClip;
+	public AudioSource successAudio;
+	public AudioClip successClip;
 	public AudioSource conflictAudio;
 	public AudioClip conflictClip;
 	public AudioSource movOnAudio;
@@ -34,13 +34,15 @@ public class SquareManager : MonoBehaviour {
 	public bool firstSquare = true;
 	public Square destination;		//TODO: TEMPORARY :O
 	public Square beginning;		//TODO: TEMPORARY :O
+	public GameManager gm;
 
 	public bool conflict = false;
 
 //	float randFreq = .2;
 
 
-	public void init(Square[,] board, int[] q, int[] rsq = null){
+	public void init(GameManager gm, Square[,] board, int[] q, int[] rsq = null){
+		this.gm = gm;
 		squareFolder = new GameObject();
 		squareFolder.name = "Squares";
 		squares = new List<Square> ();
@@ -59,12 +61,12 @@ public class SquareManager : MonoBehaviour {
 	}
 
 	void initSound(){
-		/*settleAudio = this.gameObject.AddComponent<AudioSource> ();
-		settleAudio.loop = false;
-		settleAudio.playOnAwake = false;
-		settleAudio.time = 1.0f;
-		settleClip = Resources.Load<AudioClip> ("Audio/Blocks Settle");
-		settleAudio.clip = settleClip;*/
+		successAudio = this.gameObject.AddComponent<AudioSource> ();
+		successAudio.loop = false;
+		successAudio.playOnAwake = false;
+		successAudio.time = 1.0f;
+		successClip = Resources.Load<AudioClip> ("Audio/Victory Climb");
+		successAudio.clip = successClip;
 
 		conflictAudio = this.gameObject.AddComponent<AudioSource> ();
 		conflictAudio.loop = false;
@@ -393,11 +395,18 @@ public class SquareManager : MonoBehaviour {
 		// Short circuit, because if the last column's block 1 below the destination isn't a square, then there's no point running the alg.
 		if (destinationClose() && pathValid(beginning)) {
 			solved = true;
+
+			playSuccess ();
 		} else {
 			solved = false;
 		}
 		Debug.Log ("Did you solve the board? : " + solved);
 		return solved;
+	}
+
+	private void playSuccess(){
+		gm.success = true;
+		successAudio.Play ();
 	}
 
 	private bool destinationClose() {

@@ -10,7 +10,6 @@ public class SquareModel : MonoBehaviour
 //	public Rigidbody2D rb;
 
 	public void init(Square owner) {
-
 		this.owner = owner;
 		transform.parent = owner.transform;					// Set the model's parent to the gem.
 		transform.localPosition = new Vector3(.5f,-.5f,0);		// Center the model on the parent.
@@ -58,6 +57,9 @@ public class SquareModel : MonoBehaviour
 				break;
 			case 4:
 				mat.color = Color.white;
+				break;
+			case 5:
+				mat.color = Color.gray;
 				break;
 			default:
 				mat.color = Color.black;

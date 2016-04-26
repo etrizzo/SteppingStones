@@ -6,7 +6,7 @@ using System.IO;
 public class GameManager : MonoBehaviour {
 
 
-	SquareManager sqman;
+	public SquareManager sqman;
 	public AudioSource menuAudio;
 	public AudioClip menuClip;
 	public AudioSource gameAudio1;
@@ -41,6 +41,16 @@ public class GameManager : MonoBehaviour {
 	public Square destination;
 	public Square beginning;
 
+	public Hero hero;
+	public bool success = false;
+
+	float wave = 0;
+	int waveSpeed = 3;
+
+
+	GUIStyle guiStyle;
+	GUIStyle guiStyle2;
+
 	public Highlight hi;
 
 	void Start () {
@@ -48,12 +58,24 @@ public class GameManager : MonoBehaviour {
 		groundSquareFolder.name = "Ground";
 		groundSquares = new List<Square> ();
 
-		this.cam = Camera.main;
-		dist = (cam.transform.position).z;
-		x_coord = Camera.main.ViewportToWorldPoint (new Vector3 (1, 0, dist)).x;
-		y_coord = Camera.main.ViewportToWorldPoint (new Vector3 (0, 1, dist)).y;
-
 		initSound ();
+		initStyles ();
+	}
+
+	private void initStyles(){
+		//Cursor.SetCursor ((Texture2D)Resources.Load ("Textures/cursor"), new Vector2 (4, 4), CursorMode.Auto);
+
+		guiStyle = new GUIStyle ();
+		//guiStyle.font = (Font)Resources.Load("Fonts/Mathlete-Skinny");
+		guiStyle.alignment = TextAnchor.MiddleCenter;
+		guiStyle.font = (Font)Resources.Load ("Fonts/Mathlete-Skinny");
+
+		//HOME MENU
+		guiStyle2 = new GUIStyle ();
+		guiStyle2.fontSize = 100;
+		guiStyle2.alignment = TextAnchor.MiddleCenter;
+		guiStyle2.font = (Font)Resources.Load ("Fonts/Metrica");
+		guiStyle2.normal.textColor = new Color (1f, 1f, 1f, .9f);
 	}
 
 	void initSound(){
@@ -129,7 +151,16 @@ public class GameManager : MonoBehaviour {
 			if (Input.GetMouseButtonUp (0)) {
 				sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
 			}
-			if (sqman.height < 4) {
+			if (success) {
+				gameAudio1.mute = true;
+				gameAudio2.mute = true;
+				gameAudio3.mute = true;
+				gameAudio4.mute = true;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height < 4 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = true;
 				gameAudio3.mute = true;
@@ -138,7 +169,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 4) {
+			if (sqman.height > 4 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = true;
@@ -147,7 +178,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 6) {
+			if (sqman.height > 6 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -156,7 +187,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 8) {
+			if (sqman.height > 8 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -165,7 +196,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 10) {
+			if (sqman.height > 10 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -174,7 +205,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 12) {
+			if (sqman.height > 12 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -183,7 +214,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = false;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 14) {
+			if (sqman.height > 14 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -193,6 +224,20 @@ public class GameManager : MonoBehaviour {
 				gameAudio7.mute = false;
 			}
 		} 
+
+		if (destination != null) {
+			wave += Time.deltaTime * waveSpeed;
+			if (wave > 3) {
+				destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+				wave = -1;
+			} else if (wave > 2) {
+				destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
+			} else if (wave > 1) {
+				destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+			} else if(wave > 0) {
+				destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
+			}
+		}
 	}
 
 
@@ -212,6 +257,7 @@ public class GameManager : MonoBehaviour {
 		line = sr.ReadLine ();
 		int beginHeight = int.Parse (line);
 		beginning = makeBeginning (beginHeight);
+		hero = makeHero (beginHeight);
 		line = sr.ReadLine();
 		int destHeight = int.Parse (line);
 		destination = makeDestination (destHeight);
@@ -244,7 +290,12 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void fixCamera(){
-		Camera cam = Camera.main;
+
+		this.cam = Camera.main;
+		dist = (cam.transform.position).z;
+		x_coord = Camera.main.ViewportToWorldPoint (new Vector3 (1, 0, dist)).x;
+		y_coord = Camera.main.ViewportToWorldPoint (new Vector3 (0, 1, dist)).y;
+
 		int height = (int)(h / 2);
 		int width = (int)(w / 2);
 		cam.orthographicSize = height + 2;
@@ -289,19 +340,74 @@ public class GameManager : MonoBehaviour {
 
 		square.name = "Beginning";
 
+		square.model.mat.color = Color.gray;
+
 		return square;
+	}
+
+	public Hero makeHero(int height){
+		GameObject heroObject = new GameObject ();
+		Hero hero = heroObject.AddComponent<Hero> ();
+
+		//		square.transform.parent = squareFolder.transform;
+		hero.transform.position = new Vector3 (-1, height+1, 0);
+		hero.init(new Vector2((float) -1, (float) height+1), this);
+
+		hero.name = "Hero";
+
+		return hero;
 	}
 
 	public Square makeDestination(int height){
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
-		//		square.transform.parent = squareFolder.transform;
+		//square.transform.parent = squareFolder.transform;
 		square.transform.position = new Vector3 (w, height, 0);
 		square.init(new Vector2((float) w, (float) height), 4, false);
 
 		square.name = "Destination";
 //		sqman.destination = square;
+		square.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
+
+		GameObject towerTopObject1 = new GameObject ();
+		Square towerTopSquare1 = towerTopObject1.AddComponent<Square> ();
+		GameObject towerTopObject2 = new GameObject ();
+		Square towerTopSquare2 = towerTopObject2.AddComponent<Square> ();
+
+		towerTopSquare1.transform.position = new Vector3(w, height+1, 0);
+		towerTopSquare1.init(new Vector2((float) w, (float) height+1), 5, false);
+		towerTopSquare2.transform.position = new Vector3 (w + 1, height+1, 0);
+		towerTopSquare2.init(new Vector2((float) w+1, (float) height+1), 5, false);
+
+		towerTopSquare1.name = "Tower Top Square 1 ";
+		towerTopSquare2.name = "Tower Top Square 2 ";
+
+		towerTopSquare1.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/towerCornerL");
+		towerTopSquare2.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/towerCornerR");
+
+		for (int i = height; i >= 0; i--) {
+			GameObject towerObject1 = new GameObject ();
+			Square towerSquare1 = towerObject1.AddComponent<Square> ();
+			GameObject towerObject2 = new GameObject ();
+			Square towerSquare2 = towerObject2.AddComponent<Square> ();
+
+			towerSquare1.transform.position = new Vector3(w, i, 0);
+			towerSquare1.init(new Vector2((float) w, (float) i), 5, false);
+			towerSquare2.transform.position = new Vector3 (w + 1, i, 0);
+			towerSquare2.init(new Vector2((float) w+1, (float) i), 5, false);
+
+			towerSquare1.name = "Tower Square 1 " + i;
+			towerSquare2.name = "Tower Square 2 " + i;
+		}
+
+		/*GameObject towerObject = GameObject.CreatePrimitive (PrimitiveType.Quad);
+		Tower tower = towerObject.AddComponent<Tower> ();
+
+		tower.transform.position = new Vector3 (w, height, 0);
+		tower.init(new Vector2((float) w, (float) height), square, this);
+
+		tower.name = "Tower";*/
 
 		return square;
 	}
@@ -371,7 +477,7 @@ public class GameManager : MonoBehaviour {
 		if (!go && !done) {
 			xpos = ((Screen.width) - (100)) / 2;
 			ypos = ((Screen.height) - (80)) / 2 - ((Screen.height / 3)-(Screen.height/10));
-			GUI.Label (new Rect (xpos, ypos, 100, 50), "Stepping Stones");
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "Stepping Stones", guiStyle2);
 		}
 		if (!go && !done) {
 			xpos = ((Screen.width) - (60)) / 2;
@@ -410,7 +516,7 @@ public class GameManager : MonoBehaviour {
 
 		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.name = "Square Manager";
-		sqman.init (board, q, rsq);
+		sqman.init (this, board, q, rsq);
 		sqman.destination = destination;
 		sqman.beginning = beginning;
 

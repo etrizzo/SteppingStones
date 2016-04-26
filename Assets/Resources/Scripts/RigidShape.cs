@@ -26,9 +26,12 @@ public class RigidShape : MonoBehaviour {
 	float counter = 0f;
 	int growIndex = 1;
 
+	bool wait = false;
+	float conflictCounter = 0f;
+
 	SquareManager sm;
 
-	bool falling = false;
+	public bool falling = false;
 
 	public void init(Square a, Square[,] b, SquareManager sm) {
 		anchor = a;
@@ -112,14 +115,21 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	void Update(){
+		if (wait) {
+			conflictCounter += Time.deltaTime * speed;
+			if (conflictCounter >= 1) {
+
+				checkConflicts ();
+			}
+		}
 		if (growing) {
-			growCounter += Time.deltaTime * speed*2;
+			growCounter += Time.deltaTime * speed * 2;
 		} else if (falling) {
 			counter += Time.deltaTime * speed;
 			if (counter >= 1) {
 				settleShape ();
 			}
-		}
+		} 
 		if (growCounter >= 1) {
 			Vector2 pos = anchor.getPosition ();
 			Vector2 new_pos;
@@ -142,7 +152,6 @@ public class RigidShape : MonoBehaviour {
 //				}
 
 					growCounter = 0;
-				//StartCoroutine (settleShape ());
 					break;
 				case 1: // l
 //					for (int i = 1; i <= 4; i++) {
@@ -209,27 +218,27 @@ public class RigidShape : MonoBehaviour {
 				s.setPosition (new Vector2 (pos.x, pos.y - 1));
 			}
 			counter = 0;
-//			yield return new WaitForSeconds (.5f);
-//			if (this != null) {
-//				StartCoroutine (settleShape ());
-//			}
+			setShapeFalling (true);
 		}
 		else {
+			wait = true;
 			setShapeFalling (false);
-			falling = false;
 			//Debug.Log("Checking conflicts!");
-			checkConflicts ();
+
+//			checkConflicts ();
 
 		}
 	}
 
 	public void setShapeFalling(bool b){
-		foreach (Square s in squares) {
+		falling = b;
+		counter = 0;
+		/*foreach (Square s in squares) {
 			Vector2 pos = s.getPosition ();
 			Square below = board [(int)(pos.x), (int)(pos.y - 1)];
 //			Debug.Log(s + "at position"+s.getPosition().x+", "+s.getPosition().y+" has landed on " + below+" at position"+below.getPosition().x+", "+below.getPosition().y);
 			s.setFalling (b);
-		}
+		}*/
 	}
 
 	bool checkSettle(){
@@ -257,6 +266,8 @@ public class RigidShape : MonoBehaviour {
 
 	void checkConflicts(){
 		print ("WHYY");
+		conflictCounter = 0;
+		wait = false;
 		foreach(Square s in squares){
 			if (s != null) {
 				s.checkConflicts ();

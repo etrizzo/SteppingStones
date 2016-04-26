@@ -18,7 +18,7 @@ public class BackgroundModel : MonoBehaviour
 		transform.localPosition = new Vector3(owner.gm.cam.transform.position.x,owner.gm.cam.transform.position.y,1f);		// Center the model on the parent.
 		//quadHeight = Camera.main.orthographicSize * 2.0f;
 		//quadWidth = quadHeight * Screen.width / Screen.height;
-		//		transform.localScale = new Vector3(quadWidth * BGSCALE, quadHeight * BGSCALE,1f);
+		//transform.localScale = new Vector3(quadWidth * BGSCALE, quadHeight * BGSCALE,1f);
 		transform.localScale = new Vector3(GameManager.x_coord, GameManager.y_coord,1f);
 		name = "Background Model";									// Name the object.
 
@@ -26,5 +26,17 @@ public class BackgroundModel : MonoBehaviour
 		mat.shader = Shader.Find ("Sprites/Default");						// Tell the renderer that our textures have transparency.
 		mat.mainTexture = Resources.Load<Texture2D> ("Textures/background");	// Set the texture.  Must be in Resources folder.
 
+	}
+
+	public void Update(){
+		//resizes the background if the screen size is changed
+		//(also seems like a lot of unused calculations, idk if we care that much
+		float newheight = Camera.main.orthographicSize * 2.0f;
+		float newwidth = quadHeight * Screen.width / Screen.height;
+		if (quadHeight != newheight || quadWidth != newwidth) {
+			quadHeight = newheight;
+			quadWidth = newwidth;
+			transform.localScale = new Vector3 (newwidth, newheight, 1f);
+		}
 	}
 }

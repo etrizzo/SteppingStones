@@ -8,8 +8,8 @@ public class SquareManager : MonoBehaviour {
 	public List<Square> squares;
 	public GameObject rsFolder;
 	public List<RigidShape> rigidshapes;
-	public AudioSource settleAudio;
-	public AudioClip settleClip;
+	public AudioSource successAudio;
+	public AudioClip successClip;
 	public AudioSource conflictAudio;
 	public AudioClip conflictClip;
 	public AudioSource movOnAudio;
@@ -34,11 +34,15 @@ public class SquareManager : MonoBehaviour {
 	public bool firstSquare = true;
 	public Square destination;		//TODO: TEMPORARY :O
 	public Square beginning;		//TODO: TEMPORARY :O
+	public GameManager gm;
+
+	public bool conflict = false;
 
 //	float randFreq = .2;
 
 
-	public void init(Square[,] board, int[] q, int[] rsq = null){
+	public void init(GameManager gm, Square[,] board, int[] q, int[] rsq = null){
+		this.gm = gm;
 		squareFolder = new GameObject();
 		squareFolder.name = "Squares";
 		squares = new List<Square> ();
@@ -57,18 +61,18 @@ public class SquareManager : MonoBehaviour {
 	}
 
 	void initSound(){
-		/*settleAudio = this.gameObject.AddComponent<AudioSource> ();
-		settleAudio.loop = false;
-		settleAudio.playOnAwake = false;
-		settleAudio.time = 1.0f;
-		settleClip = Resources.Load<AudioClip> ("Audio/Blocks Settle");
-		settleAudio.clip = settleClip;
+		successAudio = this.gameObject.AddComponent<AudioSource> ();
+		successAudio.loop = false;
+		successAudio.playOnAwake = false;
+		successAudio.time = 1.0f;
+		successClip = Resources.Load<AudioClip> ("Audio/Victory Climb");
+		successAudio.clip = successClip;
 
 		conflictAudio = this.gameObject.AddComponent<AudioSource> ();
 		conflictAudio.loop = false;
 		conflictAudio.playOnAwake = false;
 		conflictClip = Resources.Load<AudioClip> ("Audio/Block Colors Match");
-		conflictAudio.clip = conflictClip;*/
+		conflictAudio.clip = conflictClip;
 
 		movOnAudio = this.gameObject.AddComponent<AudioSource> ();
 		movOnAudio.loop = false;
@@ -85,6 +89,11 @@ public class SquareManager : MonoBehaviour {
 
 	void Update(){
 		getHeight ();
+
+		if (conflict) {
+			conflictAudio.Play ();
+			conflict = false;
+		}
 	}
 
 	private void getHeight (){
@@ -170,7 +179,7 @@ public class SquareManager : MonoBehaviour {
 
 						} else {
 							// Place it like normal if it's not an anchor
-//							StartCoroutine (settleSquare (square));
+
 						}
 					}
 
@@ -182,7 +191,6 @@ public class SquareManager : MonoBehaviour {
 					board [(int)pos.x, (int)pos.y] = moving;
 					moving.setFalling (true);
 					movOffAudio.Play ();
-//					StartCoroutine(settleSquare (moving));
 					moving = null;
 					chainSettle (oldpos);
 
@@ -213,6 +221,7 @@ public class SquareManager : MonoBehaviour {
 				} else {					// if you click on the moving block again, drop it
 					moving.setModelColor (2f);
 					moving = null;
+					movOffAudio.Play ();
 				}
 			} else {
 				Square next = queue.Peek ();		//if next block in the queue is eraser,
@@ -261,113 +270,18 @@ public class SquareManager : MonoBehaviour {
 	//checks to see if the square above pos needs to be settled
 	public void chainSettle(Vector2 pos){
 		if (pos.y < BOARDSIZEY - 1) {
-			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
-				Square above = board [(int)pos.x, (int)pos.y + i];
+//			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
+				Square above = board [(int)pos.x, (int)pos.y + 1];
 				if (above != null) {
-					above.setFalling (true);
+					if (above.rigid != null) {
+//						above.rigid.settleShape ();
+						above.rigid.setShapeFalling (true);
+					} else {
+						above.setFalling (true);
+					}
 				}
 			}
-		}
-		/*if (pos.y < BOARDSIZEY - 1) {
-			Square above = board [(int)pos.x, (int)pos.y + 1];
-			if (above != null) {
-//				StartCoroutine(settleSquare (above));
-				above.setFalling (true);
-			}
-		}*/
-
-	}
-
-//	IEnumerator settleSquare(Square s){
-//		//Debug.Log("Settling square!");
-//		if (s.rigid == null) {
-//			Vector2 pos = s.getPosition ();
-//			Square below = board [(int)pos.x, (int)(pos.y - 1)];
-//			Square above = null;
-//			if (pos.y < BOARDSIZEY - 1) {
-//				above = board [(int)pos.x, (int)(pos.y + 1)];
-//			}
-//
-//				
-//			if (below == null) {
-//				yield return new WaitForSeconds (.5f);
-//				counter = 0f;
-//				board [(int)pos.x, (int)pos.y] = null;
-//				board [(int)pos.x, (int)pos.y - 1] = s;
-//				s.setPosition (new Vector2 (pos.x, pos.y - 1));
-//				if (above != null) {
-////					StartCoroutine (settleSquare (above));
-//				}
-//				//("Square is at: " + s.getPosition ());
-////				StartCoroutine (settleSquare (s));
-//			} else {
-//				if (below != null && below.isFalling ()) {
-//					yield return new WaitForSeconds (.25f);
-////					StartCoroutine (settleSquare (s));
-//				} else {
-//					//Debug.Log("Checking conflicts!");
-////					print(s + " has landed on " + below);
-//					s.setFalling(false);
-//					settleAudio.Play ();
-//					StartCoroutine (checkConflicts (s));
-//				}
-//			}
-//		} else {
-//			StartCoroutine(s.rigid.settleShape ());
 //		}
-//		//getHeight ();
-//	}
-
-	public IEnumerator checkConflicts(Square s){
-		yield return new WaitForSeconds (.25f);
-		Vector2 pos = s.getPosition ();
-		Square below = null;
-		Square left = null;
-		Square right = null;
-		Square above = null;
-		if(!(pos.y-1 < 0)){
-			below = board [(int)pos.x, (int)(pos.y - 1)];
-		}
-		if (!(pos.x - 1 < 0)) {
-			left = board [(int)(pos.x - 1), (int)pos.y];
-		}
-		if(!(pos.x + 1 >= BOARDSIZEX)){
-			right = board [(int)(pos.x+1), (int)pos.y];
-		}
-		if(!(pos.y +1 >= BOARDSIZEY)){
-			above = board [(int)(pos.x), (int)pos.y+1];
-		}
-		bool conflict = false;
-		if (below != null && below.getColor () == s.getColor ()) {
-			conflict = true;
-			conflictAudio.Play();
-			resolveConflict (s, below);
-		}
-		if (left != null && left.getColor () == s.getColor ()) {
-			conflict = true;
-			conflictAudio.Play();
-			resolveConflict (s, left);
-		}
-		if (right != null && right.getColor () == s.getColor ()) {
-			conflict = true;
-			conflictAudio.Play();
-			resolveConflict (s, right);
-		}
-		if (above != null && above.getColor () == s.getColor ()) {
-			conflict = true;
-			conflictAudio.Play();
-			resolveConflict (s, above);
-		}
-		if (s.getType () > 1) {
-			activate (s);
-		}
-		if (conflict) {
-			if (s != null) {
-				DestroyImmediate (s.gameObject);
-			}
-			yield return new WaitForSeconds (.25f);
-		}
-		//getHeight (); //TODO: should this be here?
 	}
 
 	public void resolveConflict (Square s, Square c){
@@ -396,7 +310,6 @@ public class SquareManager : MonoBehaviour {
 		while (s != null) {
 			Vector2 sPos = s.getPosition ();
 			Square sAbove = board [(int)sPos.x, (int)(sPos.y + 1)];
-//			StartCoroutine(settleSquare (s));
 			s = sAbove;
 		}
 	}
@@ -472,7 +385,6 @@ public class SquareManager : MonoBehaviour {
 				s.anchor = false;
 				s.rigid = null;
 				s.setFalling (true);
-//				StartCoroutine (settleSquare (s));
 			}
 		}
 		DestroyImmediate (rs);
@@ -483,11 +395,18 @@ public class SquareManager : MonoBehaviour {
 		// Short circuit, because if the last column's block 1 below the destination isn't a square, then there's no point running the alg.
 		if (destinationClose() && pathValid(beginning)) {
 			solved = true;
+
+			playSuccess ();
 		} else {
 			solved = false;
 		}
 		Debug.Log ("Did you solve the board? : " + solved);
 		return solved;
+	}
+
+	private void playSuccess(){
+		gm.success = true;
+		successAudio.Play ();
 	}
 
 	private bool destinationClose() {

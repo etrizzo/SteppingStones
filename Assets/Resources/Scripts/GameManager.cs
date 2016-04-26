@@ -6,7 +6,7 @@ using System.IO;
 public class GameManager : MonoBehaviour {
 
 
-	SquareManager sqman;
+	public SquareManager sqman;
 	public AudioSource menuAudio;
 	public AudioClip menuClip;
 	public AudioSource gameAudio1;
@@ -40,6 +40,9 @@ public class GameManager : MonoBehaviour {
 
 	public Square destination;
 	public Square beginning;
+
+	public Hero hero;
+
 	float wave = 0;
 	int waveSpeed = 3;
 
@@ -244,6 +247,7 @@ public class GameManager : MonoBehaviour {
 		line = sr.ReadLine ();
 		int beginHeight = int.Parse (line);
 		beginning = makeBeginning (beginHeight);
+		hero = makeHero (beginHeight);
 		line = sr.ReadLine();
 		int destHeight = int.Parse (line);
 		destination = makeDestination (destHeight);
@@ -326,7 +330,22 @@ public class GameManager : MonoBehaviour {
 
 		square.name = "Beginning";
 
+		square.model.mat.color = Color.gray;
+
 		return square;
+	}
+
+	public Hero makeHero(int height){
+		GameObject heroObject = new GameObject ();
+		Hero hero = heroObject.AddComponent<Hero> ();
+
+		//		square.transform.parent = squareFolder.transform;
+		hero.transform.position = new Vector3 (-1, height+1, 0);
+		hero.init(new Vector2((float) -1, (float) height+1), this);
+
+		hero.name = "Hero";
+
+		return hero;
 	}
 
 	public Square makeDestination(int height){

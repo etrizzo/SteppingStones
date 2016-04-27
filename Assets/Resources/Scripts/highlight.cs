@@ -51,7 +51,7 @@ public class Highlight : MonoBehaviour {
 	void updateModel() {
 		int lowestY = getLowestYCoord ();
 		// If we're over the board do the things
-		Debug.Log("Lowest y coordinate is: " + lowestY);
+//		Debug.Log("Lowest y coordinate is: " + lowestY);
 		if (lowestY != -1) {
 			made.model.mat.color = color;
 			if (mouseMoved()) {
@@ -91,31 +91,37 @@ public class Highlight : MonoBehaviour {
 	private int getLowestYCoord() {
 		int ret = -1;
 		int highestBlockY = sqman.BOARDSIZEY - 1;
+		int low = (int) mouse.y;
+
 		while (board[(int) mouse.x, highestBlockY] == null) {
 			highestBlockY--;
 		}
-		int low = (int) mouse.y;
+
+		// If the highest block in the column is lower than our current 
 		if (highestBlockY < mouse.y) {
-			highestBlockY = (int) mouse.y;
-			low = (int) 0;
+			highestBlockY = (int) mouse.y - 1;
+			low = highestBlockY;
+			while (board[(int) mouse.x, low] == null && low >= 0) {
+				low--;
+			}
+//			low = 0;
 		}
 
 		Debug.Log ("---------------------");
-		Debug.Log ("highest block rn is:" + highestBlockY);
-		Debug.Log ("---------------------");
+		Debug.Log ("highest block rn is:" + highestBlockY + ", low is: " + low);
+//		Debug.Log ("---------------------");
 		// TODO: Should check for mouse.x being on the board first, to prevent null exceptions???
 		for (int y = highestBlockY; y >= low; y--) {
 			// Check all squares below your mouse
-			Debug.Log ("Checking the y coord:" + y);
+//			Debug.Log ("Checking the y coord:" + y);
 			// Specifically, check to see if this one **doesn't have something on top of it lol
-			if (board[(int) mouse.x, y] != null && board[(int) mouse.x, y + 1] == null) {
+			bool blockNull = board[(int) mouse.x, y] != null; 
+			bool aboveNull = board [(int)mouse.x, y + 1] == null;
+			if (blockNull && aboveNull) {
 				// Return the y **above** the lowest :)
 				ret = y + 1;
-			} else {
-				Debug.Log (y + "doesn't have a block :/");
-			}
+			} 
 		}
-		// If we exit that loop, we're not above the board, sooooo return -1
 		return ret;
 	}
 }

@@ -14,6 +14,9 @@ public class Highlight : MonoBehaviour {
 
 	Square made;
 	Square[,] board;
+	int EXTRASHAPES = 4;
+	Square[] rigidShapes;
+	int rigidYOffset = -10;
 
 	// Save our color here so it's consistent :)
 	Color color = Color.gray;
@@ -28,6 +31,16 @@ public class Highlight : MonoBehaviour {
 		made = sqman.addSquare(new Vector2(mouse.x, mouse.y), false);
 		made.model.mat.color = color;
 		made.setType (0);
+		made.model.gameObject.name = "Highlight Square";
+
+		rigidShapes = new Square[EXTRASHAPES];
+
+		// Make the rigid blocks even if we don't need them lol
+		for (int i = 0; i < EXTRASHAPES; i++) {
+			// TODO: Need to replace addSquare with a addHighlightSquare method :))))
+			rigidShapes[i] = sqman.addSquare(new Vector2((int) mouse.x + i + 1, rigidYOffset), false);
+		}
+
 
 		updateMouse ();
 		updateModel ();
@@ -67,12 +80,22 @@ public class Highlight : MonoBehaviour {
 					int shapeType = rs.shapeType;
 					if (shapeType == 0) {
 						// it's _, spawn some additional shapes!
-
+						for (int i = 0; i <= EXTRASHAPES; i++) {
+							rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, lowestY, 0);
+							// TODO: Need to replace add
+//							rigidShapes[i] = sqman.addSquare(new Vector2((int) mouse.x + i + 1, lowestY), false);
+						}
 					} else {
 						// it's I vertical!
 					}
 					// We know this is an anchor
 
+				} else {
+					// Reset the anchor highlight blocks to be off the screen when we don't need them!
+					for (int i = 0; i <= EXTRASHAPES; i++) {
+						rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, rigidYOffset, 0);
+						// TODO: Need to replace add
+					}
 				}
 
 			}
@@ -89,39 +112,29 @@ public class Highlight : MonoBehaviour {
 	}
 
 	private int getLowestYCoord() {
-		int ret = -1;
-		int highestBlockY = sqman.BOARDSIZEY - 1;
-		int low = (int) mouse.y;
+		int highestBlockY = (int) mouse.y;
 
-		while (board[(int) mouse.x, highestBlockY] == null) {
+		// Search down from our mouse.y for the first not null thing
+		while (squareAtYCoord(highestBlockY) == null && highestBlockY >= 0) {
 			highestBlockY--;
 		}
 
-		// If the highest block in the column is lower than our current 
-		if (highestBlockY < mouse.y) {
-			highestBlockY = (int) mouse.y - 1;
-			low = highestBlockY;
-			while (board[(int) mouse.x, low] == null && low >= 0) {
-				low--;
+		// If the highest block is below us then we're good, because we're just going to return this anyway lol
+		// But if it's equal to where we started, we got a problem, sooooo
+		if (highestBlockY == (int) mouse.y) {
+			// ... check, going up from the current block, for the first null block to put it in
+			while (squareAtYCoord(highestBlockY) != null && highestBlockY <= sqman.BOARDSIZEY - 1) {
+				highestBlockY++;
 			}
-//			low = 0;
+			return highestBlockY;
+		} else {
+			return highestBlockY + 1;
 		}
 
-		Debug.Log ("---------------------");
-		Debug.Log ("highest block rn is:" + highestBlockY + ", low is: " + low);
-//		Debug.Log ("---------------------");
-		// TODO: Should check for mouse.x being on the board first, to prevent null exceptions???
-		for (int y = highestBlockY; y >= low; y--) {
-			// Check all squares below your mouse
-//			Debug.Log ("Checking the y coord:" + y);
-			// Specifically, check to see if this one **doesn't have something on top of it lol
-			bool blockNull = board[(int) mouse.x, y] != null; 
-			bool aboveNull = board [(int)mouse.x, y + 1] == null;
-			if (blockNull && aboveNull) {
-				// Return the y **above** the lowest :)
-				ret = y + 1;
-			} 
-		}
-		return ret;
+		return -1;
+	}
+
+	private Square squareAtYCoord(int y) {
+		return board[(int) mouse.x, y];
 	}
 }

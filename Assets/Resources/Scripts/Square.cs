@@ -239,14 +239,7 @@ public class Square : MonoBehaviour {
 		if (conflicted) {
 			Destroy (self);
 		}
-
-		if (rs!= null && conflicted){
-			foreach (RigidShape s in shapesToBreak){
-				if (s != null) {
-					print (s + "will be broken");
-				}
-			}
-		}
+			
 		return shapesToBreak;
 	}
 

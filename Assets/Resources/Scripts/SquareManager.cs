@@ -419,7 +419,6 @@ public class SquareManager : MonoBehaviour {
 	public void breakShapes(LinkedList<RigidShape> shapes){
 		foreach (RigidShape rs in shapes) {
 			if (rs != null) {
-				print ("destroying shape: " + rs);
 				breakShape (rs);
 			}
 		}

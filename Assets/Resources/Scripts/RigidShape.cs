@@ -201,44 +201,6 @@ public class RigidShape : MonoBehaviour {
 
 	}
 
-//	public void settleShape(){
-//		Vector2 pos;
-//		Square above = null;
-////		bool settle = checkSettle ();
-////		Debug.Log("Settling shape! " +settle);
-//		if (this.falling && checkSettle()) {	//if there's room to fall, make each square fall
-//			foreach (Square s in squares) {
-//				if (s != null) {
-//					pos = s.getPosition ();
-//					if (pos.y + 1 < sm.BOARDSIZEY) {
-//						above = board [(int)pos.x, (int)pos.y + 1];
-//					}
-//					board [(int)pos.x, (int)pos.y] = null;
-//					board [(int)pos.x, (int)pos.y - 1] = s;
-//					s.setPosition (new Vector2 (pos.x, pos.y - 1));
-//					if (above != null) {
-//						if (above.rigid != null && above.rigid != this) {
-//							//					above.rigid.settleShape ();
-//							above.rigid.setShapeFalling (true);
-//						} else {
-//							above.setFalling (true);
-//						}
-//					}
-//				}
-//
-//			}
-//			counter = 0f;
-////			setShapeFalling (true);
-//		}
-//		else {			//if there's not room to fall, wait to check conflicts.
-//			wait = true;
-//			setShapeFalling (false);
-//			//Debug.Log("Checking conflicts!");
-//
-////			checkConflicts ();
-//
-//		}
-//	}
 
 	public void setShapeFalling(bool b){
 		falling = b;
@@ -250,38 +212,6 @@ public class RigidShape : MonoBehaviour {
 			s.setFalling (b);
 		}*/
 	}
-
-//	bool checkSettle(){
-//		Square s;
-//		Vector2 pos;
-//		Square below;
-//		Square above;
-//		Square belowbelow = null;
-//		for (int i = 0; i < 5; i++) {
-//			s = squares [i];
-//			pos = s.getPosition ();
-//
-//			below = board [(int)pos.x, (int)(pos.y - 1)];
-//			if (pos.y - 2 >= 0) {
-//				belowbelow = board [(int)pos.x, (int)(pos.y - 2)];
-//			}
-//			if (belowbelow != null && belowbelow.rigid != s.rigid && !belowbelow.isFalling () && falling && !played) {
-//				settleAudio.Play();
-//				played = true;
-//			}
-//			if (below != null && below.rigid != s.rigid){
-//				if (!below.isFalling ()) {
-//					return false;
-////				} else {
-////					print (this + "falling on a thing that is falling :o" + below);
-////					setShapeFalling(false);
-////					counter = 0f;
-////					wait = true;
-//				}
-//			}
-//		}
-//		return true;
-//	}
 
 
 	public void checkSettle(){
@@ -366,7 +296,6 @@ public class RigidShape : MonoBehaviour {
 		foreach (Square above in aboves){
 			if (above!= null){
 				if (above.rigid != null  && above.rigid != this) {
-					//					above.rigid.settleShape ();
 					above.rigid.setShapeFalling (true);
 				} else {
 					above.setFalling (true);
@@ -377,40 +306,21 @@ public class RigidShape : MonoBehaviour {
 
 
 	void checkConflicts(){
-//		print ("checking " + this + "'s conflicts");
 		conflictCounter = 0;
 		wait = false;
 		LinkedList<RigidShape> shapes = new LinkedList<RigidShape> ();
-//		RigidShape[,] shapes = new RigidShape[squares.Length, 5];
 		int i = 0;
 		bool conflicted = false;
 		foreach(Square s in squares){
 			if (s != null) {
-//				print (s + " " + s.isFalling());
 				RigidShape[] rs = s.checkConflicts ();
 				for (int j = 0; j < rs.Length; j++) {		//save every rigid shape to break eventually
-//					shapes [i, j] = rs [j];
 					shapes.AddLast(rs[j]);
 				}
-//				print (s + " " + s.isFalling());
 			}
 		}
 
 		sm.breakShapes (shapes);
-//		foreach(RigidShape shape in shapes){
-////			print (shape);
-//			if (shape != null) {
-//				print ("destroying shape: " + shape);
-//				sm.breakShape (shape);
-//			}
-//		}
-
-//		foreach (Square s in squares) {
-//			if (s == null) {
-//				print ( this + " i'm falling apart :O");
-//				sm.breakShape (this);
-//			}
-//		}
 	}
 
 	public Color getColor(int c){

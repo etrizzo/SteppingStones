@@ -269,19 +269,22 @@ public class SquareManager : MonoBehaviour {
 	}
 	//checks to see if the square above pos needs to be settled
 	public void chainSettle(Vector2 pos){
+		Square s = board [(int)pos.x, (int)pos.y];
+//		print (s + " is chain settling" + s.isFalling());
 		if (pos.y < BOARDSIZEY - 1) {
-//			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
+			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
 				Square above = board [(int)pos.x, (int)pos.y + 1];
 				if (above != null) {
-					if (above.rigid != null) {
+					if (above.rigid != null ) {
 //						above.rigid.settleShape ();
 						above.rigid.setShapeFalling (true);
 					} else {
+//						print ("Setting " + above + "to falling");
 						above.setFalling (true);
 					}
 				}
 			}
-//		}
+		}
 	}
 
 	public void resolveConflict (Square s, Square c){
@@ -380,14 +383,46 @@ public class SquareManager : MonoBehaviour {
 	}
 
 	public void breakShape(RigidShape rs){
+		print ("Breaking " + rs);
+		Square above;
 		foreach (Square s in rs.getSquares()) {
+			above = null;
 			if (s != null) {
 				s.anchor = false;
 				s.rigid = null;
 				s.setFalling (true);
+				Vector2 spos = s.getPosition ();
+				if (spos.y + 1 < BOARDSIZEY) {
+					above = board [(int)spos.x, (int)spos.y + 1];
+				}
+				if (above != null) {
+					if (above.rigid != null) {
+						print ("A RIGID SHAPE: " + above + " " + above.rigid);
+						if (above.rigid != this) {
+							print (above + " " + above.rigid + " shape being made to fall");
+							//					above.rigid.settleShape ();
+							above.rigid.setShapeFalling (true);
+						}
+					}else {
+						above.setFalling (true);
+					}
+				}
+
+				//				s.counter = 0;
+				//				sqman.chainSettle (s.pos); ???? when shapes break, need to settle above appropriately
+				//				StartCoroutine (settleSquare (s));
 			}
 		}
-		DestroyImmediate (rs);
+		Destroy (rs);
+	}
+
+	public void breakShapes(LinkedList<RigidShape> shapes){
+		foreach (RigidShape rs in shapes) {
+			if (rs != null) {
+				print ("destroying shape: " + rs);
+				breakShape (rs);
+			}
+		}
 	}
 
 	public bool boardSolved() {
@@ -513,6 +548,8 @@ public class SquareManager : MonoBehaviour {
 
 		}
 	}
+
+
 
 }
 

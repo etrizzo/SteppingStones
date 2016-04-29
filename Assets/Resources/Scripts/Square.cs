@@ -127,7 +127,9 @@ public class Square : MonoBehaviour {
 //		yield return null;
 	}
 
-
+	// checks to see if the square can fall, and if it can, 
+	// calls fall() and settles the square above you
+	// if a square below is falling, will wait for it to fall before falling
 	public void checkFall() {
 		// Move down and stuff?j
 		Square above = null;
@@ -147,15 +149,15 @@ public class Square : MonoBehaviour {
 		if (below == null) {
 			fall ();
 			if (above != null) {
-				if (above.rigid != null && rigid != null && above.rigid != rigid) {
+				if (above.rigid != null && above.rigid != rigid) {
 //					above.rigid.settleShape ();
-					above.rigid.setShapeFalling(true);
+					above.rigid.setShapeFalling (true);
 				} else {
 					above.setFalling (true);
 				}
 			}
 			counter = 0f;
-		} else if (!below.isFalling ()) {
+		} else if ((!below.isFalling ()) || (below.rigid != null && !below.rigid.falling)) {
 			// & it's not falling ....
 			falling = false;
 			counter = 0f;
@@ -191,42 +193,61 @@ public class Square : MonoBehaviour {
 		return directedBlocks;
 	}
 
-	public void checkConflicts() {
+	public RigidShape[] checkConflicts() {
 		wait = false; 
 		conflictCounter = 0;
 		bool conflicted = false;
 		Square[] directedBlocks = getNeighbors ();
+		RigidShape[] shapesToBreak = new RigidShape[5];
+		int i = 0;
 
 		foreach (Square sq in directedBlocks) {
-			if (sq != null && sq.getColor() == color && !sq.isFalling()) {
+			if (sq != null && sq.getColor() == color && (!sq.isFalling() || (sq.rigid != null && !sq.rigid.falling))) {
+				
 				sqman.chainSettle (sq.getPosition());
 				if (sq.rigid != null) {
 					//			print ("breaking " + c.rigid);
-					breakShape (sq.rigid);
+//					breakShape (sq.rigid);
+					shapesToBreak[i] = sq.rigid;
 				}
 				Destroy (sq.gameObject);
 				conflicted = true;
 				//conflictAudio.Play (); //we need more time???
 
 			}
+			i++;
 		}
 
 
+		RigidShape rs = this.rigid;
 		if (conflicted) {
 			sqman.conflict = true;
+//			print (this + " is settling");
 			sqman.chainSettle (this.getPosition());
-			if (this.rigid != null) {
+			if (rs != null) {
 				//			print ("breaking " + c.rigid);
-				breakShape (this.rigid);
+//				breakShape (this.rigid);
+				shapesToBreak[i] = this.rigid;
 			}
 
 		}
 
 		GameObject self = this.gameObject;
 
+
+
 		if (conflicted) {
 			Destroy (self);
 		}
+
+		if (rs!= null && conflicted){
+			foreach (RigidShape s in shapesToBreak){
+				if (s != null) {
+					print (s + "will be broken");
+				}
+			}
+		}
+		return shapesToBreak;
 	}
 
 
@@ -234,25 +255,24 @@ public class Square : MonoBehaviour {
 		DestroyImmediate (s);
 	}
 
-	public void breakShape(RigidShape rs){
-		foreach (Square s in rs.getSquares()) {
-			if (s != null) {
-				s.anchor = false;
-				s.rigid = null;
-				s.setFalling (true);
-				//				StartCoroutine (settleSquare (s));
+
+
+	//breaks each non-null shape in shapes
+	public void breakShapes(RigidShape[] shapes){
+		foreach (RigidShape rs in shapes) {
+			if (rs != null) {
+				sqman.breakShape (rs);
 			}
 		}
-		DestroyImmediate (rs);
 	}
 
 	public void Update() {
-		if (wait) {
+		if (wait) {	//waiting to check conflicts after settling (i think?)
 			if (type != 4) {
 				conflictCounter += Time.deltaTime * speed;
 				if (conflictCounter >= 1) {
 					
-					checkConflicts ();
+					breakShapes(checkConflicts ());
 				}
 			} else {
 				wait = false;

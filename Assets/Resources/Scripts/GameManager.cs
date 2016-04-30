@@ -242,7 +242,10 @@ public class GameManager : MonoBehaviour {
 
 
 	public void initBoard(){
-		StreamReader sr = new StreamReader ("Assets/Resources/Levels/" + getLevelName ());
+		TextAsset temp = Resources.Load<TextAsset>("Levels/"+getLevelName ()) as TextAsset;
+		byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(temp.text);
+		MemoryStream stream = new MemoryStream(byteArray);
+		StreamReader sr = new StreamReader (stream);
 		string line = "";
 		line = sr.ReadLine ();
 		w = int.Parse (line);
@@ -483,15 +486,15 @@ public class GameManager : MonoBehaviour {
 			xpos = ((Screen.width) - (60)) / 2;
 			ypos = ((Screen.height) / 2);
 			if (GUI.Button (new Rect (xpos-100, ypos, 100, 90), "Test Level 1")) {
-				setLevelName ("LTest1.txt");
+				setLevelName ("LTest1");
 				state.mode = 1;
 			}
 			if (GUI.Button (new Rect (xpos, ypos, 100, 90), "Test Level 2")) {
-				setLevelName ("LTest2.txt");
+				setLevelName ("LTest2");
 				state.mode = 1;
 			}
 			if (GUI.Button (new Rect (xpos+100, ypos, 100, 90), "Test Level 3")) {
-				setLevelName ("LTest3.txt");
+				setLevelName ("LTest3");
 				state.mode = 1;
 			}
 		}

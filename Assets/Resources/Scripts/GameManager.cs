@@ -505,7 +505,9 @@ public class GameManager : MonoBehaviour {
 		if (!go && !done) {
 			xpos = ((Screen.width) - (100)) / 2;
 			ypos = ((Screen.height) - (80)) / 2 - ((Screen.height / 3)-(Screen.height/10));
-			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>S</color> <color=magenta>t</color> <color=yellow>e</color> <color=cyan>p</color> <color=magenta>p</color> <color=yellow>i</color> <color=cyan>n</color> <color=yellow>g</color>\n\n<color=yellow>S</color> <color=magenta>t</color> <color=cyan>o</color> <color=yellow>n</color> <color=magenta>e</color> <color=cyan>s</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>S t e p p i n g\n\nS t o n e s</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>S t e p p i n g\n\nS t o n e s</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>S</color> <color=magenta>t</color> <color=yellow>e</color> <color=cyan>p</color> <color=magenta>p</color> <color=yellow>i</color> <color=cyan>n</color> <color=yellow>g</color>\n\n<color=yellow>S</color> <color=cyan>t</color> <color=magenta>o</color> <color=yellow>n</color> <color=cyan>e</color> <color=magenta>s</color>", guiStyle2);
 		}
 		if (!go && !done) {
 			xpos = ((Screen.width) - (500)) / 2;

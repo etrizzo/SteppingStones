@@ -12,13 +12,14 @@ public class SquareModel : MonoBehaviour
 	public void init(Square owner) {
 		this.owner = owner;
 		transform.parent = owner.transform;					// Set the model's parent to the gem.
-		transform.localPosition = new Vector3(.5f,-.5f,0);		// Center the model on the parent.
+		transform.localPosition = new Vector3(.5f,-.5f,-1);		// Center the model on the parent.
 		name = "Square Model";									// Name the object.
 
 
 
 		mat = GetComponent<Renderer>().material;								// Get the material component of this quad object.
 		mat.shader = Shader.Find("Sprites/Default"); 
+
 
 		switch (owner.getType ()) {	//0-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow
 

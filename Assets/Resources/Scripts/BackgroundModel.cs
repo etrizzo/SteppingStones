@@ -15,7 +15,7 @@ public class BackgroundModel : MonoBehaviour
 		this.owner = owner;
 
 		transform.parent = owner.transform;					// Set the model's parent to the background.
-		transform.localPosition = new Vector3(owner.gm.cam.transform.position.x,owner.gm.cam.transform.position.y,1f);		// Center the model on the parent.
+		transform.localPosition = new Vector3(owner.gm.cam.transform.position.x,owner.gm.cam.transform.position.y,0f);		// Center the model on the parent.
 		//quadHeight = Camera.main.orthographicSize * 2.0f;
 		//quadWidth = quadHeight * Screen.width / Screen.height;
 		//transform.localScale = new Vector3(quadWidth * BGSCALE, quadHeight * BGSCALE,1f);

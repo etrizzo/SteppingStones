@@ -106,7 +106,6 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	public void grow() {
-//		anchor.setFalling (true);
 		growing = true;
 		// you know, grow and stuff .....
 		anchor.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileBlank");
@@ -115,45 +114,46 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	void Update(){
-		if (wait) {
+		if (wait) {	//waiting to check for conflicts after settling
 			conflictCounter += Time.deltaTime * speed;
-			if (conflictCounter >= 1) {
+			if (conflictCounter >= 1 && !growing) {
 
 				checkConflicts ();
 			}
 		}
-		if (growing) {
-			growCounter += Time.deltaTime * speed * 2;
-		} else if (falling) {
+
+		if (falling) {
 			counter += Time.deltaTime * speed;
 			if (counter >= 1) {
-				settleShape ();
+				checkSettle ();		//equivalent of checkFall()
 			}
 		} 
-		if (growCounter >= 1) {
-			Vector2 pos = anchor.getPosition ();
-			Vector2 new_pos;
-			Mesh mesh = anchor.model.GetComponent<MeshFilter> ().mesh;
-			mesh.colors = acolors;
-			anchor.setColor (c1);
-			anchor.model.mat.color = color1;
-			if (growIndex <= 4) {
+		if (growing) {
+			growCounter += Time.deltaTime * speed * 2;
+			if (growCounter >= 1) {
+				Vector2 pos = anchor.getPosition ();
+				Vector2 new_pos;
+				Mesh mesh = anchor.model.GetComponent<MeshFilter> ().mesh;
+				mesh.colors = acolors;
+				anchor.setColor (c1);
+				anchor.model.mat.color = color1;
+				if (growIndex <= 4) {
 				
-				switch (shapeType) {
-				case 0: // _
+					switch (shapeType) {
+					case 0: // _
 //				for (int i = 1; i <= 4; i++) {
-					new_pos = new Vector2 (pos.x + growIndex, pos.y);
+						new_pos = new Vector2 (pos.x + growIndex, pos.y);
 //					growCounter = 0;
-					if (growIndex % 2 == 0) {
-						squares [growIndex] = addSquare (new_pos, c1);
-					} else {
-						squares [growIndex] = addSquare (new_pos, c2);
-					}
+						if (growIndex % 2 == 0) {
+							squares [growIndex] = addSquare (new_pos, c1);
+						} else {
+							squares [growIndex] = addSquare (new_pos, c2);
+						}
 //				}
 
-					growCounter = 0;
-					break;
-				case 1: // l
+						growCounter = 0;
+						break;
+					case 1: // l
 //					for (int i = 1; i <= 4; i++) {
 						new_pos = new Vector2 (pos.x, pos.y + growIndex);
 //						growCounter = 0;
@@ -163,25 +163,20 @@ public class RigidShape : MonoBehaviour {
 							squares [growIndex] = addSquare (new_pos, c2);
 						}
 //					}
+						growCounter = 0;
+						break;
+					default:
+						print ("Whoopsies! you hit the default shape case, line 42");
+						break;
+					}
+					growIndex++;
+				} else {
 					growCounter = 0;
-					break;
-				default:
-					print ("Whoopsies! you hit the default shape case, line 42");
-					break;
+					growing = false;
+//					falling = true;
+					setShapeFalling (true);
 				}
-				growIndex++;
-			} else {
-				growCounter = 0;
-				growing = false;
-				falling = true;
-//				setShapeFalling (true);
-			}
-		} else {
-			/*foreach (Square s in squares) {
-				if (s != null) {
-					s.setFalling (true);
-				}
-			}*/
+			} 
 		}
 
 	}
@@ -206,29 +201,6 @@ public class RigidShape : MonoBehaviour {
 
 	}
 
-	public void settleShape(){
-		Vector2 pos;
-//		bool settle = checkSettle ();
-//		Debug.Log("Settling shape! " +settle);
-		if (checkSettle()) {
-			foreach(Square s in squares){
-				pos = s.getPosition ();
-				board [(int)pos.x, (int)pos.y] = null;
-				board [(int)pos.x, (int)pos.y - 1] = s;
-				s.setPosition (new Vector2 (pos.x, pos.y - 1));
-			}
-			counter = 0;
-			setShapeFalling (true);
-		}
-		else {
-			wait = true;
-			setShapeFalling (false);
-			//Debug.Log("Checking conflicts!");
-
-//			checkConflicts ();
-
-		}
-	}
 
 	public void setShapeFalling(bool b){
 		falling = b;
@@ -241,38 +213,114 @@ public class RigidShape : MonoBehaviour {
 		}*/
 	}
 
-	bool checkSettle(){
+
+	public void checkSettle(){
 		Square s;
 		Vector2 pos;
 		Square below;
-		Square belowbelow = null;
+		Square above;
+		Square belowbelow;
+		Square[] belows = new Square[squares.Length];
+		Square[] aboves = new Square[squares.Length];
 		for (int i = 0; i < 5; i++) {
-			s = squares [i];
-			pos = s.getPosition ();
-			below = board [(int)pos.x, (int)(pos.y - 1)];
+			s = squares[i];
+			pos = s.getPosition();
+			above = null;
+			belowbelow = null;
+			if ((pos.y +1) < sm.BOARDSIZEY){
+				above = board [(int)pos.x, (int)pos.y + 1];
+			}
+			aboves[i] = above;
+			below = board[(int) pos.x, (int) pos.y - 1];
+			if (below != null && below.rigid != this) {
+				belows [i] = below;
+			} else {
+				belows [i] = null;
+			}
 			if (pos.y - 2 >= 0) {
-				belowbelow = board [(int)pos.x, (int)(pos.y - 2)];
+				belowbelow = board [(int)pos.x, (int)pos.y - 2];
 			}
-			if (belowbelow != null && belowbelow.rigid != s.rigid && !belowbelow.isFalling () && falling && !played) {
-				settleAudio.Play();
-				played = true;
+			if (belowbelow != null && !belowbelow.isFalling () && falling && belowbelow.rigid != this) {
+				settleAudio.Play ();
 			}
-			if (below != null && below.rigid != s.rigid && !below.isFalling()) {
+		}
+		if (checkNull(belows)){		//if every square below is null, fall
+			settleShape();
+			settleAbove(aboves);
+			counter = 0f;
+		} else if (checkStop(belows)){		//if at least one square below is not null and not falling, stop
+			//stop falling
+			setShapeFalling(false);
+			wait = true;
+			counter = 0f;
+		} else {	//every non-null square below is falling, wait for them
+			//do nothing, wait for update to call checkSettle again
+		}
+	}
+
+
+	bool checkNull(Square[] b){
+		foreach (Square s in b){
+			if (s != null){
 				return false;
 			}
 		}
 		return true;
 	}
 
-	void checkConflicts(){
-		print ("WHYY");
-		conflictCounter = 0;
-		wait = false;
-		foreach(Square s in squares){
-			if (s != null) {
-				s.checkConflicts ();
+	// checks to see if there is a square below that is not falling
+	// returns true if the shape needs to stop
+	// false indicates that the shape should wait, bc there's only null or falling objects below it
+	bool checkStop(Square[] b){
+		foreach (Square s in b){
+			if (s != null){
+				if (s.rigid == null && !s.isFalling()){
+					return true;
+				} else if (s.rigid != null && !s.rigid.falling){
+					return true;
+				}
 			}
 		}
+		return false;
+	}
+
+	void settleShape(){	//equivalent of fall() in Square
+		foreach(Square s in squares){
+			if (s != null) {
+				s.fall ();
+			}
+		}
+	}
+
+	void settleAbove(Square[] aboves){
+		foreach (Square above in aboves){
+			if (above!= null){
+				if (above.rigid != null  && above.rigid != this) {
+					above.rigid.setShapeFalling (true);
+				} else {
+					above.setFalling (true);
+				}
+			}
+		}
+	}
+
+
+	void checkConflicts(){
+		conflictCounter = 0;
+		wait = false;
+		LinkedList<RigidShape> shapes = new LinkedList<RigidShape> ();
+		int i = 0;
+		bool conflicted = false;
+		foreach(Square s in squares){
+			if (s != null) {
+				RigidShape[] rs = s.checkConflicts ();
+				for (int j = 0; j < rs.Length; j++) {		//save every rigid shape to break eventually
+					shapes.AddLast(rs[j]);
+				}
+			}
+		}
+
+		sm.breakShapes (shapes);
 	}
 
 	public Color getColor(int c){

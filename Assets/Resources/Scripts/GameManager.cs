@@ -2,9 +2,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
-
 
 	public SquareManager sqman;
 	public AudioSource menuAudio;
@@ -53,7 +53,17 @@ public class GameManager : MonoBehaviour {
 
 	public Highlight hi;
 
+	public ScrollRect scroller;
+	public RectTransform scrollContent;
+
 	void Start () {
+		/*scroller = new ScrollRect();
+		scroller.vertical = true;
+		scroller.horizontal = false;
+
+		scrollContent = new RectTransform ();
+		scroller.content = scrollContent;*/
+
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
 		groundSquares = new List<Square> ();
@@ -68,13 +78,14 @@ public class GameManager : MonoBehaviour {
 		guiStyle = new GUIStyle ();
 		//guiStyle.font = (Font)Resources.Load("Fonts/Mathlete-Skinny");
 		guiStyle.alignment = TextAnchor.MiddleCenter;
-		guiStyle.font = (Font)Resources.Load ("Fonts/Mathlete-Skinny");
+		guiStyle.font = (Font)Resources.Load ("Fonts/blockyo");
 
 		//HOME MENU
 		guiStyle2 = new GUIStyle ();
-		guiStyle2.fontSize = 100;
+		guiStyle2.fontSize = 80;
 		guiStyle2.alignment = TextAnchor.MiddleCenter;
-		guiStyle2.font = (Font)Resources.Load ("Fonts/Metrica");
+		guiStyle2.font = (Font)Resources.Load ("Fonts/blockyo");
+		guiStyle2.richText = true;
 		guiStyle2.normal.textColor = new Color (1f, 1f, 1f, .9f);
 	}
 
@@ -345,6 +356,19 @@ public class GameManager : MonoBehaviour {
 
 		square.model.mat.color = Color.gray;
 
+		for(int i=height-1; i >=0; i--){
+			GameObject squareObject2 = new GameObject ();
+			Square square2 = squareObject2.AddComponent<Square> ();
+
+			//		square.transform.parent = squareFolder.transform;
+			square2.transform.position = new Vector3 (-1, i, 0);
+			square2.init(new Vector2((float) -1, (float) i), 4, false);
+
+			square2.name = "Beginning"+i;
+
+			square2.model.mat.color = Color.gray;
+		}
+
 		return square;
 	}
 
@@ -465,6 +489,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void menuScreen(){
+
 		menuAudio.mute = false;
 		int xpos;
 		int ypos;
@@ -480,11 +505,11 @@ public class GameManager : MonoBehaviour {
 		if (!go && !done) {
 			xpos = ((Screen.width) - (100)) / 2;
 			ypos = ((Screen.height) - (80)) / 2 - ((Screen.height / 3)-(Screen.height/10));
-			GUI.Label (new Rect (xpos, ypos, 100, 50), "Stepping Stones", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>S</color> <color=magenta>t</color> <color=yellow>e</color> <color=cyan>p</color> <color=magenta>p</color> <color=yellow>i</color> <color=cyan>n</color> <color=yellow>g</color>\n\n<color=yellow>S</color> <color=magenta>t</color> <color=cyan>o</color> <color=yellow>n</color> <color=magenta>e</color> <color=cyan>s</color>", guiStyle2);
 		}
 		if (!go && !done) {
 			xpos = ((Screen.width) - (500)) / 2;
-			ypos = ((Screen.height / 7)*3);
+			ypos = ((Screen.height / 2));
 			for (int i = 0; i < 3; i++) {
 				if (GUI.Button (new Rect (xpos, ypos+50*i, 500, 50), "Level "+(i+1))) {
 					setLevelName ("Level"+(i+1));

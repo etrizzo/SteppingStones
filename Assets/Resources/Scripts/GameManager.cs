@@ -483,20 +483,26 @@ public class GameManager : MonoBehaviour {
 			GUI.Label (new Rect (xpos, ypos, 100, 50), "Stepping Stones", guiStyle2);
 		}
 		if (!go && !done) {
-			xpos = ((Screen.width) - (60)) / 2;
-			ypos = ((Screen.height) / 2);
-			if (GUI.Button (new Rect (xpos-100, ypos, 100, 90), "Test Level 1")) {
-				setLevelName ("LTest1");
+			xpos = ((Screen.width) - (500)) / 2;
+			ypos = ((Screen.height / 7)*3);
+			for (int i = 0; i < 3; i++) {
+				if (GUI.Button (new Rect (xpos, ypos+50*i, 500, 50), "Level "+(i+1))) {
+					setLevelName ("Level"+(i+1));
+					state.mode = 1;
+				}
+			}
+			/*if (GUI.Button (new Rect (xpos-100, ypos, 100, 90), "Level 1")) {
+				setLevelName ("Level1");
 				state.mode = 1;
 			}
-			if (GUI.Button (new Rect (xpos, ypos, 100, 90), "Test Level 2")) {
-				setLevelName ("LTest2");
+			if (GUI.Button (new Rect (xpos, ypos, 100, 90), "Level 2")) {
+				setLevelName ("Level2");
 				state.mode = 1;
 			}
-			if (GUI.Button (new Rect (xpos+100, ypos, 100, 90), "Test Level 3")) {
-				setLevelName ("LTest3");
+			if (GUI.Button (new Rect (xpos+100, ypos, 100, 90), "Level 3")) {
+				setLevelName ("Level3");
 				state.mode = 1;
-			}
+			}*/
 		}
 	}
 

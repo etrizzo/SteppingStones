@@ -20,13 +20,20 @@ public class Highlight : MonoBehaviour {
 
 
 	// Save our color here so it's consistent :)
-	Color color = Color.gray;
+	Color color = new Color(0.2F, 0.3F, 0.4F, 0.5F);
 
 	public Square addHighlightSquare(int x,int  y) {
-		Square sq = sqman.addSquare (new Vector2 (x, y), false);
+//		Square sq = sqman.addSquare (new Vector2 (x, y), false);
+		GameObject squareObject = new GameObject ();
+		Square sq = squareObject.AddComponent<Square> ();
+		sq.init (new Vector2 ((int)mouse.x, (int)mouse.y), 100, false, 0);
+		sq.initSound ();
 		sq.model.mat.color = color;
 		sq.setType (0);
-		sq.model.gameObject.name = "Highlight Square";
+		sq.type = 0;
+//		sq.model.transform.parent = sqman.squareFolder.transform;
+		sq.model.name = "Highlight Square";
+		sq.model.gameObject.name = "Highlight Square Model";
 		return sq;
 	}
 
@@ -69,6 +76,43 @@ public class Highlight : MonoBehaviour {
 	}
 
 	void updateModel() {
+		made.transform.position = new Vector3 (mouse.x, mouse.y, 0);
+
+		Square next = sqman.queue.Peek ();
+		int type = next.getType ();
+
+		if (type == 5) {
+			// Maybe make a delegate to run all of this code for all the 4 blocks????
+//			for (int i = 0; i <= EXTRASHAPES; i++) {
+//				rigidShapes[i].model.mat.color = color;
+//			}
+			// If it's a RigidShape, do extra things based on what kind of shape it is!
+			RigidShape rs = next.rigid;
+			int shapeType = rs.shapeType;
+			if (shapeType == 0) {
+				// it's _, spawn some additional shapes!
+				for (int i = 0; i <= EXTRASHAPES; i++) {
+					rigidShapes[i].model.mat.color = color;
+					rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, mouse.y, 0);
+				}
+			} else {
+				// it's I vertical!
+				for (int i = 0; i <= EXTRASHAPES; i++) {
+					rigidShapes [i].transform.position = new Vector3 (mouse.x, mouse.y + i + 1, 0);
+				}
+			}
+			// We know this is an anchor
+
+		} else {
+			for (int i = 0; i <= EXTRASHAPES; i++) {
+				rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, rigidYOffset, 0);
+//				rigidShapes[i].model.mat.color = Color.clear;
+				// TODO: Need to replace add
+			}
+		}
+	}
+
+	void updateModel__defunct() {
 //		Debug.Log ("Got the queue, it looks like: " + queue.Count);
 		Square next = sqman.queue.Peek ();
 		int type = next.getType ();

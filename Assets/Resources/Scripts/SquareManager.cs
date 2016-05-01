@@ -189,7 +189,9 @@ public class SquareManager : MonoBehaviour {
 					moving.setPosition (pos);
 					moving.setModelColor (2f);
 					board [(int)pos.x, (int)pos.y] = moving;
-					moving.setFalling (true);
+//					moving.setFalling (true);
+					moving.wait = true;
+//					moving.checkConflicts();
 					movOffAudio.Play ();
 					moving = null;
 					chainSettle (oldpos);

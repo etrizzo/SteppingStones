@@ -107,7 +107,11 @@ public class Square : MonoBehaviour {
 	}
 
 	public void setFalling(bool f){
-		falling = f;
+		if (type != 1) {
+			falling = f;
+		} else {
+			falling = false;
+		}
 	}
 
 	// Rigid Class Stuff

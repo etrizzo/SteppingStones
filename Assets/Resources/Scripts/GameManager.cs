@@ -47,9 +47,11 @@ public class GameManager : MonoBehaviour {
 	float wave = 0;
 	int waveSpeed = 3;
 
-
+	GUIStyle buttonStyle;
 	GUIStyle guiStyle;
 	GUIStyle guiStyle2;
+	GUIContent lvlbutton;
+	GUIStyleState lvlButtonHover;
 
 	public Highlight hi;
 
@@ -75,6 +77,10 @@ public class GameManager : MonoBehaviour {
 	private void initStyles(){
 		//Cursor.SetCursor ((Texture2D)Resources.Load ("Textures/cursor"), new Vector2 (4, 4), CursorMode.Auto);
 
+		buttonStyle = new GUIStyle ();
+		buttonStyle.font = (Font) Resources.Load("Fonts/blockyo");
+		buttonStyle.normal.textColor = new Color (0, 0, 0, .8f);
+
 		guiStyle = new GUIStyle ();
 		//guiStyle.font = (Font)Resources.Load("Fonts/Mathlete-Skinny");
 		guiStyle.alignment = TextAnchor.MiddleCenter;
@@ -87,6 +93,12 @@ public class GameManager : MonoBehaviour {
 		guiStyle2.font = (Font)Resources.Load ("Fonts/blockyo");
 		guiStyle2.richText = true;
 		guiStyle2.normal.textColor = new Color (1f, 1f, 1f, .9f);
+
+		GUI.depth = 10;
+		lvlbutton = new GUIContent ();
+		lvlButtonHover = new GUIStyleState ();
+		lvlButtonHover.background = Resources.Load<Texture2D> ("Textures/glow");
+		buttonStyle.hover = lvlButtonHover;
 	}
 
 	void initSound(){
@@ -510,10 +522,11 @@ public class GameManager : MonoBehaviour {
 			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>S</color> <color=magenta>t</color> <color=yellow>e</color> <color=cyan>p</color> <color=magenta>p</color> <color=yellow>i</color> <color=cyan>n</color> <color=yellow>g</color>\n\n<color=yellow>S</color> <color=cyan>t</color> <color=magenta>o</color> <color=yellow>n</color> <color=cyan>e</color> <color=magenta>s</color>", guiStyle2);
 		}
 		if (!go && !done) {
-			xpos = ((Screen.width) - (500)) / 2;
+			xpos = ((Screen.width)-256) / 2;
 			ypos = ((Screen.height / 2));
 			for (int i = 0; i < 3; i++) {
-				if (GUI.Button (new Rect (xpos, ypos+50*i, 500, 50), "Level "+(i+1))) {
+				lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv"+(i+1));
+				if (GUI.Button (new Rect (xpos, ypos+50*i, 256, 50), lvlbutton, buttonStyle)) {
 					setLevelName ("Level"+(i+1));
 					state.mode = 1;
 				}

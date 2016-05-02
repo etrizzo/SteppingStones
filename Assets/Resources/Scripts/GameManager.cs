@@ -55,18 +55,11 @@ public class GameManager : MonoBehaviour {
 
 	public Highlight hi;
 
-	public ScrollRect scroller;
-	public RectTransform scrollContent;
+	public Vector2 scrollPosition = Vector2.zero;
 
 	static bool[] levelUnlockStatus = {true, false, false, false, false, false, false, false, false, false};
 
 	void Start () {
-		/*scroller = new ScrollRect();
-		scroller.vertical = true;
-		scroller.horizontal = false;
-
-		scrollContent = new RectTransform ();
-		scroller.content = scrollContent;*/
 
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
@@ -526,13 +519,16 @@ public class GameManager : MonoBehaviour {
 		if (!go && !done) {
 			xpos = ((Screen.width)-256) / 2;
 			ypos = ((Screen.height / 2));
+			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 256, 150), scrollPosition, new Rect (0, 0, 220, 200)); 
+
 			for (int i = 0; i < 3; i++) {
 				lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv"+(i+1));
-				if (GUI.Button (new Rect (xpos, ypos+50*i, 256, 50), lvlbutton, buttonStyle)) {
+				if (GUI.Button (new Rect (0, 0+50*i, 256, 50), lvlbutton, buttonStyle)) {
 					setLevelName ("Level"+(i+1));
 					state.mode = 1;
 				}
 			}
+			GUI.EndScrollView ();
 			/*if (GUI.Button (new Rect (xpos-100, ypos, 100, 90), "Level 1")) {
 				setLevelName ("Level1");
 				state.mode = 1;

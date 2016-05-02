@@ -109,7 +109,11 @@ public class Square : MonoBehaviour {
 	}
 
 	public void setFalling(bool f){
-		falling = f;
+		if (type != 1) {
+			falling = f;
+		} else {
+			falling = false;
+		}
 	}
 
 	// Rigid Class Stuff
@@ -205,7 +209,7 @@ public class Square : MonoBehaviour {
 		int i = 0;
 
 		foreach (Square sq in directedBlocks) {
-			if (sq != null && sq.getColor() == color && (!sq.isFalling() || (sq.rigid != null && !sq.rigid.falling))) {
+			if (sq != null && sq.getColor() == color && (!sq.isFalling() || (sq.rigid != null && !sq.rigid.falling && !sq.rigid.growing))) {
 				
 				sqman.chainSettle (sq.getPosition());
 				if (sq.rigid != null) {

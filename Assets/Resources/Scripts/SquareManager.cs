@@ -42,7 +42,9 @@ public class SquareManager : MonoBehaviour {
 
 //	float randFreq = .2;
 
-	public void init(GameManager gm, Square[,] board, int[] q, int[] rsq = null){
+
+	public void init(GameManager gm, Square[,] board, int[] q, int[] rsq = null, List<Square> inboard = null ){
+
 		this.gm = gm;
 		squareFolder = new GameObject();
 		squareFolder.name = "Squares";
@@ -56,6 +58,9 @@ public class SquareManager : MonoBehaviour {
 		this.rsq = rsq;
 		this.BOARDSIZEX = board.GetLength (0);
 		this.BOARDSIZEY = board.GetLength(1);
+		if (inboard != null) {
+			addBoardSquares (inboard);
+		}
 		initQueue ();		//initialize queue w/ 3 initial blocks
 		initSound ();
 		//getHeight ();
@@ -206,12 +211,16 @@ public class SquareManager : MonoBehaviour {
 				} else {						//if placing a movable block, place the moving block
 					Vector2 oldpos = moving.getPosition ();
 					board [(int)oldpos.x, (int)oldpos.y] = null;
+//					chainSettle (oldpos);
 					moving.setPosition (pos);
 					moving.setModelColor (2f);
 					board [(int)pos.x, (int)pos.y] = moving;
-					moving.setFalling (true);
+//					moving.setFalling (true);
+					moving.wait = true;
+//					moving.checkConflicts();
 					movOffAudio.Play ();
 					moving = null;
+					print("chain settling: " + oldpos);
 					chainSettle (oldpos);
 
 
@@ -556,6 +565,16 @@ public class SquareManager : MonoBehaviour {
 			Debug.Log("Square wasn't on the board!");
 		}
 	}
+
+
+	public void addBoardSquares(List<Square> squares){
+		foreach (Square s in squares) {
+			print ("adding " + this + " to: " + s);
+			s.addSqman (this);
+			s.transform.parent = squareFolder.transform;
+		}
+	}
+
 
 	// -------------
 	// All GUI code down here, basically just because lol

@@ -16,6 +16,8 @@ public class SquareManager : MonoBehaviour {
 	public AudioClip movOnClip;
 	public AudioSource movOffAudio;
 	public AudioClip movOffClip;
+	public AudioSource badPlaceAudio;
+	public AudioClip badPlaceClip;
 
 	public Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
 	public int BOARDSIZEX = 24;
@@ -40,7 +42,6 @@ public class SquareManager : MonoBehaviour {
 
 //	float randFreq = .2;
 
-
 	public void init(GameManager gm, Square[,] board, int[] q, int[] rsq = null){
 		this.gm = gm;
 		squareFolder = new GameObject();
@@ -58,6 +59,19 @@ public class SquareManager : MonoBehaviour {
 		initQueue ();		//initialize queue w/ 3 initial blocks
 		initSound ();
 		//getHeight ();
+	}
+
+	public void clear(){
+		foreach (Square s in board) {
+			if (s != null) {
+				Destroy (s.gameObject);
+			}
+		}
+		foreach (Square s in queue) {
+			if (s != null) {
+				Destroy (s.gameObject);
+			}
+		}
 	}
 
 	void initSound(){
@@ -85,6 +99,12 @@ public class SquareManager : MonoBehaviour {
 		movOffAudio.playOnAwake = false;
 		movOffClip = Resources.Load<AudioClip> ("Audio/Special Blocks/Movable - Put Down");
 		movOffAudio.clip = movOffClip;
+
+		badPlaceAudio = this.gameObject.AddComponent<AudioSource> ();
+		badPlaceAudio.loop = false;
+		badPlaceAudio.playOnAwake = false;
+		badPlaceClip = Resources.Load<AudioClip> ("Audio/WrongPlacement");
+		badPlaceAudio.clip = badPlaceClip;
 	}
 
 	void Update(){
@@ -203,6 +223,7 @@ public class SquareManager : MonoBehaviour {
 			}
 		} else {
 			print ("nO");
+			badPlaceAudio.Play ();
 		}
 	}
 		

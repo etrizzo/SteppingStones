@@ -240,8 +240,9 @@ public class RigidShape : MonoBehaviour {
 			if (pos.y - 2 >= 0) {
 				belowbelow = board [(int)pos.x, (int)pos.y - 2];
 			}
-			if (belowbelow != null && !belowbelow.isFalling () && falling && belowbelow.rigid != this) {
+			if (belowbelow != null && !belowbelow.isFalling () && (below == null || below.isFalling()) && falling && belowbelow.rigid != this && !played) {
 				settleAudio.Play ();
+				played = true;
 			}
 		}
 		if (checkNull(belows)){		//if every square below is null, fall
@@ -285,6 +286,7 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	void settleShape(){	//equivalent of fall() in Square
+		played = false;
 		foreach(Square s in squares){
 			if (s != null) {
 				s.fall ();

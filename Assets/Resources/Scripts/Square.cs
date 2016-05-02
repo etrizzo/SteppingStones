@@ -26,6 +26,8 @@ public class Square : MonoBehaviour {
 	public AudioSource conflictAudio;
 	public AudioClip conflictClip;
 
+	bool played = false;
+
 
 	public void init(Vector2 pos, int color, bool isGround = false, int type = 0){
 		this.pos = pos;
@@ -162,10 +164,11 @@ public class Square : MonoBehaviour {
 			falling = false;
 			counter = 0f;
 			wait = true;		//wait for conflicts to check?
+			//settleAudio.Play ();
 		} else {
 			// Do nothing, wait for Update() to call checkFall again ;)))))))
 		}
-		if (belowbelow != null && !belowbelow.isFalling () && falling && rigid == null) {
+		if ((belowbelow != null && !belowbelow.isFalling () && falling && rigid == null)) {
 			settleAudio.Play ();
 		}
 	}

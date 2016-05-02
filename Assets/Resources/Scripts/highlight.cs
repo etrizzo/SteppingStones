@@ -65,6 +65,13 @@ public class Highlight : MonoBehaviour {
 		//
 	}
 
+	public void clear(){
+		foreach (Square s in rigidShapes) {
+			Destroy (s.gameObject);
+		}
+		Destroy (made.gameObject);
+	}
+
 	public void Update() {
 		updateMouse ();
 		// get first element in queue & change based on that
@@ -109,7 +116,7 @@ public class Highlight : MonoBehaviour {
 			}
 			// Color all the extra shapes :)
 			for (int i = 0; i < EXTRASHAPES; i++) {
-				Debug.Log ("Checking extra shape: " + i);
+				//Debug.Log ("Checking extra shape: " + i);
 //				checkConflictAndColor(rigidShapes[i]);
 			}
 
@@ -144,13 +151,13 @@ public class Highlight : MonoBehaviour {
 				for (int i = 0; i < EXTRASHAPES; i++) {
 					Vector2 pos = rigidShapes [i].transform.position;
 					if (board[(int) pos.x, (int) pos.y] != null) {
-						Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
+						//Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
 						retColor = redTransparent;
 					}
 				}
 			}
 			if (retColor != redTransparent) {
-				Debug.Log(("I'm not coloring this block red!"));
+				//Debug.Log(("I'm not coloring this block red!"));
 			}
 		}
 		return retColor;

@@ -539,13 +539,13 @@ public class SquareManager : MonoBehaviour {
 	// -------------
 	// All GUI code down here, basically just because lol
 	void OnGUI() {
-		if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
+		/*if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
 			boardSolved ();
 		}
 		if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
 			Application.LoadLevel (Application.loadedLevel);
 
-		}
+		}*/
 	}
 
 

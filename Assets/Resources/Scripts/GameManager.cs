@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour {
 	int[] q;
 	int[] rsq;
 	string levelName;
+	int levelNum;
 
 	public GameObject groundSquareFolder;
 	public List<Square> groundSquares;
@@ -466,8 +467,9 @@ public class GameManager : MonoBehaviour {
 
 	}
 
-	void setLevelName(string name){
+	void setLevelName(string name, int num){
 		levelName = name;
+		levelNum = num;
 	}
 
 	/************************ Start Gui Stuff ****************************/
@@ -490,6 +492,16 @@ public class GameManager : MonoBehaviour {
 		case 1:
 			if (!go) {			//only initialize the board once
 				startGame ();
+			}
+			if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
+				/*if (sqman.boardSolved ()) {
+					setLevelName ("Level"+(levelNum+1), (levelNum+1));
+					go = false;
+				}*/
+			}
+			if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
+				Application.LoadLevel (Application.loadedLevel);
+
 			}
 			break;
 		}
@@ -524,23 +536,11 @@ public class GameManager : MonoBehaviour {
 			for (int i = 0; i < 3; i++) {
 				lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv"+(i+1));
 				if (GUI.Button (new Rect (0, 0+50*i, 256, 50), lvlbutton, buttonStyle)) {
-					setLevelName ("Level"+(i+1));
+					setLevelName ("Level"+(i+1), (i+1));
 					state.mode = 1;
 				}
 			}
 			GUI.EndScrollView ();
-			/*if (GUI.Button (new Rect (xpos-100, ypos, 100, 90), "Level 1")) {
-				setLevelName ("Level1");
-				state.mode = 1;
-			}
-			if (GUI.Button (new Rect (xpos, ypos, 100, 90), "Level 2")) {
-				setLevelName ("Level2");
-				state.mode = 1;
-			}
-			if (GUI.Button (new Rect (xpos+100, ypos, 100, 90), "Level 3")) {
-				setLevelName ("Level3");
-				state.mode = 1;
-			}*/
 		}
 	}
 
@@ -557,6 +557,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void startGame(){
+
 		menuAudio.mute = true;
 		GameObject sqmanObject = new GameObject ();
 		initBoard ();
@@ -581,5 +582,6 @@ public class GameManager : MonoBehaviour {
 		gameAudio5.Play();
 		gameAudio6.Play();
 		gameAudio7.Play();
+
 	}
 }

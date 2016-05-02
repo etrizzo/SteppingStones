@@ -67,7 +67,9 @@ public class Highlight : MonoBehaviour {
 
 	public void clear(){
 		foreach (Square s in rigidShapes) {
-			Destroy (s.gameObject);
+			if (s != null) {
+				Destroy (s.gameObject);
+			}
 		}
 		Destroy (made.gameObject);
 	}
@@ -134,6 +136,10 @@ public class Highlight : MonoBehaviour {
 		}
 	}
 
+	bool insideBoard(float pos_x, float pos_y) {
+		return (pos_x >= 0) && (pos_x < sqman.BOARDSIZEX) && (pos_y > 0) && (pos_y < sqman.BOARDSIZEY);
+	}
+
 
 	Color getHighlightColor () {
 		Color retColor = defaultColor;
@@ -142,23 +148,50 @@ public class Highlight : MonoBehaviour {
 //		Debug.Log ("getHighlightColor is firing???");
 		// Check the mouse conflict
 		Vector3 madePos = made.transform.position;
-		if ((madePos.x > 0) && (madePos.x < sqman.BOARDSIZEX) && (madePos.y > 0) && (madePos.y < sqman.BOARDSIZEY)) {
-			if (board[(int) madePos.x, (int) madePos.y] != null) {
-	//			Debug.Log ("There's a block at " + madePos.x + ", " + madePos.y + ", so I'm coloring this red!");
-				retColor =  redTransparent;
+		if (insideBoard(madePos.x, madePos.y)) {
+			if (board [(int)madePos.x, (int)madePos.y] != null) {
+				//			Debug.Log ("There's a block at " + madePos.x + ", " + madePos.y + ", so I'm coloring this red!");
+				retColor = redTransparent;
 			}
+/*<<<<<<< HEAD
 			if (next.type == 5) {
 				for (int i = 0; i < EXTRASHAPES; i++) {
 					Vector2 pos = rigidShapes [i].transform.position;
 					if (board[(int) pos.x, (int) pos.y] != null) {
 						//Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
+/=======*/
+		} else {
+			Debug.Log ("Outside of bounds, coloring it red!");
+			retColor = redTransparent;
+		}
+		if (next.type == 5) {
+			for (int i = 0; i < EXTRASHAPES; i++) {
+				Vector2 pos = rigidShapes [i].transform.position;
+
+				if (insideBoard( pos.x, pos.y)) {
+					if (board [(int)pos.x, (int)pos.y] != null) {
+						//			Debug.Log ("There's a block at " + madePos.x + ", " + madePos.y + ", so I'm coloring this red!");
+//>>>>>>> 51d0f73961bb4603a38f1378c6b92088746ba146
 						retColor = redTransparent;
 					}
+				} else {
+					Debug.Log ("Outside of bounds, coloring it red!");
+					retColor = redTransparent;
+				}
+				if (board [(int)pos.x, (int)pos.y] != null) {
+					Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
+					retColor = redTransparent;
 				}
 			}
+/*<<<<<<< HEAD
 			if (retColor != redTransparent) {
 				//Debug.Log(("I'm not coloring this block red!"));
 			}
+=======*/
+		}
+		if (retColor != redTransparent) {
+			Debug.Log (("I'm not coloring this block red!"));
+//>>>>>>> 51d0f73961bb4603a38f1378c6b92088746ba146
 		}
 		return retColor;
 	}

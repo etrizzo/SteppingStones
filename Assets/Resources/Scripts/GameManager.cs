@@ -625,7 +625,7 @@ public class GameManager : MonoBehaviour {
 			xpos = ((Screen.width)-256) / 2;
 			ypos = ((Screen.height / 2));
 
-			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 250)); 
+			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 350)); 
 
 			for (int i = 0; i < NUMLEVELS; i++) {
 				if (!levelUnlockStatus [i]) {

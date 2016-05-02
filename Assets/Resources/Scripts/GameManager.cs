@@ -193,7 +193,7 @@ public class GameManager : MonoBehaviour {
 		Destroy (hi.gameObject);
 		Destroy (beginning.gameObject);
 		Destroy (destination.gameObject);
-		Destroy (hero.gameObject);
+//		Destroy (hero.gameObject);
 	}
 
 	void Update(){
@@ -437,16 +437,17 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public Hero makeHero(int height){
+		print ("A NEW HERO IS BORN");
 		GameObject heroObject = new GameObject ();
-		Hero hero = heroObject.AddComponent<Hero> ();
+		Hero h = heroObject.AddComponent<Hero> ();
 
 		//		square.transform.parent = squareFolder.transform;
-		hero.transform.position = new Vector3 (-1, height+1, 0);
-		hero.init(new Vector2((float) -1, (float) height+1), this);
+		h.transform.position = new Vector3 (-1, height+1, 0);
+		h.init(new Vector2((float) -1, (float) height+1), this);
 
-		hero.name = "Hero";
+		h.name = "Hero";
 
-		return hero;
+		return h;
 	}
 
 	public Square makeDestination(int height){

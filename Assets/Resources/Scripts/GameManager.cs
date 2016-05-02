@@ -58,6 +58,8 @@ public class GameManager : MonoBehaviour {
 	public ScrollRect scroller;
 	public RectTransform scrollContent;
 
+	static bool[] levelUnlockStatus = {true, false, false, false, false, false, false, false, false, false};
+
 	void Start () {
 		/*scroller = new ScrollRect();
 		scroller.vertical = true;

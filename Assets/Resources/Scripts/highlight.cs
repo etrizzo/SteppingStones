@@ -140,6 +140,10 @@ public class Highlight : MonoBehaviour {
 		return (pos_x >= 0) && (pos_x < sqman.BOARDSIZEX) && (pos_y > 0) && (pos_y < sqman.BOARDSIZEY);
 	}
 
+	bool movableBlock(float pos_x, float pos_y) {
+		return board [(int)pos_x, (int)pos_y].type == 1;
+	}
+
 
 	Color getHighlightColor () {
 		Color retColor = defaultColor;
@@ -149,17 +153,10 @@ public class Highlight : MonoBehaviour {
 		// Check the mouse conflict
 		Vector3 madePos = made.transform.position;
 		if (insideBoard(madePos.x, madePos.y)) {
-			if (board [(int)madePos.x, (int)madePos.y] != null) {
+			if (board [(int)madePos.x, (int)madePos.y] != null && !movableBlock(madePos.x, madePos.y)) {
 				//			Debug.Log ("There's a block at " + madePos.x + ", " + madePos.y + ", so I'm coloring this red!");
 				retColor = redTransparent;
 			}
-/*<<<<<<< HEAD
-			if (next.type == 5) {
-				for (int i = 0; i < EXTRASHAPES; i++) {
-					Vector2 pos = rigidShapes [i].transform.position;
-					if (board[(int) pos.x, (int) pos.y] != null) {
-						//Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
-/=======*/
 		} else {
 			//Debug.Log ("Outside of bounds, coloring it red!");
 			retColor = redTransparent;
@@ -168,30 +165,21 @@ public class Highlight : MonoBehaviour {
 			for (int i = 0; i < EXTRASHAPES; i++) {
 				Vector2 pos = rigidShapes [i].transform.position;
 
-				if (insideBoard( pos.x, pos.y)) {
-					if (board [(int)pos.x, (int)pos.y] != null) {
+				if (insideBoard (pos.x, pos.y)) {
+					if (board [(int)pos.x, (int)pos.y] != null && !movableBlock(madePos.x, madePos.y)) {
 						//			Debug.Log ("There's a block at " + madePos.x + ", " + madePos.y + ", so I'm coloring this red!");
-//>>>>>>> 51d0f73961bb4603a38f1378c6b92088746ba146
+//						sqman.badPlaceAudio.Play ();
 						retColor = redTransparent;
 					}
 				} else {
-					//Debug.Log ("Outside of bounds, coloring it red!");
-					retColor = redTransparent;
-				}
-				if (board [(int)pos.x, (int)pos.y] != null) {
-					//Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
+//					Debug.Log ("Outside of bounds, coloring it red!");
+//					sqman.badPlaceAudio.Play ();
 					retColor = redTransparent;
 				}
 			}
-/*<<<<<<< HEAD
-			if (retColor != redTransparent) {
-				//Debug.Log(("I'm not coloring this block red!"));
-			}
-=======*/
 		}
 		if (retColor != redTransparent) {
-			//Debug.Log (("I'm not coloring this block red!"));
-//>>>>>>> 51d0f73961bb4603a38f1378c6b92088746ba146
+			Debug.Log (("I'm not coloring this block red!"));
 		}
 		return retColor;
 	}

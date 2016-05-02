@@ -13,6 +13,7 @@ public class Hero : MonoBehaviour {
 	public SquareManager sqman;
 	public Square[,] board;
 
+
 	public void init(Vector2 pos, GameManager gm){
 		this.gm = gm;
 		this.pos = pos;
@@ -57,6 +58,14 @@ public class Hero : MonoBehaviour {
 	public void destroy(){
 		DestroyImmediate (this.model);
 		DestroyImmediate (this.gameObject);
+	}
+
+	public void nextMove(Vector2 newPos){
+		model.nextMove (newPos, pos);
+	}
+
+	public void changeColor(){
+		model.mat.color = Color.blue;
 	}
 
 	public void Update() {

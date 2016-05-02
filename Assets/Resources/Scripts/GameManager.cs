@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System;
 
 public class GameManager : MonoBehaviour {
 
@@ -52,6 +54,10 @@ public class GameManager : MonoBehaviour {
 	GUIStyle guiStyle2;
 
 	public Highlight hi;
+
+	public List<Square> squarePath;
+	public int pathCounter = 0;
+	public bool wait;
 
 	void Start () {
 		groundSquareFolder = new GameObject();
@@ -238,6 +244,7 @@ public class GameManager : MonoBehaviour {
 				destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
 			}
 		}
+
 	}
 
 
@@ -436,6 +443,24 @@ public class GameManager : MonoBehaviour {
 		levelName = name;
 	}
 
+	public void pathAnimation(){
+//		Time.timeScale = .01f;
+//		Time.fixedDeltaTime = .01f;
+		Debug.Log ("pathAnimation");
+		//heroAnimation(squarePath);
+		//Time.timeScale = 1f;
+		hero.model.canMove = true;
+	//	hero.model.moveAlong (squarePath);
+	}
+
+//	void heroAnimation(List<Square> squarePath){
+//		int counter = 0;
+//		foreach (Square sq in squarePath) {
+//			Vector2 nextPos = sq.getPosition ();
+//			hero.model.nextMove (nextPos);
+//		}
+//	}
+
 	/************************ Start Gui Stuff ****************************/
 	bool go = false;
 	bool done = false;
@@ -497,6 +522,8 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+
+
 	private void initBackground ()
 	{
 		//creates background tile
@@ -512,11 +539,14 @@ public class GameManager : MonoBehaviour {
 	private void startGame(){
 		menuAudio.mute = true;
 		GameObject sqmanObject = new GameObject ();
+
 		initBoard ();
+
+		squarePath = new List<Square>();
 
 		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.name = "Square Manager";
-		sqman.init (this, board, q, rsq);
+		sqman.init (this, board, q, hero, rsq);
 		sqman.destination = destination;
 		sqman.beginning = beginning;
 

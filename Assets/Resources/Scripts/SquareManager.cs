@@ -35,13 +35,18 @@ public class SquareManager : MonoBehaviour {
 	public Square destination;		//TODO: TEMPORARY :O
 	public Square beginning;		//TODO: TEMPORARY :O
 	public GameManager gm;
+	public Hero hero;
 
 	public bool conflict = false;
+
+	public bool solved = false;
+
+
 
 //	float randFreq = .2;
 
 
-	public void init(GameManager gm, Square[,] board, int[] q, int[] rsq = null){
+	public void init(GameManager gm, Square[,] board, int[] q, Hero hero, int[] rsq = null){
 		this.gm = gm;
 		squareFolder = new GameObject();
 		squareFolder.name = "Squares";
@@ -58,6 +63,8 @@ public class SquareManager : MonoBehaviour {
 		initQueue ();		//initialize queue w/ 3 initial blocks
 		initSound ();
 		//getHeight ();
+
+		this.hero = hero;
 	}
 
 	void initSound(){
@@ -391,12 +398,11 @@ public class SquareManager : MonoBehaviour {
 	}
 
 	public bool boardSolved() {
-		bool solved;
 		// Short circuit, because if the last column's block 1 below the destination isn't a square, then there's no point running the alg.
 		if (destinationClose() && pathValid(beginning)) {
 			solved = true;
-
-			playSuccess ();
+//			gm.pathAnimation ();
+//			playSuccess ();
 		} else {
 			solved = false;
 		}
@@ -423,12 +429,15 @@ public class SquareManager : MonoBehaviour {
 
 	private bool pathValid(Square curSquare) {
 		if (curSquare != null) {
+			
 			Vector2 pos = curSquare.getPosition ();
 			Debug.Log ("Got a square @: " + pos.x + ", " + pos.y + ")");
 			if (curSquare.getPosition() == destination.getPosition()) {
 				Debug.Log("Destination's position:" + destination.getPosition().x + ", " + destination.getPosition().y);
 				return true;
 			} else {
+				gm.squarePath.Add(curSquare);
+				//hero.nextMove (pos);
 				return pathValid (getNextSquare(curSquare));
 			}
 		}
@@ -506,13 +515,22 @@ public class SquareManager : MonoBehaviour {
 	// All GUI code down here, basically just because lol
 	void OnGUI() {
 		if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
-			boardSolved ();
+			if (boardSolved ()) {
+				gm.pathAnimation ();
+				playSuccess ();
+			}
+//			foreach (Square sq in gm.squarePath) {
+//				Debug.Log ("square name is: " + sq.name);
+//			}
+
 		}
 		if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
 			Application.LoadLevel (Application.loadedLevel);
 
 		}
+
 	}
+
 
 }
 

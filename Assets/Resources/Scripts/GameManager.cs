@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour {
 	string levelName;
 	int levelNum;
 
-	public int NUMLEVELS = 5;
+	public int NUMLEVELS = 7;
 
 	List<Square>destinationSquares;
 	List<Square>beginningSquares;

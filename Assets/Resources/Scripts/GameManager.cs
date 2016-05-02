@@ -183,16 +183,23 @@ public class GameManager : MonoBehaviour {
 	private void clearBoard(){
 		sqman.clear ();
 		hi.clear ();
+
 		foreach (Square s in destinationSquares) {
-			Destroy (s.gameObject);
+			if (s != null) {
+				s.destroy ();
+			}
 		}
 		foreach (Square s in beginningSquares) {
-			Destroy (s.gameObject);
+			if (s != null) {
+				s.destroy ();
+			}
 		}
-		Destroy (sqman.gameObject);
-		Destroy (hi.gameObject);
-		Destroy (beginning.gameObject);
-		Destroy (destination.gameObject);
+		destinationSquares = new List<Square> ();
+		beginningSquares = new List<Square> ();
+//		Destroy (sqman.gameObject);
+//		Destroy (hi.gameObject);
+//		Destroy (beginning.gameObject);
+//		Destroy (destination.gameObject);
 //		Destroy (hero.gameObject);
 	}
 

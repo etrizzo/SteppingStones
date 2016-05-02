@@ -68,10 +68,10 @@ public class Highlight : MonoBehaviour {
 	public void clear(){
 		foreach (Square s in rigidShapes) {
 			if (s != null) {
-				Destroy (s.gameObject);
+				DestroyImmediate (s.gameObject);
 			}
 		}
-		Destroy (made.gameObject);
+		DestroyImmediate (made.gameObject);
 	}
 
 	public void Update() {

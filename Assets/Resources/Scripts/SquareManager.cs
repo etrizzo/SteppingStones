@@ -69,12 +69,12 @@ public class SquareManager : MonoBehaviour {
 	public void clear(){
 		foreach (Square s in board) {
 			if (s != null) {
-				Destroy (s.gameObject);
+				DestroyImmediate (s.gameObject);
 			}
 		}
 		foreach (Square s in queue) {
 			if (s != null) {
-				Destroy (s.gameObject);
+				DestroyImmediate (s.gameObject);
 			}
 		}
 	}

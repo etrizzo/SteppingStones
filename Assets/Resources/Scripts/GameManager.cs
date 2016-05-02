@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour {
 	string levelName;
 	int levelNum;
 
-	public int NUMLEVELS = 4;
+	public int NUMLEVELS = 5;
 
 	List<Square>destinationSquares;
 	List<Square>beginningSquares;
@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour {
 
 	public Vector2 scrollPosition = Vector2.zero;
 
-	static bool[] levelUnlockStatus = {true, false, false, false, false, false, false, false, false, false};
+	static bool[] levelUnlockStatus = { true, true, true, true, true, true, true, true, true, true };//{true, false, false, false, false, false, false, false, false, false};
 
 	void Start () {
 

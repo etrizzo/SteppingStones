@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject groundSquareFolder;
 	public List<Square> groundSquares;
+	public List<Square> inBoardSquares;
 
 	public Camera cam;
 	float dist;
@@ -303,7 +304,7 @@ public class GameManager : MonoBehaviour {
 		}
 		rsq = new int[10];
 		int rsprob;
-		if (prob != 0) {			//using rigid shapes
+//		if (prob != 0) {			//using rigid shapes
 			start = 0;
 			for (int i = 0; i < 2; i++) {		//number of rigid shapes
 				rsprob = int.Parse (sr.ReadLine ());
@@ -311,7 +312,18 @@ public class GameManager : MonoBehaviour {
 					rsq [j + start] = i;
 				}
 			}
+//		}
+		Square sq;
+		while (sr.Peek () != -1) {
+			line = sr.ReadLine ();
+			string[] s = line.Split (' ');
+			sq = addSquare (new Vector2 (float.Parse (s [0]), float.Parse (s [1])), int.Parse (s [2]), false, int.Parse (s [3]));
+			sq.setColor (int.Parse (s [2]));
+			sq.setType (int.Parse (s [3]));
+//			Square sq = new Square ();
+//			sq.init (new Vector2 (float.Parse (s [0]), float.Parse (s [1])), int.Parse (s [2]), false,  int.Parse (s [3]));
 		}
+
 
 	}
 
@@ -334,7 +346,7 @@ public class GameManager : MonoBehaviour {
 	//adds a column of ground from 0 to height
 	public void addColumn(int height, int x){
 		for (int i = 0; i <= height; i++) {
-			Square s = addSquare (new Vector2 (x, i), true); 
+			Square s = addGround(new Vector2 (x, i), true); 
 //			print (s == null);
 			s.init (new Vector2 (x, i), -1, true);
 			board [x, i] = s;
@@ -451,19 +463,34 @@ public class GameManager : MonoBehaviour {
 		return square;
 	}
 
-	public Square addSquare(Vector2 pos, bool isGround){
+	public Square addGround(Vector2 pos, bool isGround){
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
 		square.transform.parent = groundSquareFolder.transform;
 		square.transform.position = new Vector3 (pos.x, pos.y, 0);
-		square.init (pos, -1, true);
+		square.init (pos, -1, isGround);
 
 		groundSquares.Add (square);
 		square.name = "Ground " + groundSquares.Count;
 
 		return square;
 
+	}
+
+	public Square addSquare(Vector2 pos, int color, bool isGround, int type){
+		GameObject squareObject = new GameObject ();
+		Square square = squareObject.AddComponent<Square> ();
+
+//		square.transform.parent = groundSquareFolder.transform;
+		square.transform.position = new Vector3 (pos.x, pos.y, 0);
+		square.init (pos, color, isGround, type);
+//		print ("Adding to inBoardSquares " + square);
+		inBoardSquares.Add (square);
+		square.name = "Square " + groundSquares.Count;
+		board [(int)pos.x, (int)pos.y] = square;
+
+		return square;
 	}
 
 	public string getLevelName(){		//TODO: make it good
@@ -524,11 +551,18 @@ public class GameManager : MonoBehaviour {
 		if (!go && !done) {
 			xpos = ((Screen.width)-256) / 2;
 			ypos = ((Screen.height / 2));
-			for (int i = 0; i < 3; i++) {
-				lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv"+(i+1));
-				if (GUI.Button (new Rect (xpos, ypos+50*i, 256, 50), lvlbutton, buttonStyle)) {
-					setLevelName ("Level"+(i+1));
-					state.mode = 1;
+			for (int i = 0; i < 4; i++) {
+				if (i < 3) {
+					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv" + (i + 1));
+					if (GUI.Button (new Rect (xpos, ypos + 50 * i, 256, 50), lvlbutton, buttonStyle)) {
+						setLevelName ("Level" + (i + 1));
+						state.mode = 1;
+					}
+				} else {
+					if (GUI.Button (new Rect (xpos, ypos+50*i, 500, 50), "Level "+(i+1))) {
+						setLevelName ("Level" + (i + 1));
+						state.mode = 1;
+					}
 				}
 			}
 			/*if (GUI.Button (new Rect (xpos-100, ypos, 100, 90), "Level 1")) {
@@ -565,9 +599,11 @@ public class GameManager : MonoBehaviour {
 
 		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.name = "Square Manager";
-		sqman.init (this, board, q, rsq);
+//		print ("initing sqman");
+		sqman.init (this, board, q, rsq, inBoardSquares);
 		sqman.destination = destination;
 		sqman.beginning = beginning;
+//		sqman.addBoardSquares (inBoardSquares);
 
 		initBackground ();
 		go = true;

@@ -181,6 +181,7 @@ public class Square : MonoBehaviour {
 	}
 
 	public Square[] getNeighbors(){
+		print ("Getting neighbors: " + this + " " + (sqman==null));
 		Square[] directedBlocks = new Square[4];
 		if (pos.y + 1 < sqman.BOARDSIZEY) {
 			directedBlocks [0] = board [(int)pos.x, (int)pos.y + 1];

@@ -212,15 +212,17 @@ public class GameManager : MonoBehaviour {
 				gameAudio5.mute = true;
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
-				if (!sqman.successAudio.isPlaying && levelNum < NUMLEVELS) {
-					clearBoard ();
-					setLevelName ("Level"+(levelNum+1), (levelNum+1));
+				if (levelNum < NUMLEVELS) {
 					Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
-					levelUnlockStatus[levelNum-1] = true;
-					levelNum++;
-					success = false;
-					go = false;
-					state.mode = 1;
+					levelUnlockStatus[levelNum] = true;
+					if (!sqman.successAudio.isPlaying) {
+						clearBoard ();
+						setLevelName ("Level"+(levelNum+1), (levelNum+1));
+						levelNum++;
+						success = false;
+						go = false;
+						state.mode = 1;
+					}
 				}
 			}
 			if (sqman.height < 4 && !success) {

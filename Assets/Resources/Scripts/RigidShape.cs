@@ -20,7 +20,7 @@ public class RigidShape : MonoBehaviour {
 	public AudioClip settleClip;
 
 	bool played = false;
-	bool growing = false;
+	public bool growing = false;
 	int speed = 5;
 	float growCounter = 0;
 	float counter = 0f;
@@ -114,10 +114,10 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	void Update(){
-		if (wait) {	//waiting to check for conflicts after settling
+		if (wait && !falling && !growing) {	//waiting to check for conflicts after settling
 			conflictCounter += Time.deltaTime * speed;
 			if (conflictCounter >= 1 && !growing) {
-
+				print ("Shape: " + this + " is checking conflicts :o");
 				checkConflicts ();
 			}
 		}
@@ -173,6 +173,7 @@ public class RigidShape : MonoBehaviour {
 				} else {
 					growCounter = 0;
 					growing = false;
+					wait = false;
 //					falling = true;
 					setShapeFalling (true);
 				}
@@ -240,15 +241,16 @@ public class RigidShape : MonoBehaviour {
 			if (pos.y - 2 >= 0) {
 				belowbelow = board [(int)pos.x, (int)pos.y - 2];
 			}
-			if (belowbelow != null && !belowbelow.isFalling () && falling && belowbelow.rigid != this) {
+			if (belowbelow != null && !belowbelow.isFalling () && (below == null || below.isFalling()) && falling && belowbelow.rigid != this && !played) {
 				settleAudio.Play ();
+				played = true;
 			}
 		}
 		if (checkNull(belows)){		//if every square below is null, fall
 			settleShape();
 			settleAbove(aboves);
 			counter = 0f;
-		} else if (checkStop(belows)){		//if at least one square below is not null and not falling, stop
+		} else if (checkStop(belows)){		//if at least one square below is not null and not falling AND NOT GROWING, stop
 			//stop falling
 			setShapeFalling(false);
 			wait = true;
@@ -276,7 +278,7 @@ public class RigidShape : MonoBehaviour {
 			if (s != null){
 				if (s.rigid == null && !s.isFalling()){
 					return true;
-				} else if (s.rigid != null && !s.rigid.falling){
+				} else if (s.rigid != null && !s.rigid.falling && !s.rigid.growing){
 					return true;
 				}
 			}
@@ -285,6 +287,7 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	void settleShape(){	//equivalent of fall() in Square
+		played = false;
 		foreach(Square s in squares){
 			if (s != null) {
 				s.fall ();

@@ -20,10 +20,13 @@ public class Highlight : MonoBehaviour {
 
 
 	// Save our color here so it's consistent :)
-	Color color = new Color(0.2F, 0.3F, 0.4F, 0.5F);
+	Color defaultColor = new Color(0.2F, 0.3F, 0.4F, 0.5F);
+	Color redTransparent = new Color (1f, 0, 0, 0.5f);
+	Color color;
 
 	public Square addHighlightSquare(int x,int  y) {
 //		Square sq = sqman.addSquare (new Vector2 (x, y), false);
+		color = defaultColor;
 		GameObject squareObject = new GameObject ();
 		Square sq = squareObject.AddComponent<Square> ();
 		sq.init (new Vector2 ((int)mouse.x, (int)mouse.y), 100, false, 0);
@@ -62,6 +65,15 @@ public class Highlight : MonoBehaviour {
 		//
 	}
 
+	public void clear(){
+		foreach (Square s in rigidShapes) {
+			if (s != null) {
+				Destroy (s.gameObject);
+			}
+		}
+		Destroy (made.gameObject);
+	}
+
 	public void Update() {
 		updateMouse ();
 		// get first element in queue & change based on that
@@ -76,12 +88,15 @@ public class Highlight : MonoBehaviour {
 	}
 
 	void updateModel() {
-		made.transform.position = new Vector3 (mouse.x, mouse.y, 0);
-
+//		color = checkHighlightConflicts ();
+		made.transform.position = new Vector3 (mouse.x, mouse.y, -1);
+//		checkConflictAndColor (made);
 		Square next = sqman.queue.Peek ();
 		int type = next.getType ();
 
 		if (type == 5) {
+//			if (color == defaultColor) {
+//			}
 			// Maybe make a delegate to run all of this code for all the 4 blocks????
 //			for (int i = 0; i <= EXTRASHAPES; i++) {
 //				rigidShapes[i].model.mat.color = color;
@@ -91,26 +106,111 @@ public class Highlight : MonoBehaviour {
 			int shapeType = rs.shapeType;
 			if (shapeType == 0) {
 				// it's _, spawn some additional shapes!
-				for (int i = 0; i <= EXTRASHAPES; i++) {
-					rigidShapes[i].model.mat.color = color;
-					rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, mouse.y, 0);
+				for (int i = 0; i < EXTRASHAPES; i++) {
+//					rigidShapes[i].model.mat.color = color;
+					rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, mouse.y, -1);
 				}
 			} else {
 				// it's I vertical!
-				for (int i = 0; i <= EXTRASHAPES; i++) {
-					rigidShapes [i].transform.position = new Vector3 (mouse.x, mouse.y + i + 1, 0);
+				for (int i = 0; i < EXTRASHAPES; i++) {
+					rigidShapes [i].transform.position = new Vector3 (mouse.x, mouse.y + i + 1, -1);
 				}
 			}
-			// We know this is an anchor
+			// Color all the extra shapes :)
+			for (int i = 0; i < EXTRASHAPES; i++) {
+				//Debug.Log ("Checking extra shape: " + i);
+//				checkConflictAndColor(rigidShapes[i]);
+			}
 
 		} else {
-			for (int i = 0; i <= EXTRASHAPES; i++) {
-				rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, rigidYOffset, 0);
+			for (int i = 0; i < EXTRASHAPES; i++) {
+				rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, rigidYOffset, -1);
 //				rigidShapes[i].model.mat.color = Color.clear;
 				// TODO: Need to replace add
 			}
 		}
+
+		made.model.mat.color = getHighlightColor ();
+		for (int i = 0; i < EXTRASHAPES; i++) {
+			rigidShapes [i].model.mat.color = getHighlightColor ();
+		}
 	}
+
+	bool insideBoard(float pos_x, float pos_y) {
+		return (pos_x >= 0) && (pos_x < sqman.BOARDSIZEX) && (pos_y > 0) && (pos_y < sqman.BOARDSIZEY);
+	}
+
+
+	Color getHighlightColor () {
+		Color retColor = defaultColor;
+		Square next = sqman.queue.Peek ();
+
+//		Debug.Log ("getHighlightColor is firing???");
+		// Check the mouse conflict
+		Vector3 madePos = made.transform.position;
+		if (insideBoard(madePos.x, madePos.y)) {
+			if (board [(int)madePos.x, (int)madePos.y] != null) {
+				//			Debug.Log ("There's a block at " + madePos.x + ", " + madePos.y + ", so I'm coloring this red!");
+				retColor = redTransparent;
+			}
+/*<<<<<<< HEAD
+			if (next.type == 5) {
+				for (int i = 0; i < EXTRASHAPES; i++) {
+					Vector2 pos = rigidShapes [i].transform.position;
+					if (board[(int) pos.x, (int) pos.y] != null) {
+						//Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
+/=======*/
+		} else {
+			Debug.Log ("Outside of bounds, coloring it red!");
+			retColor = redTransparent;
+		}
+		if (next.type == 5) {
+			for (int i = 0; i < EXTRASHAPES; i++) {
+				Vector2 pos = rigidShapes [i].transform.position;
+
+				if (insideBoard( pos.x, pos.y)) {
+					if (board [(int)pos.x, (int)pos.y] != null) {
+						//			Debug.Log ("There's a block at " + madePos.x + ", " + madePos.y + ", so I'm coloring this red!");
+//>>>>>>> 51d0f73961bb4603a38f1378c6b92088746ba146
+						retColor = redTransparent;
+					}
+				} else {
+					Debug.Log ("Outside of bounds, coloring it red!");
+					retColor = redTransparent;
+				}
+				if (board [(int)pos.x, (int)pos.y] != null) {
+					Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
+					retColor = redTransparent;
+				}
+			}
+/*<<<<<<< HEAD
+			if (retColor != redTransparent) {
+				//Debug.Log(("I'm not coloring this block red!"));
+			}
+=======*/
+		}
+		if (retColor != redTransparent) {
+			Debug.Log (("I'm not coloring this block red!"));
+//>>>>>>> 51d0f73961bb4603a38f1378c6b92088746ba146
+		}
+		return retColor;
+	}
+
+//	void checkConflictAndColor(Square sq) {
+//		// TODO: Also need to check if the square is off the board, and highlight it red there too!
+//		Color theColor = defaultColor;
+//		Vector2 pos = new Vector2(sq.transform.position.x, sq.transform.position.y);
+//		// If there's a block here, color this highlight block red!
+//		Debug.Log ("checkCon is firing???");
+//		if (board[(int) pos.x, (int) pos.y] != null) {
+//			Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
+//			theColor = redTransparent;
+//		} else {
+////			Debug.Log ("There's no block at " + pos.x + ", " + pos.y + "!");
+////			theColor = defaultColor;
+//		}
+//
+//	}
 
 	void updateModel__defunct() {
 //		Debug.Log ("Got the queue, it looks like: " + queue.Count);
@@ -144,7 +244,7 @@ public class Highlight : MonoBehaviour {
 					int shapeType = rs.shapeType;
 					if (shapeType == 0) {
 						// it's _, spawn some additional shapes!
-						for (int i = 0; i <= EXTRASHAPES; i++) {
+						for (int i = 0; i < EXTRASHAPES; i++) {
 							rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, lowestY, 0);
 
 //							foreach (Square sq in rigidShapes) {
@@ -171,7 +271,7 @@ public class Highlight : MonoBehaviour {
 				} else {
 					color = Color.gray;
 					// Reset the anchor highlight blocks to be off the screen when we don't need them!
-					for (int i = 0; i <= EXTRASHAPES; i++) {
+					for (int i = 0; i < EXTRASHAPES; i++) {
 						rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, rigidYOffset, 0);
 						// TODO: Need to replace add
 					}

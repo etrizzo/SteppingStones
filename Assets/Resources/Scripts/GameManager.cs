@@ -29,6 +29,12 @@ public class GameManager : MonoBehaviour {
 	int[] q;
 	int[] rsq;
 	string levelName;
+	int levelNum;
+
+	public int NUMLEVELS = 4;
+
+	List<Square>destinationSquares;
+	List<Square>beginningSquares;
 
 	public GameObject groundSquareFolder;
 	public List<Square> groundSquares;
@@ -56,20 +62,17 @@ public class GameManager : MonoBehaviour {
 
 	public Highlight hi;
 
-	public ScrollRect scroller;
-	public RectTransform scrollContent;
+	public Vector2 scrollPosition = Vector2.zero;
+
+	static bool[] levelUnlockStatus = {true, false, false, false, false, false, false, false, false, false};
 
 	void Start () {
-		/*scroller = new ScrollRect();
-		scroller.vertical = true;
-		scroller.horizontal = false;
-
-		scrollContent = new RectTransform ();
-		scroller.content = scrollContent;*/
 
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
 		groundSquares = new List<Square> ();
+		destinationSquares = new List<Square> ();
+		beginningSquares = new List<Square> ();
 
 		initSound ();
 		initStyles ();
@@ -106,7 +109,7 @@ public class GameManager : MonoBehaviour {
 		menuAudio = this.gameObject.AddComponent<AudioSource> ();
 		menuAudio.loop = true;
 		menuAudio.playOnAwake = false;
-		menuClip = Resources.Load<AudioClip> ("Audio/Soundtrack Draft 1");
+		menuClip = Resources.Load<AudioClip> ("Audio/MenuSoundtrack");
 		menuAudio.clip = menuClip;
 		menuAudio.Play ();
 
@@ -167,6 +170,22 @@ public class GameManager : MonoBehaviour {
 		gameAudio7.mute = true;
 	}
 
+	private void clearBoard(){
+		sqman.clear ();
+		hi.clear ();
+		foreach (Square s in destinationSquares) {
+			Destroy (s.gameObject);
+		}
+		foreach (Square s in beginningSquares) {
+			Destroy (s.gameObject);
+		}
+		Destroy (sqman.gameObject);
+		Destroy (hi.gameObject);
+		Destroy (beginning.gameObject);
+		Destroy (destination.gameObject);
+		Destroy (hero.gameObject);
+	}
+
 	void Update(){
 		Vector3 worldPos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		int mousex = (int)Mathf.Floor (worldPos.x);
@@ -183,6 +202,15 @@ public class GameManager : MonoBehaviour {
 				gameAudio5.mute = true;
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
+				if (!sqman.successAudio.isPlaying && levelNum < NUMLEVELS) {
+					clearBoard ();
+					setLevelName ("Level"+(levelNum+1), (levelNum+1));
+					levelUnlockStatus[levelNum+1] = true;
+					levelNum++;
+					success = false;
+					go = false;
+					state.mode = 1;
+				}
 			}
 			if (sqman.height < 4 && !success) {
 				gameAudio1.mute = false;
@@ -266,6 +294,7 @@ public class GameManager : MonoBehaviour {
 
 
 	public void initBoard(){
+		Debug.Log ("MAEK BORD");
 		TextAsset temp = Resources.Load<TextAsset>("Levels/"+getLevelName ()) as TextAsset;
 		byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(temp.text);
 		MemoryStream stream = new MemoryStream(byteArray);
@@ -437,6 +466,9 @@ public class GameManager : MonoBehaviour {
 		towerTopSquare1.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/towerCornerL");
 		towerTopSquare2.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/towerCornerR");
 
+		destinationSquares.Add (towerTopSquare1);
+		destinationSquares.Add (towerTopSquare2);
+
 		for (int i = height; i >= 0; i--) {
 			GameObject towerObject1 = new GameObject ();
 			Square towerSquare1 = towerObject1.AddComponent<Square> ();
@@ -450,6 +482,10 @@ public class GameManager : MonoBehaviour {
 
 			towerSquare1.name = "Tower Square 1 " + i;
 			towerSquare2.name = "Tower Square 2 " + i;
+
+			destinationSquares.Add (towerSquare1);
+			destinationSquares.Add (towerSquare2);
+
 		}
 
 		/*GameObject towerObject = GameObject.CreatePrimitive (PrimitiveType.Quad);
@@ -498,8 +534,9 @@ public class GameManager : MonoBehaviour {
 
 	}
 
-	void setLevelName(string name){
+	void setLevelName(string name, int num){
 		levelName = name;
+		levelNum = num;
 	}
 
 	/************************ Start Gui Stuff ****************************/
@@ -522,6 +559,15 @@ public class GameManager : MonoBehaviour {
 		case 1:
 			if (!go) {			//only initialize the board once
 				startGame ();
+			}
+			if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
+				if (sqman.boardSolved ()) {
+					success = true;
+				}
+			}
+			if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
+				Application.LoadLevel (Application.loadedLevel);
+
 			}
 			break;
 		}
@@ -551,32 +597,31 @@ public class GameManager : MonoBehaviour {
 		if (!go && !done) {
 			xpos = ((Screen.width)-256) / 2;
 			ypos = ((Screen.height / 2));
-			for (int i = 0; i < 4; i++) {
-				if (i < 3) {
-					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv" + (i + 1));
-					if (GUI.Button (new Rect (xpos, ypos + 50 * i, 256, 50), lvlbutton, buttonStyle)) {
-						setLevelName ("Level" + (i + 1));
-						state.mode = 1;
-					}
-				} else {
-					if (GUI.Button (new Rect (xpos, ypos+50*i, 500, 50), "Level "+(i+1))) {
-						setLevelName ("Level" + (i + 1));
-						state.mode = 1;
-					}
+//<<<<<<< HEAD
+//			for (int i = 0; i < 4; i++) {
+//				if (i < 3) {
+//					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv" + (i + 1));
+//					if (GUI.Button (new Rect (xpos, ypos + 50 * i, 256, 50), lvlbutton, buttonStyle)) {
+//						setLevelName ("Level" + (i + 1));
+//						state.mode = 1;
+//					}
+//				} else {
+//					if (GUI.Button (new Rect (xpos, ypos+50*i, 500, 50), "Level "+(i+1))) {
+//						setLevelName ("Level" + (i + 1));
+//						state.mode = 1;
+//					}
+//=======
+			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 250)); 
+
+			for (int i = 0; i < NUMLEVELS; i++) {
+				lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv"+(i+1));
+				if (GUI.Button (new Rect (0, 0+50*i, 256, 50), lvlbutton, buttonStyle)) {
+					setLevelName ("Level"+(i+1), (i+1));
+					state.mode = 1;
+//>>>>>>> 63e1b1ea59d0719ca86b0ecb917a1bf0111ee167
 				}
 			}
-			/*if (GUI.Button (new Rect (xpos-100, ypos, 100, 90), "Level 1")) {
-				setLevelName ("Level1");
-				state.mode = 1;
-			}
-			if (GUI.Button (new Rect (xpos, ypos, 100, 90), "Level 2")) {
-				setLevelName ("Level2");
-				state.mode = 1;
-			}
-			if (GUI.Button (new Rect (xpos+100, ypos, 100, 90), "Level 3")) {
-				setLevelName ("Level3");
-				state.mode = 1;
-			}*/
+			GUI.EndScrollView ();
 		}
 	}
 
@@ -593,8 +638,10 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void startGame(){
+
 		menuAudio.mute = true;
 		GameObject sqmanObject = new GameObject ();
+		Debug.Log ("START GAEM");
 		initBoard ();
 
 		sqman = sqmanObject.AddComponent<SquareManager> ();
@@ -619,5 +666,6 @@ public class GameManager : MonoBehaviour {
 		gameAudio5.Play();
 		gameAudio6.Play();
 		gameAudio7.Play();
+
 	}
 }

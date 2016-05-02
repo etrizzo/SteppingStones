@@ -16,6 +16,8 @@ public class SquareManager : MonoBehaviour {
 	public AudioClip movOnClip;
 	public AudioSource movOffAudio;
 	public AudioClip movOffClip;
+	public AudioSource badPlaceAudio;
+	public AudioClip badPlaceClip;
 
 	public Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
 	public int BOARDSIZEX = 24;
@@ -42,6 +44,7 @@ public class SquareManager : MonoBehaviour {
 
 
 	public void init(GameManager gm, Square[,] board, int[] q, int[] rsq = null, List<Square> inboard = null ){
+
 		this.gm = gm;
 		squareFolder = new GameObject();
 		squareFolder.name = "Squares";
@@ -61,6 +64,19 @@ public class SquareManager : MonoBehaviour {
 		initQueue ();		//initialize queue w/ 3 initial blocks
 		initSound ();
 		//getHeight ();
+	}
+
+	public void clear(){
+		foreach (Square s in board) {
+			if (s != null) {
+				Destroy (s.gameObject);
+			}
+		}
+		foreach (Square s in queue) {
+			if (s != null) {
+				Destroy (s.gameObject);
+			}
+		}
 	}
 
 	void initSound(){
@@ -88,6 +104,12 @@ public class SquareManager : MonoBehaviour {
 		movOffAudio.playOnAwake = false;
 		movOffClip = Resources.Load<AudioClip> ("Audio/Special Blocks/Movable - Put Down");
 		movOffAudio.clip = movOffClip;
+
+		badPlaceAudio = this.gameObject.AddComponent<AudioSource> ();
+		badPlaceAudio.loop = false;
+		badPlaceAudio.playOnAwake = false;
+		badPlaceClip = Resources.Load<AudioClip> ("Audio/WrongPlacement");
+		badPlaceAudio.clip = badPlaceClip;
 	}
 
 	void Update(){
@@ -210,6 +232,7 @@ public class SquareManager : MonoBehaviour {
 			}
 		} else {
 			print ("nO");
+			badPlaceAudio.Play ();
 		}
 	}
 		
@@ -556,13 +579,13 @@ public class SquareManager : MonoBehaviour {
 	// -------------
 	// All GUI code down here, basically just because lol
 	void OnGUI() {
-		if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
+		/*if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
 			boardSolved ();
 		}
 		if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
 			Application.LoadLevel (Application.loadedLevel);
 
-		}
+		}*/
 	}
 
 

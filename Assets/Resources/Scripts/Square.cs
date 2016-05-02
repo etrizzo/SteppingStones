@@ -26,6 +26,8 @@ public class Square : MonoBehaviour {
 	public AudioSource conflictAudio;
 	public AudioClip conflictClip;
 
+	bool played = false;
+
 
 	public void init(Vector2 pos, int color, bool isGround = false, int type = 0){
 		this.pos = pos;
@@ -166,10 +168,11 @@ public class Square : MonoBehaviour {
 			falling = false;
 			counter = 0f;
 			wait = true;		//wait for conflicts to check?
+			//settleAudio.Play ();
 		} else {
 			// Do nothing, wait for Update() to call checkFall again ;)))))))
 		}
-		if (belowbelow != null && !belowbelow.isFalling () && falling && rigid == null) {
+		if ((belowbelow != null && !belowbelow.isFalling () && falling && rigid == null)) {
 			settleAudio.Play ();
 		}
 	}
@@ -181,7 +184,6 @@ public class Square : MonoBehaviour {
 	}
 
 	public Square[] getNeighbors(){
-		print ("Getting neighbors: " + this + " " + (sqman==null));
 		Square[] directedBlocks = new Square[4];
 		if (pos.y + 1 < sqman.BOARDSIZEY) {
 			directedBlocks [0] = board [(int)pos.x, (int)pos.y + 1];
@@ -207,7 +209,7 @@ public class Square : MonoBehaviour {
 		int i = 0;
 
 		foreach (Square sq in directedBlocks) {
-			if (sq != null && sq.getColor() == color && (!sq.isFalling() || (sq.rigid != null && !sq.rigid.falling))) {
+			if (sq != null && sq.getColor() == color && (!sq.isFalling() || (sq.rigid != null && !sq.rigid.falling && !sq.rigid.growing))) {
 				
 				sqman.chainSettle (sq.getPosition());
 				if (sq.rigid != null) {

@@ -227,8 +227,13 @@ public class SquareManager : MonoBehaviour {
 				}
 			} else {		//if clicking on an existing block
 				if (atPos != null) {
-					clickOnBlock (atPos, pos);
+					if (atPos.getType () == 1) {
+						clickOnBlock (atPos, pos);
+					} else {
+						badPlaceAudio.Play ();
+					}
 				}
+					
 			}
 		} else {
 			print ("nO");

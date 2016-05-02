@@ -161,7 +161,7 @@ public class Highlight : MonoBehaviour {
 						//Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
 /=======*/
 		} else {
-			Debug.Log ("Outside of bounds, coloring it red!");
+			//Debug.Log ("Outside of bounds, coloring it red!");
 			retColor = redTransparent;
 		}
 		if (next.type == 5) {
@@ -175,11 +175,11 @@ public class Highlight : MonoBehaviour {
 						retColor = redTransparent;
 					}
 				} else {
-					Debug.Log ("Outside of bounds, coloring it red!");
+					//Debug.Log ("Outside of bounds, coloring it red!");
 					retColor = redTransparent;
 				}
 				if (board [(int)pos.x, (int)pos.y] != null) {
-					Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
+					//Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
 					retColor = redTransparent;
 				}
 			}
@@ -190,7 +190,7 @@ public class Highlight : MonoBehaviour {
 =======*/
 		}
 		if (retColor != redTransparent) {
-			Debug.Log (("I'm not coloring this block red!"));
+			//Debug.Log (("I'm not coloring this block red!"));
 //>>>>>>> 51d0f73961bb4603a38f1378c6b92088746ba146
 		}
 		return retColor;

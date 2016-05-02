@@ -135,21 +135,23 @@ public class Highlight : MonoBehaviour {
 //		Debug.Log ("getHighlightColor is firing???");
 		// Check the mouse conflict
 		Vector3 madePos = made.transform.position;
-		if (board[(int) madePos.x, (int) madePos.y] != null) {
-//			Debug.Log ("There's a block at " + madePos.x + ", " + madePos.y + ", so I'm coloring this red!");
-			retColor =  redTransparent;
-		}
-		if (next.type == 5) {
-			for (int i = 0; i < EXTRASHAPES; i++) {
-				Vector2 pos = rigidShapes [i].transform.position;
-				if (board[(int) pos.x, (int) pos.y] != null) {
-					Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
-					retColor = redTransparent;
+		if ((madePos.x > 0) && (madePos.x < sqman.BOARDSIZEX) && (madePos.y > 0) && (madePos.y < sqman.BOARDSIZEY)) {
+			if (board[(int) madePos.x, (int) madePos.y] != null) {
+	//			Debug.Log ("There's a block at " + madePos.x + ", " + madePos.y + ", so I'm coloring this red!");
+				retColor =  redTransparent;
+			}
+			if (next.type == 5) {
+				for (int i = 0; i < EXTRASHAPES; i++) {
+					Vector2 pos = rigidShapes [i].transform.position;
+					if (board[(int) pos.x, (int) pos.y] != null) {
+						Debug.Log ("There's a block at " + pos.x + ", " + pos.y + ", so I'm coloring this red!");
+						retColor = redTransparent;
+					}
 				}
 			}
-		}
-		if (retColor != redTransparent) {
-			Debug.Log(("I'm not coloring this block red!"));
+			if (retColor != redTransparent) {
+				Debug.Log(("I'm not coloring this block red!"));
+			}
 		}
 		return retColor;
 	}

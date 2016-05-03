@@ -28,8 +28,8 @@ public class Square : MonoBehaviour {
 
 	bool played = false;
 
-
 	public void init(Vector2 pos, int color, bool isGround = false, int type = 0){
+		
 		this.pos = pos;
 		this.color = color;
 		this.ground = isGround;
@@ -59,6 +59,10 @@ public class Square : MonoBehaviour {
 	}
 
 	public void addSqman(SquareManager sqman) {
+		if (sqman.gm.bambiQwop) {
+			speed = 30;
+		}
+
 		this.sqman = sqman;
 		this.board = sqman.board;
 	}

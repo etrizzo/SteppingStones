@@ -186,6 +186,7 @@ public class GameManager : MonoBehaviour {
 
 		foreach (Square s in destinationSquares) {
 			if (s != null) {
+				print (s);
 				s.destroy ();
 			}
 		}
@@ -194,13 +195,14 @@ public class GameManager : MonoBehaviour {
 				s.destroy ();
 			}
 		}
+
 		destinationSquares = new List<Square> ();
 		beginningSquares = new List<Square> ();
-//		Destroy (sqman.gameObject);
-//		Destroy (hi.gameObject);
-//		Destroy (beginning.gameObject);
-//		Destroy (destination.gameObject);
-//		Destroy (hero.gameObject);
+		DestroyImmediate (sqman);
+		DestroyImmediate (hi);
+		DestroyImmediate (beginning);
+		DestroyImmediate (destination);
+		DestroyImmediate (hero);
 	}
 
 	void Update(){

@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+
+using System;
+
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
@@ -64,6 +67,8 @@ public class GameManager : MonoBehaviour {
 	GUIStyleState lvlButtonHover;
 
 	public Highlight hi;
+
+	public List<Square> squarePath;
 
 	public Vector2 scrollPosition = Vector2.zero;
 
@@ -321,6 +326,7 @@ public class GameManager : MonoBehaviour {
 				}
 			}
 		}
+
 	}
 
 
@@ -571,6 +577,24 @@ public class GameManager : MonoBehaviour {
 		levelNum = num;
 	}
 
+	public void pathAnimation(){
+//		Time.timeScale = .01f;
+//		Time.fixedDeltaTime = .01f;
+		Debug.Log ("pathAnimation");
+		//heroAnimation(squarePath);
+		//Time.timeScale = 1f;
+		hero.model.canMove = true;
+	//	hero.model.moveAlong (squarePath);
+	}
+
+//	void heroAnimation(List<Square> squarePath){
+//		int counter = 0;
+//		foreach (Square sq in squarePath) {
+//			Vector2 nextPos = sq.getPosition ();
+//			hero.model.nextMove (nextPos);
+//		}
+//	}
+
 	/************************ Start Gui Stuff ****************************/
 	bool go = false;
 	bool done = false;
@@ -595,6 +619,7 @@ public class GameManager : MonoBehaviour {
 			if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
 				if (sqman.boardSolved ()) {
 					success = true;
+					pathAnimation ();
 				}
 			}
 			if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
@@ -662,6 +687,8 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+
+
 	private void initBackground ()
 	{
 		//creates background tile
@@ -678,13 +705,19 @@ public class GameManager : MonoBehaviour {
 
 		menuAudio.mute = true;
 		GameObject sqmanObject = new GameObject ();
+
 		Debug.Log ("START GAEM");
+
 		initBoard ();
+
+		squarePath = new List<Square>();
 
 		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.name = "Square Manager";
-//		print ("initing sqman");
+
+		//		print ("initing sqman");
 		sqman.init (this, board, q, rsq, inBoardSquares);
+
 		sqman.destination = destination;
 		sqman.beginning = beginning;
 //		sqman.addBoardSquares (inBoardSquares);

@@ -34,6 +34,10 @@ public class RigidShape : MonoBehaviour {
 	public bool falling = false;
 
 	public void init(Square a, Square[,] b, SquareManager sm) {
+		if (sm.gm.bambiQwop) {
+			speed = 30;
+		}
+
 		anchor = a;
 		anchor.rigid = this;
 		anchor.setAnchor ();

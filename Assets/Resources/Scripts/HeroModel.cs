@@ -10,6 +10,10 @@ public class HeroModel : MonoBehaviour
 	public int speed = 5;
 
 	public void init(Hero owner) {
+		if (owner.gm.bambiQwop) {
+			speed = 30;
+		}
+
 		this.owner = owner;
 		transform.parent = owner.transform;					// Set the model's parent to the gem.
 		transform.localPosition = new Vector3(.5f,-.5f,-2);		// Center the model on the parent.
@@ -20,7 +24,11 @@ public class HeroModel : MonoBehaviour
 		mat = GetComponent<Renderer>().material;								// Get the material component of this quad object.
 		mat.shader = Shader.Find("Sprites/Default"); 
 
-		mat.mainTexture = Resources.Load<Texture2D> ("Textures/hero");
+		if (owner.gm.bambiQwop) {
+			mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonich");
+		} else {
+			mat.mainTexture = Resources.Load<Texture2D> ("Textures/hero");
+		}
 	}
 
 	public void Update() {

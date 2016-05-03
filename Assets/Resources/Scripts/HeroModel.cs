@@ -69,7 +69,7 @@ public class HeroModel : MonoBehaviour
 			if (clock >= farthestX) {
 				updateSquareInfo ();
 			}
-			transform.position = new Vector3 (clock+, highestY, 0);
+			transform.position = new Vector3 (clock, highestY, 0);
 
 //		foreach (Square sq in owner.gm.squarePath) {
 //			//Vector2 nextPos = sq.getPosition ();

@@ -601,6 +601,7 @@ public class GameManager : MonoBehaviour {
 			if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
 				if (sqman.boardSolved ()) {
 					success = true;
+					pathAnimation ();
 				}
 			}
 			if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {

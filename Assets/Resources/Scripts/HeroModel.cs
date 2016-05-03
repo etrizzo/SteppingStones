@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections;
 using System.Collections.Generic;
 using System;
 
@@ -70,7 +69,7 @@ public class HeroModel : MonoBehaviour
 			if (clock >= farthestX) {
 				updateSquareInfo ();
 			}
-			transform.position = new Vector3 (clock, highestY, 0);
+			transform.position = new Vector3 (clock+, highestY, 0);
 
 //		foreach (Square sq in owner.gm.squarePath) {
 //			//Vector2 nextPos = sq.getPosition ();
@@ -102,7 +101,6 @@ public class HeroModel : MonoBehaviour
 
 	//Takes in the newsquare position and the current hero position
 	public void nextMove(Vector2 nextPos, Vector2 pos){
-		owner.gm.wait = true;
 		float xpos = transform.position.x;
 		float ypos = transform.position.y;
 //		while (xpos < nextPos.x) {			

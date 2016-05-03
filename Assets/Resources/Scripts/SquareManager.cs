@@ -67,7 +67,6 @@ public class SquareManager : MonoBehaviour {
 		initSound ();
 		//getHeight ();
 
-		this.hero = hero;
 	}
 
 	public void clear(){
@@ -468,7 +467,7 @@ public class SquareManager : MonoBehaviour {
 		if (destinationClose() && pathValid(beginning)) {
 			solved = true;
 //			gm.pathAnimation ();
-//			playSuccess ();
+			playSuccess ();
 		} else {
 			solved = false;
 		}
@@ -520,7 +519,7 @@ public class SquareManager : MonoBehaviour {
 		Square twoUp = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y + 1];
 		Square[] possibleNextSquares = new Square[3];
 
-		for (int i = 0; i <= 2 i++) {
+		for (int i = 0; i <= 2 ; i++) {
 			getNextPossibleSquare(i, possibleNextSquares, sq);
 			Debug.Log ("pns @ " + i + ": " + possibleNextSquares[i]);
 		}
@@ -590,12 +589,12 @@ public class SquareManager : MonoBehaviour {
 	// -------------
 	// All GUI code down here, basically just because lol
 	void OnGUI() {
-
-		if (GUI.Button (new Rect (30, 30, 100, 40), "Test your path.")) {
-			if (boardSolved ()) {
-				gm.pathAnimation ();
-				playSuccess ();
-			}
+//
+//		if (GUI.Button (new Rect (30, 30, 100, 40), "Test your path.")) {
+//			if (boardSolved ()) {
+//				gm.pathAnimation ();
+//				playSuccess ();
+//			}
 //			foreach (Square sq in gm.squarePath) {
 //				Debug.Log ("square name is: " + sq.name);
 //			}
@@ -616,8 +615,9 @@ public class SquareManager : MonoBehaviour {
 
 
 		}*/
-		}
+		//}
 
 
 	}
 
+}

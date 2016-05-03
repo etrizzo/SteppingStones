@@ -28,7 +28,7 @@ public class HeroModel : MonoBehaviour
 	public void init(Hero owner) {
 		this.owner = owner;
 		transform.parent = owner.transform;					// Set the model's parent to the gem.
-		transform.localPosition = new Vector3(.5f,-.5f,0);		// Center the model on the parent.
+		transform.localPosition = new Vector3(.5f,-.5f,-2);		// Center the model on the parent.
 		name = "Hero Model";									// Name the object.
 
 

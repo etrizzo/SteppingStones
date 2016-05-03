@@ -11,7 +11,7 @@ public class Square : MonoBehaviour {
 	private bool ground;
 //	private bool inqueue;
 
-	private int type; 	//-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow, 5-shape
+	public int type; 	//-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow, 5-shape
 	public bool falling;
 	public bool anchor;
 	public RigidShape rigid;
@@ -25,6 +25,8 @@ public class Square : MonoBehaviour {
 	public AudioClip settleClip;
 	public AudioSource conflictAudio;
 	public AudioClip conflictClip;
+
+	bool played = false;
 
 
 	public void init(Vector2 pos, int color, bool isGround = false, int type = 0){
@@ -107,7 +109,11 @@ public class Square : MonoBehaviour {
 	}
 
 	public void setFalling(bool f){
-		falling = f;
+		if (type != 1) {
+			falling = f;
+		} else {
+			falling = false;
+		}
 	}
 
 	// Rigid Class Stuff
@@ -127,7 +133,9 @@ public class Square : MonoBehaviour {
 //		yield return null;
 	}
 
-
+	// checks to see if the square can fall, and if it can, 
+	// calls fall() and settles the square above you
+	// if a square below is falling, will wait for it to fall before falling
 	public void checkFall() {
 		// Move down and stuff?j
 		Square above = null;
@@ -147,23 +155,24 @@ public class Square : MonoBehaviour {
 		if (below == null) {
 			fall ();
 			if (above != null) {
-				if (above.rigid != null && rigid != null && above.rigid != rigid) {
+				if (above.rigid != null && above.rigid != rigid) {
 //					above.rigid.settleShape ();
-					above.rigid.setShapeFalling(true);
+					above.rigid.setShapeFalling (true);
 				} else {
 					above.setFalling (true);
 				}
 			}
 			counter = 0f;
-		} else if (!below.isFalling ()) {
+		} else if ((!below.isFalling ()) || (below.rigid != null && !below.rigid.falling)) {
 			// & it's not falling ....
 			falling = false;
 			counter = 0f;
 			wait = true;		//wait for conflicts to check?
+			//settleAudio.Play ();
 		} else {
 			// Do nothing, wait for Update() to call checkFall again ;)))))))
 		}
-		if (belowbelow != null && !belowbelow.isFalling () && falling && rigid == null) {
+		if ((belowbelow != null && !belowbelow.isFalling () && falling && rigid == null)) {
 			settleAudio.Play ();
 		}
 	}
@@ -191,42 +200,54 @@ public class Square : MonoBehaviour {
 		return directedBlocks;
 	}
 
-	public void checkConflicts() {
+	public RigidShape[] checkConflicts() {
 		wait = false; 
 		conflictCounter = 0;
 		bool conflicted = false;
 		Square[] directedBlocks = getNeighbors ();
+		RigidShape[] shapesToBreak = new RigidShape[5];
+		int i = 0;
 
 		foreach (Square sq in directedBlocks) {
-			if (sq != null && sq.getColor() == color && !sq.isFalling()) {
+			if (sq != null && sq.getColor() == color && (!sq.isFalling() || (sq.rigid != null && !sq.rigid.falling && !sq.rigid.growing))) {
+				
 				sqman.chainSettle (sq.getPosition());
 				if (sq.rigid != null) {
 					//			print ("breaking " + c.rigid);
-					breakShape (sq.rigid);
+//					breakShape (sq.rigid);
+					shapesToBreak[i] = sq.rigid;
 				}
 				Destroy (sq.gameObject);
 				conflicted = true;
 				//conflictAudio.Play (); //we need more time???
 
 			}
+			i++;
 		}
 
 
+		RigidShape rs = this.rigid;
 		if (conflicted) {
 			sqman.conflict = true;
+//			print (this + " is settling");
 			sqman.chainSettle (this.getPosition());
-			if (this.rigid != null) {
+			if (rs != null) {
 				//			print ("breaking " + c.rigid);
-				breakShape (this.rigid);
+//				breakShape (this.rigid);
+				shapesToBreak[i] = this.rigid;
 			}
 
 		}
 
 		GameObject self = this.gameObject;
 
+
+
 		if (conflicted) {
 			Destroy (self);
 		}
+			
+		return shapesToBreak;
 	}
 
 
@@ -234,25 +255,24 @@ public class Square : MonoBehaviour {
 		DestroyImmediate (s);
 	}
 
-	public void breakShape(RigidShape rs){
-		foreach (Square s in rs.getSquares()) {
-			if (s != null) {
-				s.anchor = false;
-				s.rigid = null;
-				s.setFalling (true);
-				//				StartCoroutine (settleSquare (s));
+
+
+	//breaks each non-null shape in shapes
+	public void breakShapes(RigidShape[] shapes){
+		foreach (RigidShape rs in shapes) {
+			if (rs != null) {
+				sqman.breakShape (rs);
 			}
 		}
-		DestroyImmediate (rs);
 	}
 
 	public void Update() {
-		if (wait) {
+		if (wait) {	//waiting to check conflicts after settling (i think?)
 			if (type != 4) {
 				conflictCounter += Time.deltaTime * speed;
 				if (conflictCounter >= 1) {
 					
-					checkConflicts ();
+					breakShapes(checkConflicts ());
 				}
 			} else {
 				wait = false;

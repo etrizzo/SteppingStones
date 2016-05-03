@@ -2,11 +2,12 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
+
 using System;
 
-public class GameManager : MonoBehaviour {
+using UnityEngine.UI;
 
+public class GameManager : MonoBehaviour {
 
 	public SquareManager sqman;
 	public AudioSource menuAudio;
@@ -31,9 +32,16 @@ public class GameManager : MonoBehaviour {
 	int[] q;
 	int[] rsq;
 	string levelName;
+	int levelNum;
+
+	public int NUMLEVELS = 7;
+
+	List<Square>destinationSquares;
+	List<Square>beginningSquares;
 
 	public GameObject groundSquareFolder;
 	public List<Square> groundSquares;
+	public List<Square> inBoardSquares;
 
 	public Camera cam;
 	float dist;
@@ -49,20 +57,28 @@ public class GameManager : MonoBehaviour {
 	float wave = 0;
 	int waveSpeed = 3;
 
-
+	GUIStyle buttonStyle;
 	GUIStyle guiStyle;
 	GUIStyle guiStyle2;
+	GUIStyle guiStyle3;
+	GUIContent lvlbutton;
+	GUIStyleState lvlButtonHover;
 
 	public Highlight hi;
 
 	public List<Square> squarePath;
-	public int pathCounter = 0;
-	public bool wait;
+
+	public Vector2 scrollPosition = Vector2.zero;
+
+	static bool[] levelUnlockStatus = { true, true, true, true, true, true, true, true, true, true };//{true, false, false, false, false, false, false, false, false, false};
 
 	void Start () {
+
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
 		groundSquares = new List<Square> ();
+		destinationSquares = new List<Square> ();
+		beginningSquares = new List<Square> ();
 
 		initSound ();
 		initStyles ();
@@ -71,24 +87,44 @@ public class GameManager : MonoBehaviour {
 	private void initStyles(){
 		//Cursor.SetCursor ((Texture2D)Resources.Load ("Textures/cursor"), new Vector2 (4, 4), CursorMode.Auto);
 
+		buttonStyle = new GUIStyle ();
+		buttonStyle.font = (Font) Resources.Load("Fonts/blockyo");
+		buttonStyle.normal.textColor = new Color (0, 0, 0, .8f);
+
 		guiStyle = new GUIStyle ();
-		//guiStyle.font = (Font)Resources.Load("Fonts/Mathlete-Skinny");
+		guiStyle.fontSize = 30;
 		guiStyle.alignment = TextAnchor.MiddleCenter;
-		guiStyle.font = (Font)Resources.Load ("Fonts/Mathlete-Skinny");
+		guiStyle.font = (Font)Resources.Load ("Fonts/blockyo");
+		guiStyle.richText = true;
+		guiStyle.normal.textColor = new Color (1f, 1f, 1f, .9f);
 
 		//HOME MENU
 		guiStyle2 = new GUIStyle ();
-		guiStyle2.fontSize = 100;
+		guiStyle2.fontSize = 80;
 		guiStyle2.alignment = TextAnchor.MiddleCenter;
-		guiStyle2.font = (Font)Resources.Load ("Fonts/Metrica");
+		guiStyle2.font = (Font)Resources.Load ("Fonts/blockyo");
+		guiStyle2.richText = true;
 		guiStyle2.normal.textColor = new Color (1f, 1f, 1f, .9f);
+
+		guiStyle3 = new GUIStyle ();
+		guiStyle3.fontSize = 45;
+		guiStyle3.alignment = TextAnchor.MiddleCenter;
+		guiStyle3.font = (Font)Resources.Load ("Fonts/blockyo");
+		guiStyle3.richText = true;
+		guiStyle3.normal.textColor = new Color (1f, 1f, 1f, .9f);
+
+		GUI.depth = 10;
+		lvlbutton = new GUIContent ();
+		lvlButtonHover = new GUIStyleState ();
+		lvlButtonHover.background = Resources.Load<Texture2D> ("Textures/glow");
+		buttonStyle.hover = lvlButtonHover;
 	}
 
 	void initSound(){
 		menuAudio = this.gameObject.AddComponent<AudioSource> ();
 		menuAudio.loop = true;
 		menuAudio.playOnAwake = false;
-		menuClip = Resources.Load<AudioClip> ("Audio/Soundtrack Draft 1");
+		menuClip = Resources.Load<AudioClip> ("Audio/MenuSoundtrack");
 		menuAudio.clip = menuClip;
 		menuAudio.Play ();
 
@@ -149,6 +185,22 @@ public class GameManager : MonoBehaviour {
 		gameAudio7.mute = true;
 	}
 
+	private void clearBoard(){
+		sqman.clear ();
+		hi.clear ();
+		foreach (Square s in destinationSquares) {
+			Destroy (s.gameObject);
+		}
+		foreach (Square s in beginningSquares) {
+			Destroy (s.gameObject);
+		}
+		Destroy (sqman.gameObject);
+		Destroy (hi.gameObject);
+		Destroy (beginning.gameObject);
+		Destroy (destination.gameObject);
+//		Destroy (hero.gameObject);
+	}
+
 	void Update(){
 		Vector3 worldPos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		int mousex = (int)Mathf.Floor (worldPos.x);
@@ -165,6 +217,18 @@ public class GameManager : MonoBehaviour {
 				gameAudio5.mute = true;
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
+				if (levelNum < NUMLEVELS) {
+					Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
+					levelUnlockStatus[levelNum] = true;
+					if (!sqman.successAudio.isPlaying) {
+						clearBoard ();
+						setLevelName ("Level"+(levelNum+1), (levelNum+1));
+						levelNum++;
+						success = false;
+						go = false;
+						state.mode = 1;
+					}
+				}
 			}
 			if (sqman.height < 4 && !success) {
 				gameAudio1.mute = false;
@@ -249,7 +313,11 @@ public class GameManager : MonoBehaviour {
 
 
 	public void initBoard(){
-		StreamReader sr = new StreamReader ("Assets/Resources/Levels/" + getLevelName ());
+		Debug.Log ("MAEK BORD");
+		TextAsset temp = Resources.Load<TextAsset>("Levels/"+getLevelName ()) as TextAsset;
+		byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(temp.text);
+		MemoryStream stream = new MemoryStream(byteArray);
+		StreamReader sr = new StreamReader (stream);
 		string line = "";
 		line = sr.ReadLine ();
 		w = int.Parse (line);
@@ -284,7 +352,7 @@ public class GameManager : MonoBehaviour {
 		}
 		rsq = new int[10];
 		int rsprob;
-		if (prob != 0) {			//using rigid shapes
+//		if (prob != 0) {			//using rigid shapes
 			start = 0;
 			for (int i = 0; i < 2; i++) {		//number of rigid shapes
 				rsprob = int.Parse (sr.ReadLine ());
@@ -292,7 +360,18 @@ public class GameManager : MonoBehaviour {
 					rsq [j + start] = i;
 				}
 			}
+//		}
+		Square sq;
+		while (sr.Peek () != -1) {
+			line = sr.ReadLine ();
+			string[] s = line.Split (' ');
+			sq = addSquare (new Vector2 (float.Parse (s [0]), float.Parse (s [1])), int.Parse (s [2]), false, int.Parse (s [3]));
+			sq.setColor (int.Parse (s [2]));
+			sq.setType (int.Parse (s [3]));
+//			Square sq = new Square ();
+//			sq.init (new Vector2 (float.Parse (s [0]), float.Parse (s [1])), int.Parse (s [2]), false,  int.Parse (s [3]));
 		}
+
 
 	}
 
@@ -315,7 +394,7 @@ public class GameManager : MonoBehaviour {
 	//adds a column of ground from 0 to height
 	public void addColumn(int height, int x){
 		for (int i = 0; i <= height; i++) {
-			Square s = addSquare (new Vector2 (x, i), true); 
+			Square s = addGround(new Vector2 (x, i), true); 
 //			print (s == null);
 			s.init (new Vector2 (x, i), -1, true);
 			board [x, i] = s;
@@ -349,20 +428,34 @@ public class GameManager : MonoBehaviour {
 
 		square.model.mat.color = Color.gray;
 
+		for(int i=height-1; i >=0; i--){
+			GameObject squareObject2 = new GameObject ();
+			Square square2 = squareObject2.AddComponent<Square> ();
+
+			//		square.transform.parent = squareFolder.transform;
+			square2.transform.position = new Vector3 (-1, i, 0);
+			square2.init(new Vector2((float) -1, (float) i), 4, false);
+
+			square2.name = "Beginning"+i;
+
+			square2.model.mat.color = Color.gray;
+		}
+
 		return square;
 	}
 
 	public Hero makeHero(int height){
+		print ("A NEW HERO IS BORN");
 		GameObject heroObject = new GameObject ();
-		Hero hero = heroObject.AddComponent<Hero> ();
+		Hero h = heroObject.AddComponent<Hero> ();
 
 		//		square.transform.parent = squareFolder.transform;
-		hero.transform.position = new Vector3 (-1, height+1, 0);
-		hero.init(new Vector2((float) -1, (float) height+1), this);
+		h.transform.position = new Vector3 (-1, height+1, 0);
+		h.init(new Vector2((float) -1, (float) height+1), this);
 
-		hero.name = "Hero";
+		h.name = "Hero";
 
-		return hero;
+		return h;
 	}
 
 	public Square makeDestination(int height){
@@ -393,6 +486,9 @@ public class GameManager : MonoBehaviour {
 		towerTopSquare1.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/towerCornerL");
 		towerTopSquare2.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/towerCornerR");
 
+		destinationSquares.Add (towerTopSquare1);
+		destinationSquares.Add (towerTopSquare2);
+
 		for (int i = height; i >= 0; i--) {
 			GameObject towerObject1 = new GameObject ();
 			Square towerSquare1 = towerObject1.AddComponent<Square> ();
@@ -406,6 +502,10 @@ public class GameManager : MonoBehaviour {
 
 			towerSquare1.name = "Tower Square 1 " + i;
 			towerSquare2.name = "Tower Square 2 " + i;
+
+			destinationSquares.Add (towerSquare1);
+			destinationSquares.Add (towerSquare2);
+
 		}
 
 		/*GameObject towerObject = GameObject.CreatePrimitive (PrimitiveType.Quad);
@@ -419,13 +519,13 @@ public class GameManager : MonoBehaviour {
 		return square;
 	}
 
-	public Square addSquare(Vector2 pos, bool isGround){
+	public Square addGround(Vector2 pos, bool isGround){
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
 		square.transform.parent = groundSquareFolder.transform;
 		square.transform.position = new Vector3 (pos.x, pos.y, 0);
-		square.init (pos, -1, true);
+		square.init (pos, -1, isGround);
 
 		groundSquares.Add (square);
 		square.name = "Ground " + groundSquares.Count;
@@ -434,13 +534,29 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+	public Square addSquare(Vector2 pos, int color, bool isGround, int type){
+		GameObject squareObject = new GameObject ();
+		Square square = squareObject.AddComponent<Square> ();
+
+//		square.transform.parent = groundSquareFolder.transform;
+		square.transform.position = new Vector3 (pos.x, pos.y, 0);
+		square.init (pos, color, isGround, type);
+//		print ("Adding to inBoardSquares " + square);
+		inBoardSquares.Add (square);
+		square.name = "Square " + groundSquares.Count;
+		board [(int)pos.x, (int)pos.y] = square;
+
+		return square;
+	}
+
 	public string getLevelName(){		//TODO: make it good
 		return levelName;
 
 	}
 
-	void setLevelName(string name){
+	void setLevelName(string name, int num){
 		levelName = name;
+		levelNum = num;
 	}
 
 	public void pathAnimation(){
@@ -482,11 +598,21 @@ public class GameManager : MonoBehaviour {
 			if (!go) {			//only initialize the board once
 				startGame ();
 			}
+			if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
+				if (sqman.boardSolved ()) {
+					success = true;
+				}
+			}
+			if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
+				Application.LoadLevel (Application.loadedLevel);
+
+			}
 			break;
 		}
 	}
 
 	private void menuScreen(){
+
 		menuAudio.mute = false;
 		int xpos;
 		int ypos;
@@ -502,23 +628,43 @@ public class GameManager : MonoBehaviour {
 		if (!go && !done) {
 			xpos = ((Screen.width) - (100)) / 2;
 			ypos = ((Screen.height) - (80)) / 2 - ((Screen.height / 3)-(Screen.height/10));
-			GUI.Label (new Rect (xpos, ypos, 100, 50), "Stepping Stones", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>S t e p p i n g\n\nS t o n e s</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>S t e p p i n g\n\nS t o n e s</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>S</color> <color=magenta>t</color> <color=yellow>e</color> <color=cyan>p</color> <color=magenta>p</color> <color=yellow>i</color> <color=cyan>n</color> <color=yellow>g</color>\n\n<color=yellow>S</color> <color=cyan>t</color> <color=magenta>o</color> <color=yellow>n</color> <color=cyan>e</color> <color=magenta>s</color>", guiStyle2);
+
+			xpos = ((Screen.width) - (100)) / 6;
+			ypos = ((Screen.height) - (100)) / 4 * 3;
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=black>C l i c k   t o\n\np l a c e\n\nb l o c k s</color>", guiStyle);
+			xpos *= 5;
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=black>C r e a t e\n\na\n\np a t h</color>", guiStyle);
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80));
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>S a v e</color>   <color=magenta>y o u r</color>   <color=yellow>f r i e n d</color>", guiStyle3);
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=cyan>S a v e</color>   <color=magenta>y o u r</color>   <color=yellow>f r i e n d</color>", guiStyle3);
+			GUI.Label (new Rect (xpos, ypos, 95, 45), "<color=black>S a v e   y o u r   f r i e n d</color>", guiStyle3);
+
+
 		}
 		if (!go && !done) {
-			xpos = ((Screen.width) - (60)) / 2;
-			ypos = ((Screen.height) / 2);
-			if (GUI.Button (new Rect (xpos-100, ypos, 100, 90), "Test Level 1")) {
-				setLevelName ("LTest1.txt");
-				state.mode = 1;
+			xpos = ((Screen.width)-256) / 2;
+			ypos = ((Screen.height / 2));
+
+			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 350)); 
+
+			for (int i = 0; i < NUMLEVELS; i++) {
+				if (!levelUnlockStatus [i]) {
+					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lockd");
+				} else {
+					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv" + (i + 1));
+				}
+				if (GUI.Button (new Rect (0, 0+50*i, 256, 50), lvlbutton, buttonStyle)) {
+					if (levelUnlockStatus [i]) {
+						setLevelName ("Level" + (i + 1), (i + 1));
+						state.mode = 1;
+					}
+				}
 			}
-			if (GUI.Button (new Rect (xpos, ypos, 100, 90), "Test Level 2")) {
-				setLevelName ("LTest2.txt");
-				state.mode = 1;
-			}
-			if (GUI.Button (new Rect (xpos+100, ypos, 100, 90), "Test Level 3")) {
-				setLevelName ("LTest3.txt");
-				state.mode = 1;
-			}
+			GUI.EndScrollView ();
 		}
 	}
 
@@ -537,8 +683,11 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void startGame(){
+
 		menuAudio.mute = true;
 		GameObject sqmanObject = new GameObject ();
+
+		Debug.Log ("START GAEM");
 
 		initBoard ();
 
@@ -546,9 +695,13 @@ public class GameManager : MonoBehaviour {
 
 		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.name = "Square Manager";
-		sqman.init (this, board, q, hero, rsq);
+
+		//		print ("initing sqman");
+		sqman.init (this, board, q, rsq, inBoardSquares);
+
 		sqman.destination = destination;
 		sqman.beginning = beginning;
+//		sqman.addBoardSquares (inBoardSquares);
 
 		initBackground ();
 		go = true;
@@ -564,5 +717,6 @@ public class GameManager : MonoBehaviour {
 		gameAudio5.Play();
 		gameAudio6.Play();
 		gameAudio7.Play();
+
 	}
 }

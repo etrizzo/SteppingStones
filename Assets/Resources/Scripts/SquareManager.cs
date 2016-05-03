@@ -16,6 +16,8 @@ public class SquareManager : MonoBehaviour {
 	public AudioClip movOnClip;
 	public AudioSource movOffAudio;
 	public AudioClip movOffClip;
+	public AudioSource badPlaceAudio;
+	public AudioClip badPlaceClip;
 
 	public Queue<Square> queue;			// Add is enqueue, RemoveAt(0) is dequeue
 	public int BOARDSIZEX = 24;
@@ -35,7 +37,6 @@ public class SquareManager : MonoBehaviour {
 	public Square destination;		//TODO: TEMPORARY :O
 	public Square beginning;		//TODO: TEMPORARY :O
 	public GameManager gm;
-	public Hero hero;
 
 	public bool conflict = false;
 
@@ -45,8 +46,7 @@ public class SquareManager : MonoBehaviour {
 
 //	float randFreq = .2;
 
-
-	public void init(GameManager gm, Square[,] board, int[] q, Hero hero, int[] rsq = null){
+	public void init(GameManager gm, Square[,] board, int[] q, int[] rsq = null, List<Square> inboard = null ){
 		this.gm = gm;
 		squareFolder = new GameObject();
 		squareFolder.name = "Squares";
@@ -60,11 +60,27 @@ public class SquareManager : MonoBehaviour {
 		this.rsq = rsq;
 		this.BOARDSIZEX = board.GetLength (0);
 		this.BOARDSIZEY = board.GetLength(1);
+		if (inboard != null) {
+			addBoardSquares (inboard);
+		}
 		initQueue ();		//initialize queue w/ 3 initial blocks
 		initSound ();
 		//getHeight ();
 
 		this.hero = hero;
+	}
+
+	public void clear(){
+		foreach (Square s in board) {
+			if (s != null) {
+				Destroy (s.gameObject);
+			}
+		}
+		foreach (Square s in queue) {
+			if (s != null) {
+				Destroy (s.gameObject);
+			}
+		}
 	}
 
 	void initSound(){
@@ -92,6 +108,12 @@ public class SquareManager : MonoBehaviour {
 		movOffAudio.playOnAwake = false;
 		movOffClip = Resources.Load<AudioClip> ("Audio/Special Blocks/Movable - Put Down");
 		movOffAudio.clip = movOffClip;
+
+		badPlaceAudio = this.gameObject.AddComponent<AudioSource> ();
+		badPlaceAudio.loop = false;
+		badPlaceAudio.playOnAwake = false;
+		badPlaceClip = Resources.Load<AudioClip> ("Audio/WrongPlacement");
+		badPlaceAudio.clip = badPlaceClip;
 	}
 
 	void Update(){
@@ -193,23 +215,33 @@ public class SquareManager : MonoBehaviour {
 				} else {						//if placing a movable block, place the moving block
 					Vector2 oldpos = moving.getPosition ();
 					board [(int)oldpos.x, (int)oldpos.y] = null;
+//					chainSettle (oldpos);
 					moving.setPosition (pos);
 					moving.setModelColor (2f);
 					board [(int)pos.x, (int)pos.y] = moving;
-					moving.setFalling (true);
+//					moving.setFalling (true);
+					moving.wait = true;
+//					moving.checkConflicts();
 					movOffAudio.Play ();
 					moving = null;
+					print("chain settling: " + oldpos);
 					chainSettle (oldpos);
 
 
 				}
 			} else {		//if clicking on an existing block
 				if (atPos != null) {
-					clickOnBlock (atPos, pos);
+					if (atPos.getType () == 1) {
+						clickOnBlock (atPos, pos);
+					} else {
+						badPlaceAudio.Play ();
+					}
 				}
+					
 			}
 		} else {
 			print ("nO");
+			badPlaceAudio.Play ();
 		}
 	}
 		
@@ -276,19 +308,22 @@ public class SquareManager : MonoBehaviour {
 	}
 	//checks to see if the square above pos needs to be settled
 	public void chainSettle(Vector2 pos){
+		Square s = board [(int)pos.x, (int)pos.y];
+//		print (s + " is chain settling" + s.isFalling());
 		if (pos.y < BOARDSIZEY - 1) {
-//			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
+			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
 				Square above = board [(int)pos.x, (int)pos.y + 1];
 				if (above != null) {
-					if (above.rigid != null) {
+					if (above.rigid != null ) {
 //						above.rigid.settleShape ();
 						above.rigid.setShapeFalling (true);
 					} else {
+//						print ("Setting " + above + "to falling");
 						above.setFalling (true);
 					}
 				}
 			}
-//		}
+		}
 	}
 
 	public void resolveConflict (Square s, Square c){
@@ -387,14 +422,45 @@ public class SquareManager : MonoBehaviour {
 	}
 
 	public void breakShape(RigidShape rs){
+		print ("Breaking " + rs);
+		Square above;
 		foreach (Square s in rs.getSquares()) {
+			above = null;
 			if (s != null) {
 				s.anchor = false;
 				s.rigid = null;
 				s.setFalling (true);
+				Vector2 spos = s.getPosition ();
+				if (spos.y + 1 < BOARDSIZEY) {
+					above = board [(int)spos.x, (int)spos.y + 1];
+				}
+				if (above != null) {
+					if (above.rigid != null) {
+						print ("A RIGID SHAPE: " + above + " " + above.rigid);
+						if (above.rigid != this) {
+							print (above + " " + above.rigid + " shape being made to fall");
+							//					above.rigid.settleShape ();
+							above.rigid.setShapeFalling (true);
+						}
+					}else {
+						above.setFalling (true);
+					}
+				}
+
+				//				s.counter = 0;
+				//				sqman.chainSettle (s.pos); ???? when shapes break, need to settle above appropriately
+				//				StartCoroutine (settleSquare (s));
 			}
 		}
-		DestroyImmediate (rs);
+		Destroy (rs);
+	}
+
+	public void breakShapes(LinkedList<RigidShape> shapes){
+		foreach (RigidShape rs in shapes) {
+			if (rs != null) {
+				breakShape (rs);
+			}
+		}
 	}
 
 	public bool boardSolved() {
@@ -454,7 +520,7 @@ public class SquareManager : MonoBehaviour {
 		Square twoUp = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y + 1];
 		Square[] possibleNextSquares = new Square[3];
 
-		for (int i = 0; i <= 2; i++) {
+		for (int i = 0; i <= 2 i++) {
 			getNextPossibleSquare(i, possibleNextSquares, sq);
 			Debug.Log ("pns @ " + i + ": " + possibleNextSquares[i]);
 		}
@@ -511,10 +577,21 @@ public class SquareManager : MonoBehaviour {
 		}
 	}
 
+
+	public void addBoardSquares(List<Square> squares){
+		foreach (Square s in squares) {
+			print ("adding " + this + " to: " + s);
+			s.addSqman (this);
+			s.transform.parent = squareFolder.transform;
+		}
+	}
+
+
 	// -------------
 	// All GUI code down here, basically just because lol
 	void OnGUI() {
-		if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
+
+		if (GUI.Button (new Rect (30, 30, 100, 40), "Test your path.")) {
 			if (boardSolved ()) {
 				gm.pathAnimation ();
 				playSuccess ();
@@ -523,14 +600,24 @@ public class SquareManager : MonoBehaviour {
 //				Debug.Log ("square name is: " + sq.name);
 //			}
 
+
+			/*if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
+			boardSolved ();
+
 		}
 		if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
 			Application.LoadLevel (Application.loadedLevel);
+
 
 		}
 
 	}
 
 
-}
+
+		}*/
+		}
+
+
+	}
 

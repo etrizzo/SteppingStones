@@ -53,14 +53,18 @@ public class HeroModel : MonoBehaviour
 
 		if (canMove) {
 			Debug.Log ("I am in solved hero person siht");
-			clock += Time.deltaTime;
+			if (owner.gm.bambiQwop) {
+				clock += Time.deltaTime*speed;
+			} else {
+				clock += Time.deltaTime;
+			}
 			if (first) {
 				farthestX = 1;
 				highestY = transform.position.y;
 				first = false;
 			}
 			moveAlong ();
-		} else { 		//Jumping in Place at the beginning
+		} else { 		//Jumping in Place when it is not moving
 			counter += Time.deltaTime * speed;
 			if (counter >= 2) {
 				counter = 0;

@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour {
 	string levelName;
 	int levelNum;
 
-	public bool bambiQwop = true;
+	public bool bambiQwop;
 
 	public int NUMLEVELS = 7;
 
@@ -75,6 +75,8 @@ public class GameManager : MonoBehaviour {
 	static bool[] levelUnlockStatus = { true, true, true, true, true, true, true, true, true, true };//{true, false, false, false, false, false, false, false, false, false};
 
 	void Start () {
+		bambiQwop = false;
+
 		if (bambiQwop) {
 			waveSpeed = 10;
 		}
@@ -667,6 +669,9 @@ public class GameManager : MonoBehaviour {
 		if (!go && !done) {
 			xpos = ((Screen.width)-256) / 2;
 			ypos = ((Screen.height / 2));
+
+			Texture bambiTexture = Resources.Load<Texture2D> ("Textures/bambi");
+			bambiQwop = GUILayout.Toggle(bambiQwop,bambiTexture);
 
 			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 350)); 
 

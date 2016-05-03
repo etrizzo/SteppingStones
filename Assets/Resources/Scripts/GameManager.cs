@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour {
 	public bool success = false;
 
 	float wave = 0;
-	int waveSpeed = 3;
+	int waveSpeed = 4;
 
 	GUIStyle buttonStyle;
 	GUIStyle guiStyle;
@@ -72,14 +72,11 @@ public class GameManager : MonoBehaviour {
 
 	public Vector2 scrollPosition = Vector2.zero;
 
-	static bool[] levelUnlockStatus = { true, true, true, true, true, true, true, true, true, true };//{true, false, false, false, false, false, false, false, false, false};
+	static bool[] levelUnlockStatus = /*{ true, true, true, true, true, true, true, true, true, true };*/{true, false, false, false, false, false, false, false, false, false};
+
 
 	void Start () {
 		bambiQwop = false;
-
-		if (bambiQwop) {
-			waveSpeed = 10;
-		}
 
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
@@ -216,6 +213,9 @@ public class GameManager : MonoBehaviour {
 			if (Input.GetMouseButtonUp (0)) {
 				sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
 			}
+			if (bambiQwop) {
+				waveSpeed = 10;
+			}
 			if (success) {
 				gameAudio1.mute = true;
 				gameAudio2.mute = true;
@@ -316,15 +316,28 @@ public class GameManager : MonoBehaviour {
 					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi1");
 				}
 			} else {
-				if (wave > 3) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
-					wave = -1;
-				} else if (wave > 2) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
-				} else if (wave > 1) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
-				} else if (wave > 0) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
+				if (!sqman.destinationClose () && sqman.upset) {
+					if (wave > 3) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
+						wave = -1;
+					} else if (wave > 2) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?3");
+					} else if (wave > 1) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
+					} else if (wave > 0) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?1");
+					}
+				} else {
+					if (wave > 3) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+						wave = -1;
+					} else if (wave > 2) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
+					} else if (wave > 1) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+					} else if (wave > 0) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
+					}
 				}
 			}
 		}

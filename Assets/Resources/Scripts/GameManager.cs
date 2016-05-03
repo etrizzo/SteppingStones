@@ -72,10 +72,15 @@ public class GameManager : MonoBehaviour {
 
 	public Vector2 scrollPosition = Vector2.zero;
 
-	static bool[] levelUnlockStatus = /*{ true, true, true, true, true, true, true, true, true, true };*/{true, false, false, false, false, false, false, false, false, false};
+	int[] levelUnlockStatus = /*{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };*/{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 
 	void Start () {
+		levelUnlockStatus [0] = 1;
+		for (int i = 1; i < NUMLEVELS; i++) {
+			levelUnlockStatus[i] = PlayerPrefs.GetInt ("levelUnlockStatus"+i);
+		}
+
 		bambiQwop = false;
 
 		groundSquareFolder = new GameObject();
@@ -226,7 +231,8 @@ public class GameManager : MonoBehaviour {
 				gameAudio7.mute = true;
 				if (levelNum < NUMLEVELS) {
 					Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
-					levelUnlockStatus[levelNum] = true;
+					levelUnlockStatus[levelNum] = 1;
+					PlayerPrefs.SetInt("levelUnlockStatus"+levelNum, 1);
 					/*if (!sqman.successAudio.isPlaying) {
 						clearBoard ();
 						setLevelName ("Level"+(levelNum+1), (levelNum+1));
@@ -689,13 +695,13 @@ public class GameManager : MonoBehaviour {
 			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 350)); 
 
 			for (int i = 0; i < NUMLEVELS; i++) {
-				if (!levelUnlockStatus [i]) {
+				if (levelUnlockStatus [i] == 0) {
 					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lockd");
 				} else {
 					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv" + (i + 1));
 				}
 				if (GUI.Button (new Rect (0, 0+50*i, 256, 50), lvlbutton, buttonStyle)) {
-					if (levelUnlockStatus [i]) {
+					if (levelUnlockStatus [i] == 1) {
 						setLevelName ("Level" + (i + 1), (i + 1));
 						state.mode = 1;
 					}

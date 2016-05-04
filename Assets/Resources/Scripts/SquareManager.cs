@@ -31,6 +31,8 @@ public class SquareManager : MonoBehaviour {
 	public int[] rsq;
 	public int height;
 
+	public bool upset = false;
+
 	float counter = 0f;
 	public Square moving = null;
 	public bool firstSquare = true;
@@ -87,7 +89,7 @@ public class SquareManager : MonoBehaviour {
 		successAudio.loop = false;
 		successAudio.playOnAwake = false;
 		successAudio.time = 1.0f;
-		successClip = Resources.Load<AudioClip> ("Audio/Victory Climb");
+		successClip = Resources.Load<AudioClip> ("Audio/Victory Shorter");
 		successAudio.clip = successClip;
 
 		conflictAudio = this.gameObject.AddComponent<AudioSource> ();
@@ -484,11 +486,16 @@ public class SquareManager : MonoBehaviour {
 		successAudio.Play ();
 	}
 
-	private bool destinationClose() {
+	public bool destinationClose() {
 		bool ret;
-		if (board[BOARDSIZEX - 1, (int) destination.getPosition().y - 1] != null) {
+		if (board[BOARDSIZEX - 1, (int) destination.getPosition().y] != null) {
+			upset = true;
+			ret = false;
+		} 
+		else if(board[BOARDSIZEX - 1, (int) destination.getPosition().y - 1] != null){
 			ret = true;
-		} else {
+		}
+		else {
 			ret = false;
 		}
 

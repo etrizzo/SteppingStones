@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour {
 	public bool success = false;
 
 	float wave = 0;
-	int waveSpeed = 3;
+	int waveSpeed = 4;
 
 	GUIStyle buttonStyle;
 	GUIStyle guiStyle;
@@ -75,14 +75,16 @@ public class GameManager : MonoBehaviour {
 
 	public Vector2 scrollPosition = Vector2.zero;
 
-	static bool[] levelUnlockStatus = { true, true, true, true, true, true, true, true, true, true };//{true, false, false, false, false, false, false, false, false, false};
+	int[] levelUnlockStatus = /*{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };*/{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 
 	void Start () {
-		bambiQwop = false;
-
-		if (bambiQwop) {
-			waveSpeed = 10;
+		levelUnlockStatus [0] = 1;
+		for (int i = 1; i < NUMLEVELS; i++) {
+			levelUnlockStatus[i] = PlayerPrefs.GetInt ("levelUnlockStatus"+i);
 		}
+
+		bambiQwop = false;
 
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
@@ -228,6 +230,9 @@ public class GameManager : MonoBehaviour {
 			if (Input.GetMouseButtonUp (0)) {
 				sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
 			}
+			if (bambiQwop) {
+				waveSpeed = 10;
+			}
 			if (success) {
 				gameAudio1.mute = true;
 				gameAudio2.mute = true;
@@ -238,7 +243,8 @@ public class GameManager : MonoBehaviour {
 				gameAudio7.mute = true;
 				if (levelNum < NUMLEVELS) {
 					Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
-					levelUnlockStatus[levelNum] = true;
+					levelUnlockStatus[levelNum] = 1;
+					PlayerPrefs.SetInt("levelUnlockStatus"+levelNum, 1);
 					/*if (!sqman.successAudio.isPlaying) {
 						clearBoard ();
 						setLevelName ("Level"+(levelNum+1), (levelNum+1));
@@ -328,15 +334,28 @@ public class GameManager : MonoBehaviour {
 					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi1");
 				}
 			} else {
-				if (wave > 3) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
-					wave = -1;
-				} else if (wave > 2) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
-				} else if (wave > 1) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
-				} else if (wave > 0) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
+				if (!sqman.destinationClose () && sqman.upset) {
+					if (wave > 3) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
+						wave = -1;
+					} else if (wave > 2) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?3");
+					} else if (wave > 1) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
+					} else if (wave > 0) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?1");
+					}
+				} else {
+					if (wave > 3) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+						wave = -1;
+					} else if (wave > 2) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
+					} else if (wave > 1) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+					} else if (wave > 0) {
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
+					}
 				}
 			}
 		}
@@ -703,13 +722,13 @@ public class GameManager : MonoBehaviour {
 			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 350)); 
 
 			for (int i = 0; i < NUMLEVELS; i++) {
-				if (!levelUnlockStatus [i]) {
+				if (levelUnlockStatus [i] == 0) {
 					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lockd");
 				} else {
 					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv" + (i + 1));
 				}
 				if (GUI.Button (new Rect (0, 0+50*i, 256, 50), lvlbutton, buttonStyle)) {
-					if (levelUnlockStatus [i]) {
+					if (levelUnlockStatus [i] == 1) {
 						setLevelName ("Level" + (i + 1), (i + 1));
 						state.mode = 1;
 					}

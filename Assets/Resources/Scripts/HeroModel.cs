@@ -70,9 +70,9 @@ public class HeroModel : MonoBehaviour
 				counter = 0;
 			}
 			if (counter >= 1) {
-				transform.localPosition = new Vector3 (farthestX, highestY+.05f, 0);
+				transform.localPosition = new Vector3 (farthestX, highestY+.05f, -1);
 			} else if (counter >= 0) {
-				transform.localPosition = new Vector3 (farthestX, highestY, 0);
+				transform.localPosition = new Vector3 (farthestX, highestY, -1);
 			}
 		}
 	}

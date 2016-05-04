@@ -499,7 +499,7 @@ public class SquareManager : MonoBehaviour {
 			ret = false;
 		}
 
-		print ("destinationClose turned out to be " + ret);
+		//print ("destinationClose turned out to be " + ret);
 		return ret;
 	}
 

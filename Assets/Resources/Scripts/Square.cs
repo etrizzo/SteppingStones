@@ -11,6 +11,8 @@ public class Square : MonoBehaviour {
 	private bool ground;
 //	private bool inqueue;
 
+	public Vector3 direction;
+
 	public int type; 	//0-normal, 1-movable, 2-shape
 	public bool falling;
 	public bool anchor;

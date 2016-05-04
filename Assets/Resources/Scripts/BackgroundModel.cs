@@ -8,8 +8,8 @@ public class BackgroundModel : MonoBehaviour
 	private Background owner;			// Pointer to the parent object.
 	public Material mat;		// Material for setting/changing texture and color.
 	private float BGSCALE = 4f;
-	private float quadHeight;
-	private float quadWidth;
+	public float quadHeight;
+	public float quadWidth;
 
 	public void init(Background owner) {
 		this.owner = owner;
@@ -22,9 +22,9 @@ public class BackgroundModel : MonoBehaviour
 		transform.localScale = new Vector3(GameManager.x_coord, GameManager.y_coord,1f);
 		name = "Background Model";									// Name the object.
 
-		mat = GetComponent<Renderer>().material;								// Get the material component of this quad object.
+		/*mat = GetComponent<Renderer>().material;								// Get the material component of this quad object.
 		mat.shader = Shader.Find ("Sprites/Default");						// Tell the renderer that our textures have transparency.
-		mat.mainTexture = Resources.Load<Texture2D> ("Textures/background");	// Set the texture.  Must be in Resources folder.
+		mat.mainTexture = Resources.Load<Texture2D> ("Textures/background");*/	// Set the texture.  Must be in Resources folder.
 
 	}
 

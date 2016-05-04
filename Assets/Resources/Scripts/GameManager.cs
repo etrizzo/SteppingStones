@@ -235,7 +235,9 @@ public class GameManager : MonoBehaviour {
 		int mousey = (int)Mathf.Ceil (worldPos.y);
 		if (state.mode == 1 && sqman != null) {		//if the game is playing
 			if (Input.GetMouseButtonUp (0)) {
-				sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
+				if (!success) {
+					sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
+				}
 			}
 			if (bambiQwop) {
 				waveSpeed = 10;

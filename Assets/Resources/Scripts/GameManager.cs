@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour {
 	string levelName;
 	int levelNum;
 
+
 	public bool bambiQwop;
 
 	public int NUMLEVELS = 7;
@@ -442,14 +443,14 @@ public class GameManager : MonoBehaviour {
 	public void fixCamera(){
 
 		this.cam = Camera.main;
-		dist = (cam.transform.position).z;
-		x_coord = Camera.main.ViewportToWorldPoint (new Vector3 (1, 0, dist)).x;
-		y_coord = Camera.main.ViewportToWorldPoint (new Vector3 (0, 1, dist)).y;
-
 		int height = (int)(h / 2);
 		int width = (int)(w / 2);
 		cam.orthographicSize = height + 2;
 		cam.transform.position = new Vector3(width-1, height-1, -10);
+
+		dist = (transform.position - cam.transform.position).z;
+		x_coord = Camera.main.ViewportToWorldPoint (new Vector3 (1, 0, dist)).x;
+		y_coord = Camera.main.ViewportToWorldPoint (new Vector3 (0, 1, dist)).y;
 
 
 
@@ -514,7 +515,7 @@ public class GameManager : MonoBehaviour {
 		Hero h = heroObject.AddComponent<Hero> ();
 
 		//		square.transform.parent = squareFolder.transform;
-		h.transform.position = new Vector3 (-1, height+1, 0);
+		h.transform.position = new Vector3 (-.5f, height+.5f, 0);
 		h.init(new Vector2((float) -1, (float) height+1), this);
 
 		h.name = "Hero";
@@ -624,6 +625,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void pathAnimation(){
+		squarePath.Reverse ();
+		printPath ();
 //		Time.timeScale = .01f;
 //		Time.fixedDeltaTime = .01f;
 		Debug.Log ("pathAnimation");
@@ -632,6 +635,15 @@ public class GameManager : MonoBehaviour {
 		hero.model.canMove = true;
 	//	hero.model.moveAlong (squarePath);
 	}
+
+	void printPath(){
+		String path = "PATH: ";
+		foreach (Square s in squarePath){
+			path = path + s.getPosition() + " ";
+		}
+		print(path);
+	}
+			
 
 //	void heroAnimation(List<Square> squarePath){
 //		int counter = 0;

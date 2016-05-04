@@ -9,9 +9,9 @@ public class HeroModel : MonoBehaviour
 	public Material mat;		// Material for setting/changing texture and color.
 
 	public float counter = 0;
-	public int speed = 5;
+	public float speed = 5f;
 	int moveSpeed = 100;
-	public float clock = 0f;
+	public float clock = -1f;
 	bool move = false;
 	public bool canMove = false;
 	List<Square> squarePath;
@@ -26,7 +26,7 @@ public class HeroModel : MonoBehaviour
 
 	public void init(Hero owner) {
 		if (owner.gm.bambiQwop) {
-			speed = 30;
+			speed = 15;
 		}
 
 		this.owner = owner;
@@ -46,7 +46,7 @@ public class HeroModel : MonoBehaviour
 		}
 
 		highestY = -.5f;
-		farthestX = .5f;
+		farthestX = -.5f;
 	}
 
 	public void Update() {
@@ -54,37 +54,45 @@ public class HeroModel : MonoBehaviour
 		if (canMove) {
 			Debug.Log ("I am in solved hero person siht");
 			if (owner.gm.bambiQwop) {
-				clock += Time.deltaTime*speed;
+				clock += Time.deltaTime * speed * 5;
 			} else {
-				clock += Time.deltaTime;
+				clock += Time.deltaTime * (speed * .75f);
 			}
 			if (first) {
-				farthestX = 1;
+				farthestX = -1;
 				highestY = transform.position.y;
 				first = false;
 			}
 			moveAlong ();
+//		}
 		} else { 		//Jumping in Place when it is not moving
+//			print ("JUMP! " + farthestX + ", " + highestY);
 			counter += Time.deltaTime * speed;
 			if (counter >= 2) {
 				counter = 0;
 			}
 			if (counter >= 1) {
-				transform.localPosition = new Vector3 (farthestX, highestY+.05f, 0);
+//				transform.position = new Vector3 (farthestX, highestY+.05f, 0);
+				transform.localPosition = new Vector3 (0, .05f, 0);
 			} else if (counter >= 0) {
-				transform.localPosition = new Vector3 (farthestX, highestY, 0);
+//				transform.position = new Vector3 (farthestX, highestY, 0);
+				transform.localPosition = new Vector3 (0, 0, 0);
 			}
 		}
 	}
 
 	public void moveAlong(){	//List<Square> squarePath
-			if (clock >= farthestX) {
-				updateSquareInfo ();
-				print ("updating position to : " + (clock + .5f) + ", " + highestY);
-				
-			}
-			transform.position = new Vector3 (clock +.5f, highestY, 0);
-
+		if (clock >= farthestX) {
+			updateSquareInfo ();
+//			if (canMove) {
+//				print ("updating position to : " + (clock + .5f) + ", " + highestY);
+//				print (" or actually... " + (curSquare.getPosition ().x + .5f) + " , " + (curSquare.getPosition ().y + .5f));
+//
+//
+//			}
+		}
+		owner.transform.position = new Vector3 (farthestX, highestY, 0);
+			
 
 
 
@@ -105,15 +113,17 @@ public class HeroModel : MonoBehaviour
 //			Debug.Log ("sq = count.... so farthest x is: " + farthestX + " highest y is: " + highestY);
 //			farthestX = farthestX + .5f;
 //			highestY = highestY 1f;
+//			print("cursquare is : " + curSquare.getPosition() + " And we're stopping there.");
 			canMove = false;
 		} else {
-			print ("Counter " + sqcounter);
 			curSquare = owner.gm.squarePath [sqcounter];
 			Vector2 pos = curSquare.getPosition ();
-			farthestX = pos.x + 1; // may have to change
+			print ("Counter " + sqcounter + ", Cursquare: " + curSquare.getPosition()); 
+//			farthestX = pos.x + 1; // may have to change
+			farthestX = pos.x + .5f;
 //			highestY = pos.y + .5f;
-			highestY = curSquare.model.transform.position.y + 1;
-			Debug.Log("on square: " + curSquare.name + " farthest x is: " + farthestX + " highest y is: " + highestY);
+			highestY =pos.y + .5f;
+//			Debug.Log("on square: " + curSquare.name + " farthest x is: " + farthestX + " highest y is: " + highestY);
 		}
 
 	}

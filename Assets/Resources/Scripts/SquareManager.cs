@@ -468,6 +468,7 @@ public class SquareManager : MonoBehaviour {
 	}
 
 	public bool boardSolved() {
+		gm.squarePath = new List<Square> ();
 		// Short circuit, because if the last column's block 1 below the destination isn't a square, then there's no point running the alg.
 		bool valid = pathValid(beginning);
 		if (destinationClose() && valid) {
@@ -498,14 +499,12 @@ public class SquareManager : MonoBehaviour {
 		else {
 			ret = false;
 		}
-
-		print ("destinationClose turned out to be " + ret);
+			
 		return ret;
 	}
 
 	private bool pathValid(Square curSquare) {
 		if (curSquare != null) {
-			
 			Vector2 pos = curSquare.getPosition ();
 			Debug.Log ("Got a square @: " + pos.x + ", " + pos.y + ")");
 			if (curSquare.getPosition() == destination.getPosition()) {
@@ -514,9 +513,9 @@ public class SquareManager : MonoBehaviour {
 			} else {
 				print ("adding square: " + curSquare);
 				bool valid = pathValid(getNextSquare (curSquare));
-				if (valid) {
+//				if (valid) {
 					gm.squarePath.Add (curSquare);
-				}
+//				}
 				return valid;
 				//hero.nextMove (pos);
 //				return pathValid (getNextSquare(curSquare));

@@ -27,6 +27,7 @@ public class Background : MonoBehaviour
 		this.bg_model = modelObject.AddComponent<BackgroundModel> ();
 		this.bg_model.init (this);
 		bgMat = bg_model.GetComponent<Renderer> ().material;
+		bgMat.color = new Color (.74f, .74f, .74f, .6f);
 
 		bgSquareFolder = new GameObject ();
 		bgSquareFolder.name = "BG Squares";
@@ -43,14 +44,17 @@ public class Background : MonoBehaviour
 			square.transform.parent = bgSquareFolder.transform;
 			x = randFloat (-8, gm.sqman.BOARDSIZEX + 5);
 			y = randFloat (-5, gm.sqman.BOARDSIZEY + 5);
-			square.transform.position = new Vector3 (x, y, 0);
+			square.transform.position = new Vector3 (x, y, 1);
 			square.init (new Vector2 ((float)x, (float)y), 4, false);
 
 			square.name = "BGSquare " + i;
 
-			square.model.mat.color = new Color (.5f, .5f, .5f, randFloat (0f, .4f));
+			float f = randFloat (0f, 1f);
+
+			square.model.mat.color = new Color (f, f, f, randFloat (0f, .8f));
 			float lw = randFloat (.1f, 6.5f);
 			square.model.transform.localScale = new Vector3 (lw, lw, 2);
+			square.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bgSquare");
 			bgSquares.Add (square);
 		}
 	}

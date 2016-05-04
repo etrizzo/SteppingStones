@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour {
 	public int w;
 	public int h;
 	Square[,] board;
+	bool useQueue;
 	int[] q;
 	int[] rsq;
 	string levelName;
@@ -37,6 +38,8 @@ public class GameManager : MonoBehaviour {
 	public bool bambiQwop;
 
 	public int NUMLEVELS = 7;
+	public static int numBlockTypes = 3;
+	public static int numRigidTypes = 2;
 
 	List<Square>destinationSquares;
 	List<Square>beginningSquares;
@@ -348,30 +351,31 @@ public class GameManager : MonoBehaviour {
 		MemoryStream stream = new MemoryStream(byteArray);
 		StreamReader sr = new StreamReader (stream);
 		string line = "";
-		line = sr.ReadLine ();
+		line = readLine(sr);
 		w = int.Parse (line);
-		line = sr.ReadLine ();
+		line = readLine(sr);
 		h = int.Parse (line);
 		board = new Square[w, h];
 		fixCamera ();
-		for (int i = 0; i < w; i++) {
-			line = sr.ReadLine ();
+		for (int i = 0; i < w; i++) {	//read ground height of each column in the board
+			line = readLine(sr);
 			addColumn (int.Parse (line), i);
 		}
-		line = sr.ReadLine ();
-		int beginHeight = int.Parse (line);
+		line = readLine(sr);
+		int beginHeight = int.Parse (line);		//get start height
 		beginning = makeBeginning (beginHeight);
 		hero = makeHero (beginHeight);
-		line = sr.ReadLine();
+		line = readLine(sr);;					//get destination height
 		int destHeight = int.Parse (line);
 		destination = makeDestination (destHeight);
 		q = new int[10];
 		int prob = 0;
 		int start = 0;
-		if (int.Parse (sr.ReadLine()) == 1) {
-			
-			for (int i = 0; i < 6; i++) {
-				prob = int.Parse (sr.ReadLine ());
+		useQueue = (int.Parse (readLine (sr)) == 1);
+		if (useQueue) {
+			for (int i = 0; i < numBlockTypes; i++) {
+				print ("Adding block type : " + i);
+				prob = int.Parse (readLine(sr));
 				for (int j = 0; j < prob; j++) {
 					q [j + start] = i;
 				}
@@ -381,18 +385,18 @@ public class GameManager : MonoBehaviour {
 		}
 		rsq = new int[10];
 		int rsprob;
-//		if (prob != 0) {			//using rigid shapes
+		if (prob != 0) {			//using rigid shapes
 			start = 0;
-			for (int i = 0; i < 2; i++) {		//number of rigid shapes
-				rsprob = int.Parse (sr.ReadLine ());
+			for (int i = 0; i < numRigidTypes; i++) {		//number of rigid shapes
+				rsprob = int.Parse (readLine(sr));
 				for (int j = 0; j < rsprob; j++) {
 					rsq [j + start] = i;
 				}
 			}
-//		}
+		}
 		Square sq;
 		while (sr.Peek () != -1) {
-			line = sr.ReadLine ();
+			line = readLine(sr);
 			string[] s = line.Split (' ');
 			sq = addSquare (new Vector2 (float.Parse (s [0]), float.Parse (s [1])), int.Parse (s [2]), false, int.Parse (s [3]));
 			sq.setColor (int.Parse (s [2]));
@@ -400,6 +404,18 @@ public class GameManager : MonoBehaviour {
 //			Square sq = new Square ();
 //			sq.init (new Vector2 (float.Parse (s [0]), float.Parse (s [1])), int.Parse (s [2]), false,  int.Parse (s [3]));
 		}
+
+
+	}
+
+
+	public string readLine(StreamReader sr){
+		String line = sr.ReadLine ();
+		while (line.StartsWith("//") && sr.Peek () != -1) {
+			line = sr.ReadLine ();
+		}
+		return line;
+
 
 
 	}
@@ -630,8 +646,10 @@ public class GameManager : MonoBehaviour {
 			if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
 				if (sqman.boardSolved ()) {
 					success = true;
-					pathAnimation ();
+
 				}
+				pathAnimation ();
+
 			}
 			if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
 				Application.LoadLevel (Application.loadedLevel);
@@ -730,6 +748,9 @@ public class GameManager : MonoBehaviour {
 		sqman.name = "Square Manager";
 
 		//		print ("initing sqman");
+		if (!useQueue) {
+			q = null;
+		}
 		sqman.init (this, board, q, rsq, inBoardSquares);
 
 		sqman.destination = destination;

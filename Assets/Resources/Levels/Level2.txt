@@ -1,18 +1,17 @@
 ﻿5
 5
+// ground heights
 0
 0
 0
 0
 0
+// start and dest heights
 3
 3
+// use queue
 1
+// queue probabilities
 10
-0
-0
-0
-0
-0
 0
 0

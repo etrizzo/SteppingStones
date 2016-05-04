@@ -1,18 +1,20 @@
 ﻿5
 10
+// column ground heights
 5
 0
 5
 0
 5
+// start and dest heights
 6
 6
+// use queue
 1
-0
-0
-0
+// block probabilities - only rigid shapes
 0
 0
 10
+// rs probabilities - only |-shapes
 0
 10

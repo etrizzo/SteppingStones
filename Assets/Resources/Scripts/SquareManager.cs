@@ -149,15 +149,17 @@ public class SquareManager : MonoBehaviour {
 
 
 	public void initQueue(){
-		queue = new Queue<Square> ();
-		//initialize first 3 blocks
-		Square s1 = addSquare(qpos1, false);
-		Square s2 = addSquare (qpos2, false);
-		Square s3 = addSquare (qpos3, false);
+		if (q != null) {
+			queue = new Queue<Square> ();
+			//initialize first 3 blocks
+			Square s1 = addSquare (qpos1, false);
+			Square s2 = addSquare (qpos2, false);
+			Square s3 = addSquare (qpos3, false);
 
-		queue.Enqueue (s1);
-		queue.Enqueue (s2);
-		queue.Enqueue (s3);
+			queue.Enqueue (s1);
+			queue.Enqueue (s2);
+			queue.Enqueue (s3);
+		}
 
 	}
 
@@ -170,12 +172,12 @@ public class SquareManager : MonoBehaviour {
 				above = board [(int)pos.x, (int)pos.y + 1];
 			}
 			if (atPos == null && (above == null || !above.isFalling())) {			//check if clicking on an existing block
-				if (moving == null) {			//if not moving a movable block, try to place from queue
-					bool place = true;
-					Square next = queue.Peek();
-					if (next.isAnchor ()) {
-						place = false;
-						switch(next.rigid.shapeType){
+				if (moving == null && q != null) {			//if not moving a movable block, try to place from queue
+						bool place = true;
+						Square next = queue.Peek ();
+						if (next.isAnchor ()) {
+							place = false;
+							switch (next.rigid.shapeType) {
 							case 0: // _
 								if (next.rigid.checkValidGrow (pos, 0, 5)) {	//TODO: figure out for different shapes 
 									place = true;
@@ -189,45 +191,46 @@ public class SquareManager : MonoBehaviour {
 							default:
 								place = false;
 								break;
+							}
 						}
-					}
 
-					if (place) {
+						if (place && q != null) {
 						
-						Square square = queue.Dequeue ();
-						if (!square.isAnchor ()) {
-							square.setFalling (true);
+							Square square = queue.Dequeue ();
+							if (!square.isAnchor ()) {
+								square.setFalling (true);
+							}
+							square.setPosition (pos);
+							board [(int)pos.x, (int)pos.y] = square;
+							updateQueue ();
+							if (square.isAnchor ()) {
+								// do rigid stuff
+								square.rigid.grow ();
+
+							} else {
+								// Place it like normal if it's not an anchor
+
+							}
 						}
-						square.setPosition (pos);
-						board [(int)pos.x, (int)pos.y] = square;
-						updateQueue ();
-						if (square.isAnchor ()) {
-							// do rigid stuff
-							square.rigid.grow ();
 
-						} else {
-							// Place it like normal if it's not an anchor
-
-						}
-					}
-
-				} else {						//if placing a movable block, place the moving block
-					Vector2 oldpos = moving.getPosition ();
-					board [(int)oldpos.x, (int)oldpos.y] = null;
+					} else {						//if placing a movable block, place the moving block
+						Vector2 oldpos = moving.getPosition ();
+						board [(int)oldpos.x, (int)oldpos.y] = null;
 //					chainSettle (oldpos);
-					moving.setPosition (pos);
-					moving.setModelColor (2f);
-					board [(int)pos.x, (int)pos.y] = moving;
+						moving.setPosition (pos);
+						moving.setModelColor (2f);
+						board [(int)pos.x, (int)pos.y] = moving;
 //					moving.setFalling (true);
-					moving.wait = true;
+						moving.wait = true;
 //					moving.checkConflicts();
-					movOffAudio.Play ();
-					moving = null;
-					print("chain settling: " + oldpos);
-					chainSettle (oldpos);
+						movOffAudio.Play ();
+						moving = null;
+						print ("chain settling: " + oldpos);
+						chainSettle (oldpos);
 
 
-				}
+					}
+				
 			} else {		//if clicking on an existing block
 				if (atPos != null) {
 					if (atPos.getType () == 1) {
@@ -279,7 +282,7 @@ public class SquareManager : MonoBehaviour {
 		Vector2 pos = s.getPosition ();
 		Square below = board [(int)pos.x, (int)pos.y - 1];
 		if (below != null) {
-			if (type == 2) {			//erase one below
+			if (type == 6) {			//erase one below
 				
 				if (!below.isGround ()) {
 					below.destroy ();
@@ -397,7 +400,7 @@ public class SquareManager : MonoBehaviour {
 			square.init (pos, getColor (type), false, type);
 			square.addSqman (this);
 
-			if (type == 5) {
+			if (type == 2) {
 				RigidShape rs = makeRigidShape(square);
 			}
 		}
@@ -464,7 +467,8 @@ public class SquareManager : MonoBehaviour {
 
 	public bool boardSolved() {
 		// Short circuit, because if the last column's block 1 below the destination isn't a square, then there's no point running the alg.
-		if (destinationClose() && pathValid(beginning)) {
+		bool valid = pathValid(beginning);
+		if (destinationClose() && valid) {
 			solved = true;
 //			gm.pathAnimation ();
 			playSuccess ();
@@ -501,9 +505,14 @@ public class SquareManager : MonoBehaviour {
 				Debug.Log("Destination's position:" + destination.getPosition().x + ", " + destination.getPosition().y);
 				return true;
 			} else {
-				gm.squarePath.Add(curSquare);
+				print ("adding square: " + curSquare);
+				bool valid = pathValid(getNextSquare (curSquare));
+				if (valid) {
+					gm.squarePath.Add (curSquare);
+				}
+				return valid;
 				//hero.nextMove (pos);
-				return pathValid (getNextSquare(curSquare));
+//				return pathValid (getNextSquare(curSquare));
 			}
 		}
 		return false;

@@ -1,5 +1,6 @@
 ﻿11
 15
+// column heights
 0
 0
 0
@@ -11,14 +12,14 @@
 0
 0
 0
+// start and dest heights
 7
 7
+// use queue - only rigid shapes
 1
 0
 0
-0
-0
-0
 10
+// rs probabilities
 5
 5

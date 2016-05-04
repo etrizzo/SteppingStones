@@ -19,7 +19,7 @@ public class HeroModel : MonoBehaviour
 	private float farthestX;
 	private float highestY;
 	private Square curSquare;
-	private int sqcounter= 0; //start on square after beginning, since hero is alreayd on the beginning square
+	private int sqcounter= -1; //start on square after beginning, since hero is alreayd on the beginning square
 	private bool end = false;
 
 
@@ -80,8 +80,13 @@ public class HeroModel : MonoBehaviour
 	public void moveAlong(){	//List<Square> squarePath
 			if (clock >= farthestX) {
 				updateSquareInfo ();
+				print ("updating position to : " + (clock + .5f) + ", " + highestY);
+				
 			}
-			transform.position = new Vector3 (clock, highestY, 0);
+			transform.position = new Vector3 (clock +.5f, highestY, 0);
+
+
+
 
 //		foreach (Square sq in owner.gm.squarePath) {
 //			//Vector2 nextPos = sq.getPosition ();
@@ -96,15 +101,17 @@ public class HeroModel : MonoBehaviour
 
 	void updateSquareInfo(){
 		sqcounter++;
-		if (sqcounter == (owner.gm.squarePath.Count)) {
+		if (sqcounter >= (owner.gm.squarePath.Count)) {
 //			Debug.Log ("sq = count.... so farthest x is: " + farthestX + " highest y is: " + highestY);
-			farthestX = farthestX + .5f;
-			highestY = highestY - 1f;
+//			farthestX = farthestX + .5f;
+//			highestY = highestY 1f;
 			canMove = false;
 		} else {
+			print ("Counter " + sqcounter);
 			curSquare = owner.gm.squarePath [sqcounter];
 			Vector2 pos = curSquare.getPosition ();
 			farthestX = pos.x + 1; // may have to change
+//			highestY = pos.y + .5f;
 			highestY = curSquare.model.transform.position.y + 1;
 			Debug.Log("on square: " + curSquare.name + " farthest x is: " + farthestX + " highest y is: " + highestY);
 		}

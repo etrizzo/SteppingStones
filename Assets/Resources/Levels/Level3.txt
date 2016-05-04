@@ -1,5 +1,6 @@
 ﻿15
 15
+// column ground heights
 0
 0
 0
@@ -15,14 +16,15 @@
 0
 0
 7
+// start and destination heights
 6
 9
+// use queue
 1
-0
-0
-0
+// block probabilities - only rigid shapes
 0
 0
 10
+// rigid shape probabilities - only _ shapes
 10
 0

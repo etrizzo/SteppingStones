@@ -94,7 +94,7 @@ public class Highlight : MonoBehaviour {
 		Square next = sqman.queue.Peek ();
 		int type = next.getType ();
 
-		if (type == 5) {
+		if (type == 2) {
 //			if (color == defaultColor) {
 //			}
 			// Maybe make a delegate to run all of this code for all the 4 blocks????
@@ -141,7 +141,11 @@ public class Highlight : MonoBehaviour {
 	}
 
 	bool movableBlock(float pos_x, float pos_y) {
-		return board [(int)pos_x, (int)pos_y].type == 1;
+		Square s = board [(int)pos_x, (int)pos_y];
+		if (s != null){
+			return s.type == 1;
+		}
+		return false;
 	}
 
 
@@ -161,7 +165,7 @@ public class Highlight : MonoBehaviour {
 			//Debug.Log ("Outside of bounds, coloring it red!");
 			retColor = redTransparent;
 		}
-		if (next.type == 5) {
+		if (next.type == 2) {
 			for (int i = 0; i < EXTRASHAPES; i++) {
 				Vector2 pos = rigidShapes [i].transform.position;
 
@@ -178,9 +182,9 @@ public class Highlight : MonoBehaviour {
 				}
 			}
 		}
-		if (retColor != redTransparent) {
-			Debug.Log (("I'm not coloring this block red!"));
-		}
+//		if (retColor != redTransparent) {
+//			Debug.Log (("I'm not coloring this block red!"));
+//		}
 		return retColor;
 	}
 
@@ -226,7 +230,7 @@ public class Highlight : MonoBehaviour {
 				// If the mouse moved, update the position of the anchor
 				made.transform.position = new Vector3(mouse.x, lowestY, 0);
 //				Debug.Log ("Next queued block is of type: " + type);
-				if (type == 5) {
+				if (type == 2) {
 					// If it's a RigidShape, do extra things based on what kind of shape it is!
 					RigidShape rs = next.rigid;
 					int shapeType = rs.shapeType;

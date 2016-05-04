@@ -1,21 +1,17 @@
 ﻿5
 5
+// ground heights
 0
 0
 0
 0
 0
+// start and dest heights
 3
 3
-1
-10
+// do not use queue
 0
-0
-0
-0
-0
-0
-0
+// squares already in board
 0 2 1 1
 0 3 2 0
 0 4 0 0

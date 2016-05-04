@@ -1,18 +1,17 @@
 ﻿5
 5
+// y-coords of board
 0
 0
 1
 2
 0
+// start and destination heights
 0
 3
+// use queue
 1
+// queue probabilities
 10
-0
-0
-0
-0
-0
 0
 0

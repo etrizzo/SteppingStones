@@ -29,12 +29,12 @@ public class SquareModel : MonoBehaviour
 			case 2:
 				mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileErase");
 				break;
-			case 3:
-				mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileBomb");
-				break;
-			case 4:
-				mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileRainbowBambi");
-				break;
+//			case 3:
+//				mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileBomb");
+//				break;
+//			case 4:
+//				mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileRainbowBambi");
+//				break;
 			default:
 				mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileBlank");	// Set the texture.  Must be in Resources folder.
 				break;

@@ -42,7 +42,9 @@ public class GameManager : MonoBehaviour {
 	public static int numBlockTypes = 3;
 	public static int numRigidTypes = 2;
 
+	public GameObject destinationSquareFolder;
 	List<Square>destinationSquares;
+	public GameObject beginningSquareFolder;
 	List<Square>beginningSquares;
 
 	public GameObject groundSquareFolder;
@@ -76,7 +78,7 @@ public class GameManager : MonoBehaviour {
 
 	public Vector2 scrollPosition = Vector2.zero;
 
-	int[] levelUnlockStatus = /*{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };*/{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };/*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
 
 
 	void Start () {
@@ -90,7 +92,11 @@ public class GameManager : MonoBehaviour {
 		groundSquareFolder = new GameObject();
 		groundSquareFolder.name = "Ground";
 		groundSquares = new List<Square> ();
+		destinationSquareFolder = new GameObject();
+		destinationSquareFolder.name = "Destination";
 		destinationSquares = new List<Square> ();
+		beginningSquareFolder = new GameObject();
+		beginningSquareFolder.name = "Beginning";
 		beginningSquares = new List<Square> ();
 
 		initSound ();
@@ -485,7 +491,7 @@ public class GameManager : MonoBehaviour {
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
-		//		square.transform.parent = squareFolder.transform;
+		square.transform.parent = beginningSquareFolder.transform;
 		square.transform.position = new Vector3 (-1, height, 0);
 		square.init(new Vector2((float) -1, (float) height), 4, false);
 
@@ -497,11 +503,11 @@ public class GameManager : MonoBehaviour {
 			GameObject squareObject2 = new GameObject ();
 			Square square2 = squareObject2.AddComponent<Square> ();
 
-			//		square.transform.parent = squareFolder.transform;
+			square2.transform.parent = beginningSquareFolder.transform;
 			square2.transform.position = new Vector3 (-1, i, 0);
 			square2.init(new Vector2((float) -1, (float) i), 4, false);
 
-			square2.name = "Beginning"+i;
+			square2.name = "Beginning "+i;
 
 			square2.model.mat.color = Color.gray;
 		}
@@ -516,6 +522,7 @@ public class GameManager : MonoBehaviour {
 
 		//		square.transform.parent = squareFolder.transform;
 		h.transform.position = new Vector3 (-.5f, height+.5f, 0);
+
 		h.init(new Vector2((float) -1, (float) height+1), this);
 
 		h.name = "Hero";
@@ -527,7 +534,7 @@ public class GameManager : MonoBehaviour {
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
-		//square.transform.parent = squareFolder.transform;
+		square.transform.parent = destinationSquareFolder.transform;
 		square.transform.position = new Vector3 (w, height, 0);
 		square.init(new Vector2((float) w, (float) height), 4, false);
 
@@ -547,6 +554,9 @@ public class GameManager : MonoBehaviour {
 
 		towerTopSquare1.name = "Tower Top Square 1 ";
 		towerTopSquare2.name = "Tower Top Square 2 ";
+		towerTopSquare1.transform.parent = destinationSquareFolder.transform;
+		towerTopSquare2.transform.parent = destinationSquareFolder.transform;
+
 
 		towerTopSquare1.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/towerCornerL");
 		towerTopSquare2.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/towerCornerR");
@@ -567,6 +577,9 @@ public class GameManager : MonoBehaviour {
 
 			towerSquare1.name = "Tower Square 1 " + i;
 			towerSquare2.name = "Tower Square 2 " + i;
+
+			towerSquare1.transform.parent = destinationSquareFolder.transform;
+			towerSquare2.transform.parent = destinationSquareFolder.transform;
 
 			destinationSquares.Add (towerSquare1);
 			destinationSquares.Add (towerSquare2);

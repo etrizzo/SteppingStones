@@ -499,7 +499,6 @@ public class SquareManager : MonoBehaviour {
 		else {
 			ret = false;
 		}
-			
 		return ret;
 	}
 

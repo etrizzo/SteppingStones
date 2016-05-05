@@ -124,6 +124,17 @@ public class SquareManager : MonoBehaviour {
 			conflictAudio.Play ();
 			conflict = false;
 		}
+		checkWindowBlock ();
+	}
+
+	private void checkWindowBlock(){
+		Square block = board [BOARDSIZEX - 1, (int)destination.getPosition ().y];
+		if (block != null && !block.isFalling ()) {
+			upset = true;
+		} else {
+			upset = false;
+		}
+
 	}
 
 	private void getHeight (){
@@ -489,11 +500,10 @@ public class SquareManager : MonoBehaviour {
 
 	public bool destinationClose() {
 		bool ret;
-		if (board[BOARDSIZEX - 1, (int) destination.getPosition().y] != null) {
-			upset = true;
+		if (board [BOARDSIZEX - 1, (int)destination.getPosition ().y] != null) {
+//			upset = true;
 			ret = false;
-		} 
-		else if(board[BOARDSIZEX - 1, (int) destination.getPosition().y - 1] != null){
+		} else if(board[BOARDSIZEX - 1, (int) destination.getPosition().y - 1] != null){
 			ret = true;
 		}
 		else {
@@ -529,6 +539,8 @@ public class SquareManager : MonoBehaviour {
 			Debug.Log (sq);
 			StartCoroutine(sq.tempHighlight ());
 			return destination;
+		} else if (sq.getPosition ().x == BOARDSIZEX - 1) {
+			return null;
 		}
 		Square twoUp = board [(int) sq.getPosition ().x + 1, (int) sq.getPosition ().y + 1];
 		Square[] possibleNextSquares = new Square[3];

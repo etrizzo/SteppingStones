@@ -26,7 +26,7 @@ public class HeroModel : MonoBehaviour
 
 	public void init(Hero owner) {
 		if (owner.gm.bambiQwop) {
-			speed = 15;
+			speed = 30;
 		}
 
 		this.owner = owner;
@@ -91,6 +91,7 @@ public class HeroModel : MonoBehaviour
 //
 //			}
 		}
+		print ("moving to : " + farthestX + ", " + highestY);
 		owner.transform.position = new Vector3 (farthestX, highestY, 0);
 			
 
@@ -114,6 +115,10 @@ public class HeroModel : MonoBehaviour
 //			farthestX = farthestX + .5f;
 //			highestY = highestY 1f;
 //			print("cursquare is : " + curSquare.getPosition() + " And we're stopping there.");
+
+			if (!owner.gm.success) {
+				resetHero ();
+			}
 			canMove = false;
 		} else {
 			curSquare = owner.gm.squarePath [sqcounter];
@@ -126,6 +131,18 @@ public class HeroModel : MonoBehaviour
 //			Debug.Log("on square: " + curSquare.name + " farthest x is: " + farthestX + " highest y is: " + highestY);
 		}
 
+	}
+
+	void resetHero(){
+		sqcounter = -1;
+		counter = 0;
+		clock = -1f;
+		print ("resetting to: -.5, " +  (owner.gm.beginning.getPosition().y + .5f));
+		owner.transform.position = new Vector3 (-.5f, owner.gm.beginning.getPosition().y + .5f, 0);
+		print (owner.transform.position);
+		first = true;
+		highestY = owner.gm.beginning.getPosition ().y + .5f;
+		farthestX = -.5f;
 	}
 
 	//Takes in the newsquare position and the current hero position

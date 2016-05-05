@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour {
 
 	public Vector2 scrollPosition = Vector2.zero;
 
-	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };/*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
+	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };/*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
 
 
 	void Start () {
@@ -744,7 +744,7 @@ public class GameManager : MonoBehaviour {
 			Texture bambiTexture = Resources.Load<Texture2D> ("Textures/bambi");
 			bambiQwop = GUILayout.Toggle(bambiQwop,bambiTexture);
 
-			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 350)); 
+			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 600)); 
 
 			for (int i = 0; i < NUMLEVELS; i++) {
 				if (levelUnlockStatus [i] == 0) {

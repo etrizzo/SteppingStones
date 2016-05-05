@@ -328,7 +328,7 @@ public class SquareManager : MonoBehaviour {
 		if (pos.y < BOARDSIZEY - 1) {
 			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
 				Square above = board [(int)pos.x, (int)pos.y + 1];
-				if (above != null) {
+				if (above != null && !above.isGround()) {
 					if (above.rigid != null ) {
 //						above.rigid.settleShape ();
 						above.rigid.setShapeFalling (true);

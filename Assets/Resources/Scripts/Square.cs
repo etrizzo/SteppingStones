@@ -36,6 +36,9 @@ public class Square : MonoBehaviour {
 		this.color = color;
 		this.ground = isGround;
 		this.type = type;
+		if (type == -1) {
+			this.ground = true;
+		};
 
 		var modelObject = GameObject.CreatePrimitive (PrimitiveType.Quad);
 		model = modelObject.AddComponent<SquareModel> ();

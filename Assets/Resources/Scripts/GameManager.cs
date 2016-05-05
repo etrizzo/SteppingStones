@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour {
 
 	public bool bambiQwop;
 
-	public int NUMLEVELS = 7;
+	public int NUMLEVELS = 9;
 	public static int numBlockTypes = 3;
 	public static int numRigidTypes = 2;
 
@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour {
 
 	public Vector2 scrollPosition = Vector2.zero;
 
-	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };/*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
+	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };/*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
 
 
 	void Start () {
@@ -746,12 +746,14 @@ public class GameManager : MonoBehaviour {
 			Texture bambiTexture = Resources.Load<Texture2D> ("Textures/bambi");
 			bambiQwop = GUILayout.Toggle(bambiQwop,bambiTexture);
 
-			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 350)); 
+			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 50 * NUMLEVELS)); 
 
 			for (int i = 0; i < NUMLEVELS; i++) {
 				if (levelUnlockStatus [i] == 0) {
+					
 					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lockd");
 				} else {
+					print ("level: " + (i + 1));
 					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv" + (i + 1));
 				}
 				if (GUI.Button (new Rect (0, 0+50*i, 256, 50), lvlbutton, buttonStyle)) {

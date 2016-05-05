@@ -20,9 +20,7 @@ public class Highlight : MonoBehaviour {
 
 
 	// Save our color here so it's consistent :)
-	Color defaultColor = new Color(0.2F, 0.3F, 0.4F, 0.5F);
-	Color redTransparent = new Color (1f, 0, 0, 0.5f);
-	Color color;
+	Color defaultColor, redTransparent, color;
 
 	public Square addHighlightSquare(int x,int  y) {
 //		Square sq = sqman.addSquare (new Vector2 (x, y), false);
@@ -41,6 +39,8 @@ public class Highlight : MonoBehaviour {
 	}
 
 	public void init(Queue<Square> q, SquareManager sqm) {
+		defaultColor = makeTransparent(new Color(0.2F, 0.3F, 0.4F));
+		redTransparent = makeTransparent(Color.red, 0.5f);
 		sqman = sqm;
 		board = sqman.board;
 		lastMousePos = new Vector2 (-1, 1);
@@ -87,12 +87,28 @@ public class Highlight : MonoBehaviour {
 
 	}
 
+	Color makeTransparent(Color color, float transparency = 0.3f) {
+		return new Color (color.r, color.g, color.b, transparency);
+	}
+
 	void updateModel() {
 //		color = checkHighlightConflicts ();
 		made.transform.position = new Vector3 (mouse.x, mouse.y, -1);
 //		checkConflictAndColor (made);
 		Square next = sqman.queue.Peek ();
 		int type = next.getType ();
+		// 0-c,1-m,2-y,-1-k
+		switch (next.getColor()) {
+		case 0:
+			color = makeTransparent (Color.cyan);
+			break;
+		case 1:
+			color = makeTransparent (Color.magenta);
+			break;
+		case 2:
+			color = makeTransparent (Color.yellow);
+			break;
+		}
 
 		if (type == 2) {
 //			if (color == defaultColor) {
@@ -131,8 +147,12 @@ public class Highlight : MonoBehaviour {
 		}
 
 		made.model.mat.color = getHighlightColor ();
-		for (int i = 0; i < EXTRASHAPES; i++) {
-			rigidShapes [i].model.mat.color = getHighlightColor ();
+		if (type == 2) {
+			for (int i = 0; i < EXTRASHAPES; i++) {
+	//			rigidShapes [i].model.mat.color = getHighlightColor ();
+				Color rigidColor = getRigidHighlightColor (i);
+				rigidShapes [i].model.mat.color = rigidColor;
+			}
 		}
 	}
 
@@ -148,10 +168,40 @@ public class Highlight : MonoBehaviour {
 		return false;
 	}
 
+	Color getRigidHighlightColor(int i) {
+		if (getHighlightColor() != redTransparent) {
+			Square next = sqman.queue.Peek ();
+			if (i % 2 == 0) {
+				return makeTransparent(next.rigid.color2);
+			} else {
+				return makeTransparent(next.rigid.color1);
+			}
+		} else {
+			return getHighlightColor ();
+		}
+	}
+
 
 	Color getHighlightColor () {
 		Color retColor = defaultColor;
+
 		Square next = sqman.queue.Peek ();
+		int type = next.getType ();
+		// 0-c,1-m,2-y,-1-k
+		switch (next.getColor()) {
+		case 0:
+			retColor = makeTransparent (Color.cyan);
+			break;
+		case 1:
+			retColor = makeTransparent (Color.magenta);
+			break;
+		case 2:
+			retColor = makeTransparent (Color.yellow);
+			break;
+		}
+		if (next.type == 2) {
+			retColor = makeTransparent (next.rigid.color1);
+		}
 
 //		Debug.Log ("getHighlightColor is firing???");
 		// Check the mouse conflict

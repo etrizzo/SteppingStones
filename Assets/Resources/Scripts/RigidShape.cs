@@ -7,8 +7,8 @@ public class RigidShape : MonoBehaviour {
 	// 0 = _
 	// 1 = l
 	public int shapeType = -1; // 0-_, 1-l
-	Color color1;
-	Color color2;
+	public Color color1;
+	public Color color2;
 	int c1, c2;
 	Square[] squares = new Square[5];
 	Square anchor;

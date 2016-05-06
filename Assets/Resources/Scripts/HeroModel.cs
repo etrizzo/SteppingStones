@@ -128,6 +128,9 @@ public class HeroModel : MonoBehaviour
 			}
 			canMove = false;
 		} else if (sqcounter >= (owner.gm.squarePath.Count-1)) {
+			if (owner.gm.bambiQwop) {
+				mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonichRoll");
+			}
 			curSquare = owner.gm.squarePath [sqcounter];
 			Vector2 pos = curSquare.getPosition ();
 			print ("Counter " + sqcounter + ", Cursquare: " + curSquare.getPosition()); 
@@ -137,6 +140,9 @@ public class HeroModel : MonoBehaviour
 			highestY =pos.y + .5f;
 		}
 		else {
+			if (owner.gm.bambiQwop) {
+				mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonichRoll");
+			}
 			curSquare = owner.gm.squarePath [sqcounter];
 			Vector2 pos = curSquare.getPosition ();
 			print ("Counter " + sqcounter + ", Cursquare: " + curSquare.getPosition()); 

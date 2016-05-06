@@ -360,7 +360,7 @@ public class GameManager : MonoBehaviour
 				friendRescued ();
 				saved = false;
 			} else {
-				if (bambiQwop) {
+				if (bambiQwop && !success) {
 					if (wave > 3) {
 						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi2");
 						wave = -1;
@@ -412,7 +412,6 @@ public class GameManager : MonoBehaviour
 		rescued.transform.position = new Vector3 (sqman.BOARDSIZEX - .25f, destinationHeight - .5f, -1);
 
 		if (bambiQwop) {
-			destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/windowEmpty");
 			rescued.transform.position = new Vector3 (sqman.BOARDSIZEX - .5f, destinationHeight - .5f, -1);
 
 			rescued.init (new Vector2 (sqman.BOARDSIZEX + .5f, destinationHeight + .5f), this);

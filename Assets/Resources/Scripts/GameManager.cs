@@ -56,11 +56,13 @@ public class GameManager : MonoBehaviour {
 	public Background bg;
 	public static float x_coord, y_coord;
 
+	int destinationHeight;
 	public Square destination;
 	public Square beginning;
 
 	public Hero hero;
 	public bool success = false;
+	public bool saved = false;
 
 	float wave = 0;
 	int waveSpeed = 4;
@@ -251,7 +253,7 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 				if (levelNum < NUMLEVELS) {
-					Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
+					//Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
 					levelUnlockStatus[levelNum] = 1;
 					PlayerPrefs.SetInt("levelUnlockStatus"+levelNum, 1);
 					/*if (!sqman.successAudio.isPlaying) {
@@ -343,27 +345,32 @@ public class GameManager : MonoBehaviour {
 					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi1");
 				}
 			} else {
-				if (!sqman.destinationClose () && sqman.upset) {
-					if (wave > 3) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
-						wave = -1;
-					} else if (wave > 2) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?3");
-					} else if (wave > 1) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
-					} else if (wave > 0) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?1");
-					}
+				if (saved) {
+					friendRescued ();
+					saved = false;
 				} else {
-					if (wave > 3) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
-						wave = -1;
-					} else if (wave > 2) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
-					} else if (wave > 1) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
-					} else if (wave > 0) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
+					if (!sqman.destinationClose () && sqman.upset && !success) {
+						if (wave > 3) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
+							wave = -1;
+						} else if (wave > 2) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?3");
+						} else if (wave > 1) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
+						} else if (wave > 0) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?1");
+						}
+					} else if(!success){
+						if (wave > 3) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+							wave = -1;
+						} else if (wave > 2) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
+						} else if (wave > 1) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+						} else if (wave > 0) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
+						}
 					}
 				}
 			}
@@ -371,6 +378,20 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+	public void friendRescued(){
+		destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/windowEmpty");
+
+		GameObject rescuedObject = new GameObject ();
+		Hero rescued = rescuedObject.AddComponent<Hero> ();
+
+		//		square.transform.parent = squareFolder.transform;
+		rescued.transform.position = new Vector3 (sqman.BOARDSIZEX-.25f, destinationHeight-.5f, -1);
+
+		rescued.init(new Vector2 (sqman.BOARDSIZEX+.5f, destinationHeight+.5f), this);
+
+		rescued.name = "Rescued";
+		rescued.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/heroSuccess");
+	}
 
 	public void initBoard(){
 		Debug.Log ("MAEK BORD");
@@ -533,6 +554,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public Square makeDestination(int height){
+		destinationHeight = height;
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 

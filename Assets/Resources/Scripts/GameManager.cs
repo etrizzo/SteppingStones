@@ -314,9 +314,18 @@ public class GameManager : MonoBehaviour
 					}*/
 				}
 			}
-			if (sqman.height < 4 && !success) {
+			if (sqman.height < 2 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = true;
+				gameAudio3.mute = true;
+				gameAudio4.mute = true;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 2 && !success) {
+				gameAudio1.mute = false;
+				gameAudio2.mute = false;
 				gameAudio3.mute = true;
 				gameAudio4.mute = true;
 				gameAudio5.mute = true;
@@ -326,7 +335,7 @@ public class GameManager : MonoBehaviour
 			if (sqman.height > 4 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
-				gameAudio3.mute = true;
+				gameAudio3.mute = false;
 				gameAudio4.mute = true;
 				gameAudio5.mute = true;
 				gameAudio6.mute = true;
@@ -336,7 +345,7 @@ public class GameManager : MonoBehaviour
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
-				gameAudio4.mute = true;
+				gameAudio4.mute = false;
 				gameAudio5.mute = true;
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
@@ -346,7 +355,7 @@ public class GameManager : MonoBehaviour
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
 				gameAudio4.mute = false;
-				gameAudio5.mute = true;
+				gameAudio5.mute = false;
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
@@ -356,19 +365,10 @@ public class GameManager : MonoBehaviour
 				gameAudio3.mute = false;
 				gameAudio4.mute = false;
 				gameAudio5.mute = false;
-				gameAudio6.mute = true;
-				gameAudio7.mute = true;
-			}
-			if (sqman.height > 12 && !success) {
-				gameAudio1.mute = false;
-				gameAudio2.mute = false;
-				gameAudio3.mute = false;
-				gameAudio4.mute = false;
-				gameAudio5.mute = false;
 				gameAudio6.mute = false;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 14 && !success) {
+			if (sqman.height > 12 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -846,6 +846,8 @@ public class GameManager : MonoBehaviour
 				PlayerPrefs.SetInt ("bambiQWOP", 0);
 			}
 
+
+	/***********************MENU BUTTONS**************************/
 			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, (50 * NUMLEVELS))); 
 
 
@@ -906,6 +908,8 @@ public class GameManager : MonoBehaviour
 		sqman.beginning = beginning;
 //		sqman.addBoardSquares (inBoardSquares);
 
+		hero.addSquareManager(this.sqman);
+
 		initBackground ();
 		go = true;
 
@@ -920,6 +924,6 @@ public class GameManager : MonoBehaviour
 		gameAudio5.Play ();
 		gameAudio6.Play ();
 		gameAudio7.Play ();
-
 	}
+
 }

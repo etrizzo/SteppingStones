@@ -778,7 +778,7 @@ public class GameManager : MonoBehaviour
 
 			}
 			if (GUI.Button (new Rect (110, 30, 80, 80), restartButton, buttonStyle)) {
-				//PlayerPrefs.SetInt ("level", 0);
+				PlayerPrefs.SetInt ("level", levelNum);
 				Application.LoadLevel (Application.loadedLevel);
 
 			}

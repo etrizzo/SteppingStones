@@ -78,6 +78,11 @@ public class Highlight : MonoBehaviour {
 		updateMouse ();
 		// get first element in queue & change based on that
 		updateModel ();
+
+		if(sqman.gm.success){
+			made.model.mat.color = Color.clear;
+		}
+			
 	}
 
 	void updateMouse() {

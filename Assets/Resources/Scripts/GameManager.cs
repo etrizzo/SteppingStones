@@ -81,7 +81,16 @@ public class GameManager : MonoBehaviour {
 	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };/*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
 
 
+	public float shakeDuration = 0f;
+
+	// Amplitude of the shake. A larger value shakes the camera harder.
+	public float shakeAmount = .7f;
+	public float decreaseFactor = 1.0f;
+	Vector3 originalPos;
+	public float shakeCounter = 0f;
+
 	void Start () {
+		shakeAmount = .1f;
 		levelUnlockStatus [0] = 1;
 		for (int i = 1; i < NUMLEVELS; i++) {
 			levelUnlockStatus[i] = PlayerPrefs.GetInt ("levelUnlockStatus"+i);
@@ -228,6 +237,20 @@ public class GameManager : MonoBehaviour {
 		DestroyImmediate (destination);
 		DestroyImmediate (hero);
 	}
+	void cameraShake(){
+		print("SHAKESHAKESHAKE " + shakeAmount);
+		if (shakeDuration > 0)
+		{
+			cam.transform.localPosition = originalPos + (UnityEngine.Random.insideUnitSphere * shakeAmount);
+
+			shakeDuration -= Time.deltaTime * decreaseFactor;
+		}
+		else
+		{
+			shakeDuration = 1f;
+			cam.transform.localPosition = originalPos;
+		}
+	}
 
 	void Update(){
 		Vector3 worldPos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
@@ -241,6 +264,9 @@ public class GameManager : MonoBehaviour {
 			}
 			if (bambiQwop) {
 				waveSpeed = 10;
+				if (state.mode == 1) {
+					cameraShake ();
+				}
 			}
 			if (success) {
 				gameAudio1.mute = true;
@@ -459,7 +485,7 @@ public class GameManager : MonoBehaviour {
 		dist = (transform.position - cam.transform.position).z;
 		x_coord = Camera.main.ViewportToWorldPoint (new Vector3 (1, 0, dist)).x;
 		y_coord = Camera.main.ViewportToWorldPoint (new Vector3 (0, 1, dist)).y;
-
+		originalPos = cam.transform.position;
 
 
 	}

@@ -49,9 +49,19 @@ public class Background : MonoBehaviour
 
 			square.name = "BGSquare " + i;
 
-			float f = randFloat (0f, 1f);
 
-			square.model.mat.color = new Color (f, f, f, randFloat (0f, .8f));
+
+			if (gm.bambiQwop) {
+				float f1 = randFloat (.3f, 1f);
+				float f2 = randFloat (.3f, 1f);
+				float f3 = randFloat (.3f, 1f);
+				square.model.mat.color = new Color (f1, f2, f3, randFloat (.4f, .9f));
+
+
+			} else {
+				float f = randFloat (0f, 1f);
+				square.model.mat.color = new Color (f, f, f, randFloat (0f, .8f));
+			}
 			float lw = randFloat (.1f, 6.5f);
 			square.model.transform.localScale = new Vector3 (lw, lw, 2);
 			square.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bgSquare");

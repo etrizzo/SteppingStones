@@ -7,7 +7,8 @@ using System;
 
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
 
 	public SquareManager sqman;
 	public AudioSource menuAudio;
@@ -38,14 +39,14 @@ public class GameManager : MonoBehaviour {
 
 	public bool bambiQwop;
 
-	public int NUMLEVELS = 9;
+	public int NUMLEVELS = 11;
 	public static int numBlockTypes = 3;
 	public static int numRigidTypes = 2;
 
 	public GameObject destinationSquareFolder;
-	List<Square>destinationSquares;
+	List<Square> destinationSquares;
 	public GameObject beginningSquareFolder;
-	List<Square>beginningSquares;
+	List<Square> beginningSquares;
 
 	public GameObject groundSquareFolder;
 	public List<Square> groundSquares;
@@ -56,11 +57,13 @@ public class GameManager : MonoBehaviour {
 	public Background bg;
 	public static float x_coord, y_coord;
 
+	int destinationHeight;
 	public Square destination;
 	public Square beginning;
 
 	public Hero hero;
 	public bool success = false;
+	public bool saved = false;
 
 	float wave = 0;
 	int waveSpeed = 4;
@@ -72,13 +75,19 @@ public class GameManager : MonoBehaviour {
 	GUIContent lvlbutton;
 	GUIStyleState lvlButtonHover;
 
+	GUIContent menuButton;
+	GUIContent restartButton;
+	GUIContent testButton;
+
 	public Highlight hi;
 
 	public List<Square> squarePath;
 
 	public Vector2 scrollPosition = Vector2.zero;
 
-	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };/*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
+	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+/*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
+	int bambiQuopPref = 0;
 
 
 	public float shakeDuration = 0f;
@@ -93,18 +102,22 @@ public class GameManager : MonoBehaviour {
 		shakeAmount = .1f;
 		levelUnlockStatus [0] = 1;
 		for (int i = 1; i < NUMLEVELS; i++) {
-			levelUnlockStatus[i] = PlayerPrefs.GetInt ("levelUnlockStatus"+i);
+			levelUnlockStatus [i] = PlayerPrefs.GetInt ("levelUnlockStatus" + i);
+		}
+		bambiQuopPref = PlayerPrefs.GetInt ("bambiQWOP");
+		if (bambiQuopPref == 0) {
+			bambiQwop = false;
+		} else {
+			bambiQwop = true;
 		}
 
-		bambiQwop = false;
-
-		groundSquareFolder = new GameObject();
+		groundSquareFolder = new GameObject ();
 		groundSquareFolder.name = "Ground";
 		groundSquares = new List<Square> ();
-		destinationSquareFolder = new GameObject();
+		destinationSquareFolder = new GameObject ();
 		destinationSquareFolder.name = "Destination";
 		destinationSquares = new List<Square> ();
-		beginningSquareFolder = new GameObject();
+		beginningSquareFolder = new GameObject ();
 		beginningSquareFolder.name = "Beginning";
 		beginningSquares = new List<Square> ();
 
@@ -112,11 +125,12 @@ public class GameManager : MonoBehaviour {
 		initStyles ();
 	}
 
-	private void initStyles(){
+	private void initStyles ()
+	{
 		//Cursor.SetCursor ((Texture2D)Resources.Load ("Textures/cursor"), new Vector2 (4, 4), CursorMode.Auto);
 
 		buttonStyle = new GUIStyle ();
-		buttonStyle.font = (Font) Resources.Load("Fonts/blockyo");
+		buttonStyle.font = (Font)Resources.Load ("Fonts/blockyo");
 		buttonStyle.normal.textColor = new Color (0, 0, 0, .8f);
 
 		guiStyle = new GUIStyle ();
@@ -146,9 +160,17 @@ public class GameManager : MonoBehaviour {
 		lvlButtonHover = new GUIStyleState ();
 		lvlButtonHover.background = Resources.Load<Texture2D> ("Textures/glow");
 		buttonStyle.hover = lvlButtonHover;
+
+		menuButton = new GUIContent ();
+		menuButton.image = Resources.Load<Texture2D> ("Textures/menuButton");
+		restartButton = new GUIContent ();
+		restartButton.image = Resources.Load<Texture2D> ("Textures/restartButton");
+		testButton = new GUIContent ();
+		testButton.image = Resources.Load<Texture2D> ("Textures/testButton");
 	}
 
-	void initSound(){
+	void initSound ()
+	{
 		menuAudio = this.gameObject.AddComponent<AudioSource> ();
 		menuAudio.loop = true;
 		menuAudio.playOnAwake = false;
@@ -213,7 +235,8 @@ public class GameManager : MonoBehaviour {
 		gameAudio7.mute = true;
 	}
 
-	private void clearBoard(){
+	private void clearBoard ()
+	{
 		sqman.clear ();
 		hi.clear ();
 
@@ -252,7 +275,8 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	void Update(){
+	void Update ()
+	{
 		Vector3 worldPos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		int mousex = (int)Mathf.Floor (worldPos.x);
 		int mousey = (int)Mathf.Ceil (worldPos.y);
@@ -264,7 +288,7 @@ public class GameManager : MonoBehaviour {
 			}
 			if (bambiQwop) {
 				waveSpeed = 10;
-				if (state.mode == 1) {
+				if (state.mode == 1 && success) {
 					cameraShake ();
 				}
 			}
@@ -277,9 +301,9 @@ public class GameManager : MonoBehaviour {
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 				if (levelNum < NUMLEVELS) {
-					Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
-					levelUnlockStatus[levelNum] = 1;
-					PlayerPrefs.SetInt("levelUnlockStatus"+levelNum, 1);
+					//Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
+					levelUnlockStatus [levelNum] = 1;
+					PlayerPrefs.SetInt ("levelUnlockStatus" + levelNum, 1);
 					/*if (!sqman.successAudio.isPlaying) {
 						clearBoard ();
 						setLevelName ("Level"+(levelNum+1), (levelNum+1));
@@ -357,39 +381,44 @@ public class GameManager : MonoBehaviour {
 
 		if (destination != null) {
 			wave += Time.deltaTime * waveSpeed;
-			if (bambiQwop) {
-				if (wave > 3) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi2");
-					wave = -1;
-				} else if (wave > 2) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi3");
-				} else if (wave > 1) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi2");
-				} else if (wave > 0) {
-					destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi1");
-				}
+			if (saved) {
+				friendRescued ();
+				saved = false;
 			} else {
-				if (!sqman.destinationClose () && sqman.upset) {
+				if (bambiQwop && !success) {
 					if (wave > 3) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi2");
 						wave = -1;
 					} else if (wave > 2) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?3");
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi3");
 					} else if (wave > 1) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi2");
 					} else if (wave > 0) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?1");
+						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi1");
 					}
 				} else {
-					if (wave > 3) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
-						wave = -1;
-					} else if (wave > 2) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
-					} else if (wave > 1) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
-					} else if (wave > 0) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
+					if (!sqman.destinationClose () && sqman.upset && !success) {
+						if (wave > 3) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
+							wave = -1;
+						} else if (wave > 2) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?3");
+						} else if (wave > 1) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?2");
+						} else if (wave > 0) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window?1");
+						}
+					} else if (!success) {
+						if (wave > 3) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+							wave = -1;
+						} else if (wave > 2) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window3");
+						} else if (wave > 1) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window2");
+						} else if (wave > 0) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
+						}
 					}
 				}
 			}
@@ -397,29 +426,54 @@ public class GameManager : MonoBehaviour {
 
 	}
 
+	public void friendRescued ()
+	{
+		destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/windowEmpty");
 
-	public void initBoard(){
+		GameObject rescuedObject = new GameObject ();
+		Hero rescued = rescuedObject.AddComponent<Hero> ();
+
+		//		square.transform.parent = squareFolder.transform;
+		rescued.transform.position = new Vector3 (sqman.BOARDSIZEX - .25f, destinationHeight - .5f, -1);
+
+		if (bambiQwop) {
+			rescued.transform.position = new Vector3 (sqman.BOARDSIZEX - .5f, destinationHeight - .5f, -1);
+
+			rescued.init (new Vector2 (sqman.BOARDSIZEX + .5f, destinationHeight + .5f), this);
+			rescued.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambiSuccess");
+		} else {
+			rescued.transform.position = new Vector3 (sqman.BOARDSIZEX - .25f, destinationHeight - .5f, -1);
+
+			rescued.init (new Vector2 (sqman.BOARDSIZEX + .5f, destinationHeight + .5f), this);
+			rescued.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/heroSuccess");
+		}
+		rescued.name = "Rescued";
+	}
+
+	public void initBoard ()
+	{
 		Debug.Log ("MAEK BORD");
-		TextAsset temp = Resources.Load<TextAsset>("Levels/"+getLevelName ()) as TextAsset;
-		byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(temp.text);
-		MemoryStream stream = new MemoryStream(byteArray);
+		TextAsset temp = Resources.Load<TextAsset> ("Levels/" + getLevelName ()) as TextAsset;
+		byte[] byteArray = System.Text.Encoding.UTF8.GetBytes (temp.text);
+		MemoryStream stream = new MemoryStream (byteArray);
 		StreamReader sr = new StreamReader (stream);
 		string line = "";
-		line = readLine(sr);
+		line = readLine (sr);
 		w = int.Parse (line);
-		line = readLine(sr);
+		line = readLine (sr);
 		h = int.Parse (line);
 		board = new Square[w, h];
 		fixCamera ();
 		for (int i = 0; i < w; i++) {	//read ground height of each column in the board
-			line = readLine(sr);
+			line = readLine (sr);
 			addColumn (int.Parse (line), i);
 		}
-		line = readLine(sr);
+		line = readLine (sr);
 		int beginHeight = int.Parse (line);		//get start height
 		beginning = makeBeginning (beginHeight);
 		hero = makeHero (beginHeight);
-		line = readLine(sr);;					//get destination height
+		line = readLine (sr);
+		;					//get destination height
 		int destHeight = int.Parse (line);
 		destination = makeDestination (destHeight);
 		q = new int[10];
@@ -429,7 +483,7 @@ public class GameManager : MonoBehaviour {
 		if (useQueue) {
 			for (int i = 0; i < numBlockTypes; i++) {
 				print ("Adding block type : " + i);
-				prob = int.Parse (readLine(sr));
+				prob = int.Parse (readLine (sr));
 				for (int j = 0; j < prob; j++) {
 					q [j + start] = i;
 				}
@@ -442,7 +496,7 @@ public class GameManager : MonoBehaviour {
 		if (prob != 0) {			//using rigid shapes
 			start = 0;
 			for (int i = 0; i < numRigidTypes; i++) {		//number of rigid shapes
-				rsprob = int.Parse (readLine(sr));
+				rsprob = int.Parse (readLine (sr));
 				for (int j = 0; j < rsprob; j++) {
 					rsq [j + start] = i;
 				}
@@ -450,7 +504,7 @@ public class GameManager : MonoBehaviour {
 		}
 		Square sq;
 		while (sr.Peek () != -1) {
-			line = readLine(sr);
+			line = readLine (sr);
 			string[] s = line.Split (' ');
 			sq = addSquare (new Vector2 (float.Parse (s [0]), float.Parse (s [1])), int.Parse (s [2]), false, int.Parse (s [3]));
 			sq.setColor (int.Parse (s [2]));
@@ -463,9 +517,10 @@ public class GameManager : MonoBehaviour {
 	}
 
 
-	public string readLine(StreamReader sr){
+	public string readLine (StreamReader sr)
+	{
 		String line = sr.ReadLine ();
-		while (line.StartsWith("//") && sr.Peek () != -1) {
+		while (line.StartsWith ("//") && sr.Peek () != -1) {
 			line = sr.ReadLine ();
 		}
 		return line;
@@ -474,13 +529,14 @@ public class GameManager : MonoBehaviour {
 
 	}
 
-	public void fixCamera(){
+	public void fixCamera ()
+	{
 
 		this.cam = Camera.main;
 		int height = (int)(h / 2);
 		int width = (int)(w / 2);
 		cam.orthographicSize = height + 2;
-		cam.transform.position = new Vector3(width-1, height-1, -10);
+		cam.transform.position = new Vector3 (width - 1, height - 1, -10);
 
 		dist = (transform.position - cam.transform.position).z;
 		x_coord = Camera.main.ViewportToWorldPoint (new Vector3 (1, 0, dist)).x;
@@ -491,9 +547,10 @@ public class GameManager : MonoBehaviour {
 	}
 
 	//adds a column of ground from 0 to height
-	public void addColumn(int height, int x){
+	public void addColumn (int height, int x)
+	{
 		for (int i = 0; i <= height; i++) {
-			Square s = addGround(new Vector2 (x, i), true); 
+			Square s = addGround (new Vector2 (x, i), true); 
 //			print (s == null);
 			s.init (new Vector2 (x, i), -1, true);
 			board [x, i] = s;
@@ -501,41 +558,42 @@ public class GameManager : MonoBehaviour {
 	}
 
 
-//		board = new Square[BOARDSIZEX, BOARDSIZEY];
-//		//initialize level w/ ground squares (read from text file?)
-//		for (int i = 0; i < BOARDSIZEX; i++) {
-//			Square s = addSquare (new Vector2(i,0), true);
-//			//			s.init (new Vector2 (i, 0), -1, true);
-//			board [i, 0] = s;
-//
-//		}
-//
-//
-//		destination = makeExtremeSquare ("destination");
-//		beginning = makeExtremeSquare ("beginning");
-//	}
+	//		board = new Square[BOARDSIZEX, BOARDSIZEY];
+	//		//initialize level w/ ground squares (read from text file?)
+	//		for (int i = 0; i < BOARDSIZEX; i++) {
+	//			Square s = addSquare (new Vector2(i,0), true);
+	//			//			s.init (new Vector2 (i, 0), -1, true);
+	//			board [i, 0] = s;
+	//
+	//		}
+	//
+	//
+	//		destination = makeExtremeSquare ("destination");
+	//		beginning = makeExtremeSquare ("beginning");
+	//	}
 
-	public Square makeBeginning(int height){
+	public Square makeBeginning (int height)
+	{
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
 		square.transform.parent = beginningSquareFolder.transform;
 		square.transform.position = new Vector3 (-1, height, 0);
-		square.init(new Vector2((float) -1, (float) height), 4, false);
+		square.init (new Vector2 ((float)-1, (float)height), 4, false);
 
 		square.name = "Beginning";
 
 		square.model.mat.color = Color.gray;
 
-		for(int i=height-1; i >=0; i--){
+		for (int i = height - 1; i >= 0; i--) {
 			GameObject squareObject2 = new GameObject ();
 			Square square2 = squareObject2.AddComponent<Square> ();
 
 			square2.transform.parent = beginningSquareFolder.transform;
 			square2.transform.position = new Vector3 (-1, i, 0);
-			square2.init(new Vector2((float) -1, (float) i), 4, false);
+			square2.init (new Vector2 ((float)-1, (float)i), 4, false);
 
-			square2.name = "Beginning "+i;
+			square2.name = "Beginning " + i;
 
 			square2.model.mat.color = Color.gray;
 		}
@@ -543,28 +601,31 @@ public class GameManager : MonoBehaviour {
 		return square;
 	}
 
-	public Hero makeHero(int height){
+	public Hero makeHero (int height)
+	{
 		print ("A NEW HERO IS BORN");
 		GameObject heroObject = new GameObject ();
 		Hero h = heroObject.AddComponent<Hero> ();
 
 		//		square.transform.parent = squareFolder.transform;
-		h.transform.position = new Vector3 (-.5f, height+.5f, 0);
+		h.transform.position = new Vector3 (-.5f, height + .5f, 0);
 
-		h.init(new Vector2((float) -1, (float) height+1), this);
+		h.init (new Vector2 ((float)-1, (float)height + 1), this);
 
 		h.name = "Hero";
 
 		return h;
 	}
 
-	public Square makeDestination(int height){
+	public Square makeDestination (int height)
+	{
+		destinationHeight = height;
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
 		square.transform.parent = destinationSquareFolder.transform;
 		square.transform.position = new Vector3 (w, height, 0);
-		square.init(new Vector2((float) w, (float) height), 4, false);
+		square.init (new Vector2 ((float)w, (float)height), 4, false);
 
 		square.name = "Destination";
 //		sqman.destination = square;
@@ -575,10 +636,10 @@ public class GameManager : MonoBehaviour {
 		GameObject towerTopObject2 = new GameObject ();
 		Square towerTopSquare2 = towerTopObject2.AddComponent<Square> ();
 
-		towerTopSquare1.transform.position = new Vector3(w, height+1, 0);
-		towerTopSquare1.init(new Vector2((float) w, (float) height+1), 5, false);
-		towerTopSquare2.transform.position = new Vector3 (w + 1, height+1, 0);
-		towerTopSquare2.init(new Vector2((float) w+1, (float) height+1), 5, false);
+		towerTopSquare1.transform.position = new Vector3 (w, height + 1, 0);
+		towerTopSquare1.init (new Vector2 ((float)w, (float)height + 1), 5, false);
+		towerTopSquare2.transform.position = new Vector3 (w + 1, height + 1, 0);
+		towerTopSquare2.init (new Vector2 ((float)w + 1, (float)height + 1), 5, false);
 
 		towerTopSquare1.name = "Tower Top Square 1 ";
 		towerTopSquare2.name = "Tower Top Square 2 ";
@@ -598,10 +659,10 @@ public class GameManager : MonoBehaviour {
 			GameObject towerObject2 = new GameObject ();
 			Square towerSquare2 = towerObject2.AddComponent<Square> ();
 
-			towerSquare1.transform.position = new Vector3(w, i, 0);
-			towerSquare1.init(new Vector2((float) w, (float) i), 5, false);
+			towerSquare1.transform.position = new Vector3 (w, i, 0);
+			towerSquare1.init (new Vector2 ((float)w, (float)i), 5, false);
 			towerSquare2.transform.position = new Vector3 (w + 1, i, 0);
-			towerSquare2.init(new Vector2((float) w+1, (float) i), 5, false);
+			towerSquare2.init (new Vector2 ((float)w + 1, (float)i), 5, false);
 
 			towerSquare1.name = "Tower Square 1 " + i;
 			towerSquare2.name = "Tower Square 2 " + i;
@@ -625,7 +686,8 @@ public class GameManager : MonoBehaviour {
 		return square;
 	}
 
-	public Square addGround(Vector2 pos, bool isGround){
+	public Square addGround (Vector2 pos, bool isGround)
+	{
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
@@ -640,7 +702,8 @@ public class GameManager : MonoBehaviour {
 
 	}
 
-	public Square addSquare(Vector2 pos, int color, bool isGround, int type){
+	public Square addSquare (Vector2 pos, int color, bool isGround, int type)
+	{
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
@@ -655,17 +718,20 @@ public class GameManager : MonoBehaviour {
 		return square;
 	}
 
-	public string getLevelName(){		//TODO: make it good
+	public string getLevelName ()
+	{		//TODO: make it good
 		return levelName;
 
 	}
 
-	void setLevelName(string name, int num){
+	void setLevelName (string name, int num)
+	{
 		levelName = name;
 		levelNum = num;
 	}
 
-	public void pathAnimation(){
+	public void pathAnimation ()
+	{
 		squarePath.Reverse ();
 		printPath ();
 //		Time.timeScale = .01f;
@@ -674,29 +740,31 @@ public class GameManager : MonoBehaviour {
 		//heroAnimation(squarePath);
 		//Time.timeScale = 1f;
 		hero.model.canMove = true;
-	//	hero.model.moveAlong (squarePath);
+		//	hero.model.moveAlong (squarePath);
 	}
 
-	void printPath(){
+	void printPath ()
+	{
 		String path = "PATH: ";
-		foreach (Square s in squarePath){
-			path = path + s.getPosition() + " ";
+		foreach (Square s in squarePath) {
+			path = path + s.getPosition () + " ";
 		}
-		print(path);
+		print (path);
 	}
 			
 
-//	void heroAnimation(List<Square> squarePath){
-//		int counter = 0;
-//		foreach (Square sq in squarePath) {
-//			Vector2 nextPos = sq.getPosition ();
-//			hero.model.nextMove (nextPos);
-//		}
-//	}
+	//	void heroAnimation(List<Square> squarePath){
+	//		int counter = 0;
+	//		foreach (Square sq in squarePath) {
+	//			Vector2 nextPos = sq.getPosition ();
+	//			hero.model.nextMove (nextPos);
+	//		}
+	//	}
 
 	/************************ Start Gui Stuff ****************************/
 	bool go = false;
 	bool done = false;
+
 	public struct GuiState
 	{
 		public int mode;
@@ -715,7 +783,7 @@ public class GameManager : MonoBehaviour {
 			if (!go) {			//only initialize the board once
 				startGame ();
 			}
-			if (GUI.Button(new Rect(30, 30, 100, 40), "Test your path.")) {
+			if (GUI.Button (new Rect (30, 30, 80, 80), testButton, buttonStyle)) {
 				if (sqman.boardSolved ()) {
 					success = true;
 
@@ -723,7 +791,7 @@ public class GameManager : MonoBehaviour {
 				pathAnimation ();
 
 			}
-			if (GUI.Button (new Rect (Screen.width-160, 30, 100, 40), "Menu")) {
+			if (GUI.Button (new Rect (110, 30, 80, 80), menuButton, buttonStyle)) {
 				Application.LoadLevel (Application.loadedLevel);
 
 			}
@@ -731,23 +799,24 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	private void menuScreen(){
+	private void menuScreen ()
+	{
 
 		menuAudio.mute = false;
 		int xpos;
 		int ypos;
 
-		gameAudio1.Stop();
-		gameAudio2.Stop();
-		gameAudio3.Stop();
-		gameAudio4.Stop();
-		gameAudio5.Stop();
-		gameAudio6.Stop();
-		gameAudio7.Stop();
+		gameAudio1.Stop ();
+		gameAudio2.Stop ();
+		gameAudio3.Stop ();
+		gameAudio4.Stop ();
+		gameAudio5.Stop ();
+		gameAudio6.Stop ();
+		gameAudio7.Stop ();
 
 		if (!go && !done) {
 			xpos = ((Screen.width) - (100)) / 2;
-			ypos = ((Screen.height) - (80)) / 2 - ((Screen.height / 3)-(Screen.height/10));
+			ypos = ((Screen.height) - (80)) / 2 - ((Screen.height / 3) - (Screen.height / 10));
 			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>S t e p p i n g\n\nS t o n e s</color>", guiStyle2);
 			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>S t e p p i n g\n\nS t o n e s</color>", guiStyle2);
 			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>S</color> <color=magenta>t</color> <color=yellow>e</color> <color=cyan>p</color> <color=magenta>p</color> <color=yellow>i</color> <color=cyan>n</color> <color=yellow>g</color>\n\n<color=yellow>S</color> <color=cyan>t</color> <color=magenta>o</color> <color=yellow>n</color> <color=cyan>e</color> <color=magenta>s</color>", guiStyle2);
@@ -766,24 +835,28 @@ public class GameManager : MonoBehaviour {
 
 		}
 		if (!go && !done) {
-			xpos = ((Screen.width)-256) / 2;
+			xpos = ((Screen.width) - 256) / 2;
 			ypos = ((Screen.height / 2));
 
 			Texture bambiTexture = Resources.Load<Texture2D> ("Textures/bambi");
-			bambiQwop = GUILayout.Toggle(bambiQwop,bambiTexture);
+			bambiQwop = GUILayout.Toggle (bambiQwop, bambiTexture);
+			if (bambiQwop) {
+				PlayerPrefs.SetInt ("bambiQWOP", 1);
+			} else {
+				PlayerPrefs.SetInt ("bambiQWOP", 0);
+			}
 
-			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, 50 *NUMLEVELS)); 
+			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, (50 * NUMLEVELS))); 
 
 
 			for (int i = 0; i < NUMLEVELS; i++) {
+				Debug.Log ("LEVEL: " + (i + 1));
 				if (levelUnlockStatus [i] == 0) {
-					
 					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lockd");
 				} else {
-					print ("level: " + (i + 1));
 					lvlbutton.image = Resources.Load<Texture2D> ("Textures/lv" + (i + 1));
 				}
-				if (GUI.Button (new Rect (0, 0+50*i, 256, 50), lvlbutton, buttonStyle)) {
+				if (GUI.Button (new Rect (0, 0 + 50 * i, 256, 50), lvlbutton, buttonStyle)) {
 					if (levelUnlockStatus [i] == 1) {
 						setLevelName ("Level" + (i + 1), (i + 1));
 						state.mode = 1;
@@ -808,7 +881,8 @@ public class GameManager : MonoBehaviour {
 		this.bg = bg;							
 	}
 
-	private void startGame(){
+	private void startGame ()
+	{
 
 		menuAudio.mute = true;
 		GameObject sqmanObject = new GameObject ();
@@ -817,7 +891,7 @@ public class GameManager : MonoBehaviour {
 
 		initBoard ();
 
-		squarePath = new List<Square>();
+		squarePath = new List<Square> ();
 
 		sqman = sqmanObject.AddComponent<SquareManager> ();
 		sqman.name = "Square Manager";
@@ -836,16 +910,16 @@ public class GameManager : MonoBehaviour {
 		go = true;
 
 		GameObject hiObject = new GameObject ();
-		hi = hiObject.AddComponent<Highlight>();
+		hi = hiObject.AddComponent<Highlight> ();
 		hi.init (sqman.queue, sqman);
 
-		gameAudio1.Play();
-		gameAudio2.Play();
-		gameAudio3.Play();
-		gameAudio4.Play();
-		gameAudio5.Play();
-		gameAudio6.Play();
-		gameAudio7.Play();
+		gameAudio1.Play ();
+		gameAudio2.Play ();
+		gameAudio3.Play ();
+		gameAudio4.Play ();
+		gameAudio5.Play ();
+		gameAudio6.Play ();
+		gameAudio7.Play ();
 
 	}
 }

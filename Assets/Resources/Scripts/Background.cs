@@ -80,9 +80,13 @@ public class Background : MonoBehaviour
 	}
 
 	void Update ()
-	{
+	{	
+		if (gm.bambiQwop) {
+			counter += Time.deltaTime * speed * 10;
+		} else {
 			
-		counter += Time.deltaTime * speed;
+			counter += Time.deltaTime * speed;
+		}
 
 		foreach (Square s in bgSquares) {
 			//float newX = randFloat (s.getPosition().x - 1, s.getPosition().x + 1);
@@ -104,7 +108,11 @@ public class Background : MonoBehaviour
 					break;
 				}
 			}
-			s.transform.Translate (s.direction * Time.deltaTime);
+			if (gm.bambiQwop) {
+				s.transform.Translate (s.direction * Time.deltaTime * 4);
+			} else {
+				s.transform.Translate (s.direction * Time.deltaTime);
+			}
 		}
 		if (counter > 5) {	
 			counter = 0;

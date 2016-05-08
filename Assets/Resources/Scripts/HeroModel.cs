@@ -115,12 +115,34 @@ public class HeroModel : MonoBehaviour
 //			farthestX = farthestX + .5f;
 //			highestY = highestY 1f;
 //			print("cursquare is : " + curSquare.getPosition() + " And we're stopping there.");
-
 			if (!owner.gm.success) {
 				resetHero ();
+			} else { //success!
+				if (owner.gm.bambiQwop) {
+					mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonichVictory");
+					owner.gm.saved = true;
+				} else {
+					mat.mainTexture = Resources.Load<Texture2D> ("Textures/heroSuccess");
+					owner.gm.saved = true;
+				}
 			}
 			canMove = false;
-		} else {
+		} else if (sqcounter >= (owner.gm.squarePath.Count-1)) {
+			if (owner.gm.bambiQwop) {
+				mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonichRoll");
+			}
+			curSquare = owner.gm.squarePath [sqcounter];
+			Vector2 pos = curSquare.getPosition ();
+			print ("Counter " + sqcounter + ", Cursquare: " + curSquare.getPosition()); 
+			//			farthestX = pos.x + 1; // may have to change
+			farthestX = pos.x + .25f;
+			//			highestY = pos.y + .5f;
+			highestY =pos.y + .5f;
+		}
+		else {
+			if (owner.gm.bambiQwop) {
+				mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonichRoll");
+			}
 			curSquare = owner.gm.squarePath [sqcounter];
 			Vector2 pos = curSquare.getPosition ();
 			print ("Counter " + sqcounter + ", Cursquare: " + curSquare.getPosition()); 

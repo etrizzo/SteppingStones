@@ -44,6 +44,9 @@ public class SquareManager : MonoBehaviour {
 
 	public bool solved = false;
 
+	public bool success = false;
+
+	GUIStyle guiStyle2;
 
 
 //	float randFreq = .2;
@@ -65,10 +68,20 @@ public class SquareManager : MonoBehaviour {
 		if (inboard != null) {
 			addBoardSquares (inboard);
 		}
+		initStyles ();
 		initQueue ();		//initialize queue w/ 3 initial blocks
 		initSound ();
 		//getHeight ();
 
+	}
+
+	public void initStyles(){
+		guiStyle2 = new GUIStyle ();
+		guiStyle2.fontSize = 80;
+		guiStyle2.alignment = TextAnchor.MiddleCenter;
+		guiStyle2.font = (Font)Resources.Load ("Fonts/blockyo");
+		guiStyle2.richText = true;
+		guiStyle2.normal.textColor = new Color (1f, 1f, 1f, .9f);
 	}
 
 	public void clear(){
@@ -321,6 +334,26 @@ public class SquareManager : MonoBehaviour {
 
 
 	}
+	//checks to see if the square above pos needs to be settled
+	public void chainSettleBeginning(Vector2 pos){
+		Square s = board [(int)pos.x, (int)pos.y];
+		//		print (s + " is chain settling" + s.isFalling());
+		if (pos.y < BOARDSIZEY - 1) {
+			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
+				Square above = board [(int)pos.x, (int)pos.y + 1];
+				if (above != null) {
+					if (above.rigid != null ) {
+						//						above.rigid.settleShape ();
+						above.rigid.setShapeFalling (true);
+					} else {
+						//						print ("Setting " + above + "to falling");
+						above.setFalling (true);
+					}
+				}
+			}
+		}
+	}
+
 	//checks to see if the square above pos needs to be settled
 	public void chainSettle(Vector2 pos){
 		Square s = board [(int)pos.x, (int)pos.y];
@@ -615,6 +648,14 @@ public class SquareManager : MonoBehaviour {
 	// -------------
 	// All GUI code down here, basically just because lol
 	void OnGUI() {
+
+		if (success) {
+			float xpos = ((Screen.width) - (100)) / 2;
+			float ypos = ((Screen.height) - (80))/2;
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>Y o u\n\nW i n</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>Y o u\n\nW i n</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>Y</color> <color=magenta>o</color> <color=yellow>u</color>\n\n<color=cyan>w</color> <color=magenta>i</color> <color=yellow>n</color>", guiStyle2);
+		}
 //
 //		if (GUI.Button (new Rect (30, 30, 100, 40), "Test your path.")) {
 //			if (boardSolved ()) {

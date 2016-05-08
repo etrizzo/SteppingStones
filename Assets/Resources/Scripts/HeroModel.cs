@@ -118,6 +118,9 @@ public class HeroModel : MonoBehaviour
 			if (!owner.gm.success) {
 				resetHero ();
 			} else { //success!
+				if(owner.sqman != null){
+						owner.sqman.success = true;
+					}
 				if (owner.gm.bambiQwop) {
 					mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonichVictory");
 					owner.gm.saved = true;

@@ -84,8 +84,9 @@ public class GameManager : MonoBehaviour
 
 	public Vector2 scrollPosition = Vector2.zero;
 
-	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-/*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
+	int[] levelUnlockStatus = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	//int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
 	int bambiQuopPref = 0;
 	int level = 0;
 
@@ -851,6 +852,7 @@ public class GameManager : MonoBehaviour
 				}
 				if (GUI.Button (new Rect (0, 0 + 50 * i, 256, 50), lvlbutton, buttonStyle)) {
 					if (levelUnlockStatus [i] == 1) {
+						level = i + 1;
 						setLevelName ("Level" + (i + 1), (i + 1));
 						state.mode = 1;
 					}

@@ -36,7 +36,6 @@ public class GameManager : MonoBehaviour
 	string levelName;
 	int levelNum;
 
-
 	public bool bambiQwop;
 
 	public int NUMLEVELS = 11;
@@ -88,6 +87,7 @@ public class GameManager : MonoBehaviour
 	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 /*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
 	int bambiQuopPref = 0;
+	int level = 0;
 
 
 	void Start ()
@@ -101,6 +101,17 @@ public class GameManager : MonoBehaviour
 			bambiQwop = false;
 		} else {
 			bambiQwop = true;
+		}
+		level = PlayerPrefs.GetInt ("level");
+		if (level > 0) {
+			levelNum = level;
+			levelName = "Level" + level;
+		}
+
+		if (level == 0) {
+			state.mode = 0;
+		} else {
+			state.mode = 1;
 		}
 
 		groundSquareFolder = new GameObject ();
@@ -276,22 +287,30 @@ public class GameManager : MonoBehaviour
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 				if (levelNum < NUMLEVELS) {
-					//Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
-					levelUnlockStatus [levelNum] = 1;
-					PlayerPrefs.SetInt ("levelUnlockStatus" + levelNum, 1);
-					/*if (!sqman.successAudio.isPlaying) {
-						clearBoard ();
-						setLevelName ("Level"+(levelNum+1), (levelNum+1));
-						levelNum++;
-						success = false;
-						go = false;
-						state.mode = 1;
-					}*/
+					if (!sqman.successAudio.isPlaying) {
+						Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
+						Debug.Log ("ONTO LEVEL " + (level+1));
+						print ("LOADING LEVEL");
+						levelUnlockStatus [levelNum] = 1;
+						PlayerPrefs.SetInt ("levelUnlockStatus" + levelNum, 1);
+						PlayerPrefs.SetInt ("level", (level+1));
+						setLevelName ("Level"+(level+1), (level+1));
+						Application.LoadLevel (Application.loadedLevel);
+					}
 				}
 			}
-			if (sqman.height < 4 && !success) {
+			if (sqman.height < 2 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = true;
+				gameAudio3.mute = true;
+				gameAudio4.mute = true;
+				gameAudio5.mute = true;
+				gameAudio6.mute = true;
+				gameAudio7.mute = true;
+			}
+			if (sqman.height > 2 && !success) {
+				gameAudio1.mute = false;
+				gameAudio2.mute = false;
 				gameAudio3.mute = true;
 				gameAudio4.mute = true;
 				gameAudio5.mute = true;
@@ -301,7 +320,7 @@ public class GameManager : MonoBehaviour
 			if (sqman.height > 4 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
-				gameAudio3.mute = true;
+				gameAudio3.mute = false;
 				gameAudio4.mute = true;
 				gameAudio5.mute = true;
 				gameAudio6.mute = true;
@@ -311,7 +330,7 @@ public class GameManager : MonoBehaviour
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
-				gameAudio4.mute = true;
+				gameAudio4.mute = false;
 				gameAudio5.mute = true;
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
@@ -321,7 +340,7 @@ public class GameManager : MonoBehaviour
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
 				gameAudio4.mute = false;
-				gameAudio5.mute = true;
+				gameAudio5.mute = false;
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 			}
@@ -331,19 +350,10 @@ public class GameManager : MonoBehaviour
 				gameAudio3.mute = false;
 				gameAudio4.mute = false;
 				gameAudio5.mute = false;
-				gameAudio6.mute = true;
-				gameAudio7.mute = true;
-			}
-			if (sqman.height > 12 && !success) {
-				gameAudio1.mute = false;
-				gameAudio2.mute = false;
-				gameAudio3.mute = false;
-				gameAudio4.mute = false;
-				gameAudio5.mute = false;
 				gameAudio6.mute = false;
 				gameAudio7.mute = true;
 			}
-			if (sqman.height > 14 && !success) {
+			if (sqman.height > 12 && !success) {
 				gameAudio1.mute = false;
 				gameAudio2.mute = false;
 				gameAudio3.mute = false;
@@ -766,7 +776,13 @@ public class GameManager : MonoBehaviour
 				pathAnimation ();
 
 			}
-			if (GUI.Button (new Rect (110, 30, 80, 80), menuButton, buttonStyle)) {
+			if (GUI.Button (new Rect (110, 30, 80, 80), restartButton, buttonStyle)) {
+				//PlayerPrefs.SetInt ("level", 0);
+				Application.LoadLevel (Application.loadedLevel);
+
+			}
+			if (GUI.Button (new Rect (190, 30, 80, 80), menuButton, buttonStyle)) {
+				PlayerPrefs.SetInt ("level", 0);
 				Application.LoadLevel (Application.loadedLevel);
 
 			}
@@ -821,6 +837,8 @@ public class GameManager : MonoBehaviour
 				PlayerPrefs.SetInt ("bambiQWOP", 0);
 			}
 
+
+	/***********************MENU BUTTONS**************************/
 			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, (50 * NUMLEVELS))); 
 
 
@@ -881,6 +899,8 @@ public class GameManager : MonoBehaviour
 		sqman.beginning = beginning;
 //		sqman.addBoardSquares (inBoardSquares);
 
+		hero.addSquareManager(this.sqman);
+
 		initBackground ();
 		go = true;
 
@@ -895,6 +915,6 @@ public class GameManager : MonoBehaviour
 		gameAudio5.Play ();
 		gameAudio6.Play ();
 		gameAudio7.Play ();
-
 	}
+
 }

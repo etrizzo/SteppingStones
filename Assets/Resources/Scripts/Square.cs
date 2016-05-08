@@ -217,16 +217,19 @@ public class Square : MonoBehaviour {
 		RigidShape[] shapesToBreak = new RigidShape[5];
 		int i = 0;
 
+		Vector2 pos = this.getPosition();
+
 		foreach (Square sq in directedBlocks) {
 			if (sq != null && sq.getColor() == color && (!sq.isFalling() || (sq.rigid != null && !sq.rigid.falling && !sq.rigid.growing))) {
-				
-				sqman.chainSettle (sq.getPosition());
+
+				pos = sq.getPosition ();
 				if (sq.rigid != null) {
 					//			print ("breaking " + c.rigid);
 //					breakShape (sq.rigid);
 					shapesToBreak[i] = sq.rigid;
 				}
 				Destroy (sq.gameObject);
+				sqman.chainSettle (pos);
 				conflicted = true;
 				//conflictAudio.Play (); //we need more time???
 
@@ -239,7 +242,7 @@ public class Square : MonoBehaviour {
 		if (conflicted) {
 			sqman.conflict = true;
 //			print (this + " is settling");
-			sqman.chainSettle (this.getPosition());
+			pos = this.getPosition();
 			if (rs != null) {
 				//			print ("breaking " + c.rigid);
 //				breakShape (this.rigid);
@@ -255,7 +258,11 @@ public class Square : MonoBehaviour {
 		if (conflicted) {
 			Destroy (self);
 		}
-			
+
+		if (conflicted) {
+			sqman.chainSettle (pos);
+		}
+
 		return shapesToBreak;
 	}
 

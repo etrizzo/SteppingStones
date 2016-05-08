@@ -519,12 +519,13 @@ public class SquareManager : MonoBehaviour {
 			if (curSquare.getPosition() == destination.getPosition()) {
 				Debug.Log("Destination's position:" + destination.getPosition().x + ", " + destination.getPosition().y);
 				return true;
-			} else {
+			} else  {
+				if (curSquare != beginning && board[(int) pos.x, (int) pos.y + 1] != null) {
+					return false;
+				}
 				print ("adding square: " + curSquare);
 				bool valid = pathValid(getNextSquare (curSquare));
-//				if (valid) {
-					gm.squarePath.Add (curSquare);
-//				}
+				gm.squarePath.Add (curSquare);
 				return valid;
 				//hero.nextMove (pos);
 //				return pathValid (getNextSquare(curSquare));

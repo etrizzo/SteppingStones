@@ -36,7 +36,6 @@ public class GameManager : MonoBehaviour
 	string levelName;
 	int levelNum;
 
-
 	public bool bambiQwop;
 
 	public int NUMLEVELS = 11;
@@ -88,6 +87,7 @@ public class GameManager : MonoBehaviour
 	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 /*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
 	int bambiQuopPref = 0;
+	int level = 0;
 
 
 	void Start ()
@@ -101,6 +101,17 @@ public class GameManager : MonoBehaviour
 			bambiQwop = false;
 		} else {
 			bambiQwop = true;
+		}
+		level = PlayerPrefs.GetInt ("level");
+		if (level > 0) {
+			levelNum = level;
+			levelName = "Level" + level;
+		}
+
+		if (level == 0) {
+			state.mode = 0;
+		} else {
+			state.mode = 1;
 		}
 
 		groundSquareFolder = new GameObject ();
@@ -276,17 +287,16 @@ public class GameManager : MonoBehaviour
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 				if (levelNum < NUMLEVELS) {
-					//Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
-					levelUnlockStatus [levelNum] = 1;
-					PlayerPrefs.SetInt ("levelUnlockStatus" + levelNum, 1);
-					/*if (!sqman.successAudio.isPlaying) {
-						clearBoard ();
-						setLevelName ("Level"+(levelNum+1), (levelNum+1));
-						levelNum++;
-						success = false;
-						go = false;
-						state.mode = 1;
-					}*/
+					if (!sqman.successAudio.isPlaying) {
+						Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
+						Debug.Log ("ONTO LEVEL " + (level+1));
+						print ("LOADING LEVEL");
+						levelUnlockStatus [levelNum] = 1;
+						PlayerPrefs.SetInt ("levelUnlockStatus" + levelNum, 1);
+						PlayerPrefs.SetInt ("level", (level+1));
+						setLevelName ("Level"+(level+1), (level+1));
+						Application.LoadLevel (Application.loadedLevel);
+					}
 				}
 			}
 			if (sqman.height < 2 && !success) {
@@ -766,7 +776,13 @@ public class GameManager : MonoBehaviour
 				pathAnimation ();
 
 			}
-			if (GUI.Button (new Rect (110, 30, 80, 80), menuButton, buttonStyle)) {
+			if (GUI.Button (new Rect (110, 30, 80, 80), restartButton, buttonStyle)) {
+				//PlayerPrefs.SetInt ("level", 0);
+				Application.LoadLevel (Application.loadedLevel);
+
+			}
+			if (GUI.Button (new Rect (190, 30, 80, 80), menuButton, buttonStyle)) {
+				PlayerPrefs.SetInt ("level", 0);
 				Application.LoadLevel (Application.loadedLevel);
 
 			}

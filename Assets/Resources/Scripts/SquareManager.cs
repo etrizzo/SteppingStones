@@ -77,11 +77,11 @@ public class SquareManager : MonoBehaviour {
 
 	public void initStyles(){
 		guiStyle2 = new GUIStyle ();
-		guiStyle2.fontSize = 80;
+		guiStyle2.fontSize = 120;
 		guiStyle2.alignment = TextAnchor.MiddleCenter;
 		guiStyle2.font = (Font)Resources.Load ("Fonts/blockyo");
 		guiStyle2.richText = true;
-		guiStyle2.normal.textColor = new Color (1f, 1f, 1f, .9f);
+		guiStyle2.normal.textColor = new Color (1f, 1f, 1f, .6f);
 	}
 
 	public void clear(){
@@ -552,12 +552,13 @@ public class SquareManager : MonoBehaviour {
 			if (curSquare.getPosition() == destination.getPosition()) {
 				Debug.Log("Destination's position:" + destination.getPosition().x + ", " + destination.getPosition().y);
 				return true;
-			} else {
+			} else  {
+				if (curSquare != beginning && board[(int) pos.x, (int) pos.y + 1] != null) {
+					return false;
+				}
 				print ("adding square: " + curSquare);
 				bool valid = pathValid(getNextSquare (curSquare));
-//				if (valid) {
-					gm.squarePath.Add (curSquare);
-//				}
+				gm.squarePath.Add (curSquare);
 				return valid;
 				//hero.nextMove (pos);
 //				return pathValid (getNextSquare(curSquare));

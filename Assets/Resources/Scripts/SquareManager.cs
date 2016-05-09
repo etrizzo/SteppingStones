@@ -639,7 +639,7 @@ public class SquareManager : MonoBehaviour {
 
 	public void addBoardSquares(List<Square> squares){
 		foreach (Square s in squares) {
-			print ("adding " + this + " to: " + s);
+//			print ("adding " + this + " to: " + s);
 			s.addSqman (this);
 			s.transform.parent = squareFolder.transform;
 		}

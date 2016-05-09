@@ -1,20 +1,30 @@
-﻿5
-5
+﻿15
+15
 // ground heights
 0
 0
 0
 0
 0
-// start and dest heights
-3
-3
-// do not use queue
 0
-// squares already in board
-0 2 1 1
-0 3 2 0
-0 4 0 0
-4 2 2 1
-4 3 0 0
-4 4 1 0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+// start and dest heights
+7
+7
+// use queue
+1
+// queue probabilities - only rigid shapes
+0
+0
+10
+// rs probabilities - even split
+5
+5

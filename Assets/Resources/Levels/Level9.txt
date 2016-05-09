@@ -1,11 +1,6 @@
-﻿10
-6
+﻿5
+5
 // ground heights
-1
-3
-0
-0
-0
 0
 0
 0
@@ -13,14 +8,13 @@
 0
 // start and dest heights
 3
-4
-// use queue
-1
-// square probs
-10
-0
+3
+// do not use queue
 0
 // squares already in board
-9 4 0 0
-8 3 1 0
-7 2 2 0
+0 2 1 1
+0 3 2 0
+0 4 0 0
+4 2 2 1
+4 3 0 0
+4 4 1 0

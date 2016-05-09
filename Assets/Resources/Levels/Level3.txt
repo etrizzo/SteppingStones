@@ -1,30 +1,27 @@
-﻿15
-15
-// column ground heights
-0
-0
-0
-0
+﻿8
 5
+// ground heights
 0
 0
 0
 0
-6
 0
 0
 0
 0
-7
-// start and destination heights
-6
-9
+// start and dest heights
+3
+3
 // use queue
 1
-// block probabilities - only rigid shapes
-0
-0
-10
-// rigid shape probabilities - only _ shapes
+// square probs
 10
 0
+0
+// squares already in board
+5 1 1 0
+5 2 2 0
+5 3 0 0
+7 1 2 0
+7 2 0 0
+7 3 1 0

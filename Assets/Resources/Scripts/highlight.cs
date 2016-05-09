@@ -18,6 +18,8 @@ public class Highlight : MonoBehaviour {
 	Square[] rigidShapes;
 	int rigidYOffset = -10;
 
+	Square next = null;
+
 
 	// Save our color here so it's consistent :)
 	Color defaultColor, redTransparent, color;
@@ -100,19 +102,35 @@ public class Highlight : MonoBehaviour {
 //		color = checkHighlightConflicts ();
 		made.transform.position = new Vector3 (mouse.x, mouse.y, -1);
 //		checkConflictAndColor (made);
-		Square next = sqman.queue.Peek ();
-		int type = next.getType ();
+		if (sqman.moving != null) {
+			next = sqman.moving;
+		} else {
+			if (sqman.queue != null) {
+				next = sqman.queue.Peek ();
+			}
+		}
+
+		int type = 0;
+		if (sqman.moving == null && next != null) {
+			type = next.getType ();
+		} else {
+			type = 1;
+		}
+
 		// 0-c,1-m,2-y,-1-k
-		switch (next.getColor()) {
-		case 0:
-			color = makeTransparent (Color.cyan);
-			break;
-		case 1:
-			color = makeTransparent (Color.magenta);
-			break;
-		case 2:
-			color = makeTransparent (Color.yellow);
-			break;
+//		switch (next.getColor()) {
+//		case 0:
+//			color = makeTransparent (Color.cyan);
+//			break;
+//		case 1:
+//			color = makeTransparent (Color.magenta);
+//			break;
+//		case 2:
+//			color = makeTransparent (Color.yellow);
+//			break;
+//		}
+		if (next != null) {
+			color = makeTransparent (next.model.mat.color);
 		}
 
 		if (type == 2) {
@@ -173,24 +191,15 @@ public class Highlight : MonoBehaviour {
 		return false;
 	}
 
-	Color getRigidHighlightColor(int i) {
-		if (getHighlightColor() != redTransparent) {
-			Square next = sqman.queue.Peek ();
-			if (i % 2 == 0) {
-				return makeTransparent(next.rigid.color2);
-			} else {
-				return makeTransparent(next.rigid.color1);
-			}
-		} else {
-			return getHighlightColor ();
-		}
-	}
-
 
 	Color getHighlightColor () {
 		Color retColor = defaultColor;
 
-		Square next = sqman.queue.Peek ();
+		if (sqman.queue == null) {
+			return Color.clear;
+		}
+
+//		Square next = sqman.queue.Peek ();
 		int type = next.getType ();
 		// 0-c,1-m,2-y,-1-k
 		switch (next.getColor()) {
@@ -204,7 +213,10 @@ public class Highlight : MonoBehaviour {
 			retColor = makeTransparent (Color.yellow);
 			break;
 		}
-		if (next.type == 2) {
+		if (next.type == 1) {
+			Debug.Log ("Setting movable block color :)");
+			return makeTransparent (next.model.mat.color);
+		} else if (next.type == 2) {
 			retColor = makeTransparent (next.rigid.color1);
 		}
 
@@ -243,6 +255,20 @@ public class Highlight : MonoBehaviour {
 		return retColor;
 	}
 
+
+	Color getRigidHighlightColor(int i) {
+		if (getHighlightColor() != redTransparent) {
+//			Square next = sqman.queue.Peek ();
+			if (i % 2 == 0) {
+				return makeTransparent(next.rigid.color2);
+			} else {
+				return makeTransparent(next.rigid.color1);
+			}
+		} else {
+			return getHighlightColor ();
+		}
+	}
+
 //	void checkConflictAndColor(Square sq) {
 //		// TODO: Also need to check if the square is off the board, and highlight it red there too!
 //		Color theColor = defaultColor;
@@ -258,79 +284,6 @@ public class Highlight : MonoBehaviour {
 //		}
 //
 //	}
-
-	void updateModel__defunct() {
-//		Debug.Log ("Got the queue, it looks like: " + queue.Count);
-		Square next = sqman.queue.Peek ();
-		int type = next.getType ();
-
-		int lowestY = getLowestYCoordForColumn ((int) mouse.x);
-
-//		if (type == 5) {
-//			// If it's a rigid shape, we have to get the lowest possible y for all the rigids
-//			foreach (Square sq in rigidShapes) {
-//				int this_y = (int) sq.getPosition ().y;
-//				if (this_y > lowestY) {
-//					Debug.Log ("Changing this_y to:" + this_y);
-//					lowestY = this_y;
-//					color = Color.red;
-//				}
-//			}
-//		}
-
-		// If we're over the board do the things
-//		Debug.Log("Lowest y coordinate is: " + lowestY);
-		if (lowestY != -1) {
-			if (mouseMoved()) {
-				// If the mouse moved, update the position of the anchor
-				made.transform.position = new Vector3(mouse.x, lowestY, 0);
-//				Debug.Log ("Next queued block is of type: " + type);
-				if (type == 2) {
-					// If it's a RigidShape, do extra things based on what kind of shape it is!
-					RigidShape rs = next.rigid;
-					int shapeType = rs.shapeType;
-					if (shapeType == 0) {
-						// it's _, spawn some additional shapes!
-						for (int i = 0; i < EXTRASHAPES; i++) {
-							rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, lowestY, 0);
-
-//							foreach (Square sq in rigidShapes) {
-//								int this_y = (int) sq.getPosition ().y;
-//								// TODO: Okay, no, you actually have to check that this is occupied, and then get the y in this
-//								// column :////////////
-//								if (squareAtYCoord((int) mouse.x, this_y) != null) {
-//									Debug.Log ("Changing this_y to:" + this_y);
-//									lowestY = this_y;
-//									color = Color.red;
-//								}
-//							}
-//
-//							rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, lowestY, 0);
-
-							// TODO: Need to replace add
-//							rigidShapes[i] = sqman.addSquare(new Vector2((int) mouse.x + i + 1, lowestY), false);
-						}
-					} else {
-						// it's I vertical!
-					}
-					// We know this is an anchor
-
-				} else {
-					color = Color.gray;
-					// Reset the anchor highlight blocks to be off the screen when we don't need them!
-					for (int i = 0; i < EXTRASHAPES; i++) {
-						rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, rigidYOffset, 0);
-						// TODO: Need to replace add
-					}
-				}
-			made.model.mat.color = color;
-			}
-		} else {
-			// If we're **not over the board**, make the square transparent lol
-			made.model.mat.color = Color.clear;
-		}
-		lastMousePos = new Vector2((int)mouse.x, (int) mouse.y);
-	}
 
 	private bool mouseMoved() {
 		// This should actually check if it moved over 1 square or more since last update :/

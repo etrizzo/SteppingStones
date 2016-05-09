@@ -67,6 +67,7 @@ public class GameManager : MonoBehaviour
 	float wave = 0;
 	int waveSpeed = 4;
 
+	GUIStyle defaultText;
 	GUIStyle buttonStyle;
 	GUIStyle guiStyle;
 	GUIStyle guiStyle2;
@@ -140,6 +141,8 @@ public class GameManager : MonoBehaviour
 	private void initStyles ()
 	{
 		//Cursor.SetCursor ((Texture2D)Resources.Load ("Textures/cursor"), new Vector2 (4, 4), CursorMode.Auto);
+		defaultText = new GUIStyle ();
+		defaultText.normal.textColor = Color.black;
 
 		buttonStyle = new GUIStyle ();
 		buttonStyle.font = (Font)Resources.Load ("Fonts/blockyo");
@@ -154,7 +157,7 @@ public class GameManager : MonoBehaviour
 
 		//HOME MENU
 		guiStyle2 = new GUIStyle ();
-		guiStyle2.fontSize = 80;
+		guiStyle2.fontSize = 75;
 		guiStyle2.alignment = TextAnchor.MiddleCenter;
 		guiStyle2.font = (Font)Resources.Load ("Fonts/blockyo");
 		guiStyle2.richText = true;
@@ -832,19 +835,22 @@ public class GameManager : MonoBehaviour
 		gameAudio7.Stop ();
 
 		if (!go && !done) {
+			int moveThisByThisMuch = 45;
 			xpos = ((Screen.width) - (100)) / 2;
-			ypos = ((Screen.height) - (80)) / 2 - ((Screen.height / 3) - (Screen.height / 10));
+			ypos = ((Screen.height) - 70) / 2 - ((Screen.height / 3) - (Screen.height / 15));
 			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>S t e p p i n g\n\nS t o n e s</color>", guiStyle2);
 			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>S t e p p i n g\n\nS t o n e s</color>", guiStyle2);
 			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>S</color> <color=magenta>t</color> <color=yellow>e</color> <color=cyan>p</color> <color=magenta>p</color> <color=yellow>i</color> <color=cyan>n</color> <color=yellow>g</color>\n\n<color=yellow>S</color> <color=cyan>t</color> <color=magenta>o</color> <color=yellow>n</color> <color=cyan>e</color> <color=magenta>s</color>", guiStyle2);
 
 			xpos = ((Screen.width) - (100)) / 6;
 			ypos = ((Screen.height) - (100)) / 4 * 3;
+			ypos -= moveThisByThisMuch + 15;
 			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=black>C l i c k   t o\n\np l a c e\n\nb l o c k s</color>", guiStyle);
 			xpos *= 5;
 			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=black>C r e a t e\n\na\n\np a t h</color>", guiStyle);
 			xpos = ((Screen.width) - (100)) / 2;
 			ypos = ((Screen.height) - (80));
+			ypos -= moveThisByThisMuch;
 			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>S a v e</color>   <color=magenta>y o u r</color>   <color=yellow>f r i e n d</color>", guiStyle3);
 			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=cyan>S a v e</color>   <color=magenta>y o u r</color>   <color=yellow>f r i e n d</color>", guiStyle3);
 			GUI.Label (new Rect (xpos, ypos, 95, 45), "<color=black>S a v e   y o u r   f r i e n d</color>", guiStyle3);
@@ -865,7 +871,8 @@ public class GameManager : MonoBehaviour
 
 
 	/***********************MENU BUTTONS**************************/
-			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, (50 * NUMLEVELS))); 
+			int scrollY = ypos - 25;
+			scrollPosition = GUI.BeginScrollView (new Rect (xpos, scrollY, 270, 200), scrollPosition, new Rect (0, 0, 220, (50 * NUMLEVELS))); 
 
 
 			for (int i = 0; i < NUMLEVELS; i++) {
@@ -884,6 +891,10 @@ public class GameManager : MonoBehaviour
 				}
 			}
 			GUI.EndScrollView ();
+
+			int madeByHeight = 50;
+			int madeByWidth = Screen.width - 50;
+			GUI.Label (new Rect (Screen.width / 2 - (madeByWidth / 4), Screen.height - madeByHeight, madeByWidth, madeByHeight), "Made by: Alejandro Belgrave, Andres Cuervo, Linnea Kirby, Margaret McCarthy, and Emily Rizzo", defaultText);
 		}
 	}
 

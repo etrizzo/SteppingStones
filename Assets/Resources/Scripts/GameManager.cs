@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour
 	public AudioClip gameClip6;
 	public AudioSource gameAudio7;
 	public AudioClip gameClip7;
+	public AudioSource beginLevelAudio;
+	public AudioClip beginLevelClip;
 	public int w;
 	public int h;
 	Square[,] board;
@@ -74,6 +76,8 @@ public class GameManager : MonoBehaviour
 	GUIContent lvlbutton;
 	GUIStyleState lvlButtonHover;
 
+	float displayStart = 6f;
+
 	GUIContent menuButton;
 	GUIContent restartButton;
 	GUIContent testButton;
@@ -93,6 +97,7 @@ public class GameManager : MonoBehaviour
 
 	void Start ()
 	{
+		//PlayerPrefs.DeleteAll (); //to reset player prefs
 		levelUnlockStatus [0] = 1;
 		for (int i = 1; i < NUMLEVELS; i++) {
 			levelUnlockStatus [i] = PlayerPrefs.GetInt ("levelUnlockStatus" + i);
@@ -182,6 +187,12 @@ public class GameManager : MonoBehaviour
 		menuAudio.clip = menuClip;
 		menuAudio.Play ();
 
+		beginLevelAudio = this.gameObject.AddComponent<AudioSource> ();
+		beginLevelAudio.loop = false;
+		beginLevelAudio.playOnAwake = false;
+		beginLevelClip = Resources.Load<AudioClip> ("Audio/Blocks Settle Thud");
+		beginLevelAudio.clip = beginLevelClip;
+
 		gameAudio1 = this.gameObject.AddComponent<AudioSource> ();
 		gameAudio1.loop = true;
 		gameAudio1.playOnAwake = false;
@@ -270,7 +281,24 @@ public class GameManager : MonoBehaviour
 		Vector3 worldPos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		int mousex = (int)Mathf.Floor (worldPos.x);
 		int mousey = (int)Mathf.Ceil (worldPos.y);
+		if (Input.GetKeyDown ("q") || Input.GetKeyDown("escape")){
+			print ("HEY");
+			PlayerPrefs.SetInt ("level", 0);
+			Application.Quit();
+		}
 		if (state.mode == 1 && sqman != null) {		//if the game is playing
+			if(displayStart > 0){
+				displayStart -= Time.deltaTime*waveSpeed;
+			}
+			if (Input.GetKeyDown ("m")){
+				PlayerPrefs.SetInt ("level", 0);
+				Application.LoadLevel (Application.loadedLevel);
+			}
+
+			if (Input.GetKeyDown ("r")){
+				Application.LoadLevel (Application.loadedLevel);
+			}
+
 			if (Input.GetMouseButtonUp (0)) {
 				if (!success) {
 					sqman.placeSquare (new Vector2 ((float)mousex, (float)mousey));
@@ -768,7 +796,10 @@ public class GameManager : MonoBehaviour
 		case 1:
 			if (!go) {			//only initialize the board once
 				startGame ();
+				displayStart = 6;
+				beginLevelAudio.Play ();
 			}
+			checkDisplayStart ();
 			if (GUI.Button (new Rect (30, 30, 80, 80), testButton, buttonStyle)) {
 				if (sqman.boardSolved ()) {
 					success = true;
@@ -788,6 +819,95 @@ public class GameManager : MonoBehaviour
 
 			}
 			break;
+		}
+	}
+
+	private void checkDisplayStart(){
+		int xpos;
+		int ypos;
+		if (displayStart >= 0 && level == 1) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\no n e\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\no n e\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>o</color> <color=cyan>n</color> <color=magenta>e</color>\n\n<color=yellow>s</color> <color=cyan>t</color> <color=magenta>a</color> <color=yellow>r</color> <color=cyan>t</color>", guiStyle2);
+		}
+		if (displayStart >= 0 && level == 2) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\nt w o\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\nt w o\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>t</color> <color=cyan>w</color> <color=magenta>o</color>\n\n<color=yellow>s</color> <color=cyan>t</color> <color=magenta>a</color> <color=yellow>r</color> <color=cyan>t</color>", guiStyle2);
+		}
+		if (displayStart >= 0 && level == 3) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\nt h r e e\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\nt h r e e\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>t</color> <color=cyan>h</color> <color=magenta>r</color> <color=yellow>e</color> <color=cyan>e</color>\n\n<color=magenta>s</color> <color=yellow>t</color> <color=cyan>a</color> <color=magenta>r</color> <color=yellow>t</color>", guiStyle2);
+		}
+		if (displayStart >= 0 && level == 4) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\nf o u r\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\nf o u r\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>f</color> <color=cyan>o</color> <color=magenta>u</color> <color=yellow>r</color>\n\n<color=cyan>s</color> <color=magenta>t</color> <color=yellow>a</color> <color=cyan>r</color> <color=magenta>t</color>", guiStyle2);
+		}
+		if (displayStart >= 0 && level == 5) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\nf i v e\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\nf i v e\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>f</color> <color=cyan>i</color> <color=magenta>v</color> <color=yellow>e</color>\n\n<color=cyan>s</color> <color=magenta>t</color> <color=yellow>a</color> <color=cyan>r</color> <color=magenta>t</color>", guiStyle2);
+		}
+		if (displayStart >= 0 && level == 6) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\ns i x\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\ns i x\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>s</color> <color=cyan>i</color> <color=magenta>x</color>\n\n<color=yellow>s</color> <color=cyan>t</color> <color=magenta>a</color> <color=yellow>r</color> <color=cyan>t</color>", guiStyle2);
+		}
+		if (displayStart >= 0 && level == 7) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\ns e v e n\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\ns e v e n\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>s</color> <color=cyan>e</color> <color=magenta>v</color> <color=yellow>e</color> <color=cyan>n</color>\n\n<color=magenta>s</color> <color=yellow>t</color> <color=cyan>a</color> <color=magenta>r</color> <color=yellow>t</color>", guiStyle2);
+		}
+		if (displayStart >= 0 && level == 8) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\ne i g h t\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\ne i g h t\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>e</color> <color=cyan>i</color> <color=magenta>g</color> <color=yellow>h</color> <color=cyan>t</color>\n\n<color=magenta>s</color> <color=yellow>t</color> <color=cyan>a</color> <color=magenta>r</color> <color=yellow>t</color>", guiStyle2);
+		}
+		if (displayStart >= 0 && level == 9) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\nn i n e\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\nn i n e\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>n</color> <color=cyan>i</color> <color=magenta>n</color> <color=yellow>e</color>\n\n<color=cyan>s</color> <color=magenta>t</color> <color=yellow>a</color> <color=cyan>r</color> <color=magenta>t</color>", guiStyle2);
+		}
+		if (displayStart >= 0 && level == 10) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\nt e n\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\nt e n\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>t</color> <color=cyan>e</color> <color=magenta>n</color>\n\n<color=yellow>s</color> <color=cyan>t</color> <color=magenta>a</color> <color=yellow>r</color> <color=cyan>t</color>", guiStyle2);
+		}
+		if (displayStart >= 0 && level == 11) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\ne l e v e n\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\ne l e v e n\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>e</color> <color=cyan>l</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>n</color>\n\n<color=yellow>s</color> <color=cyan>t</color> <color=magenta>a</color> <color=yellow>r</color> <color=yellow>t</color>", guiStyle2);
+		}
+		if (displayStart >= 0 && level == 12) {
+			xpos = ((Screen.width) - (100)) / 2;
+			ypos = ((Screen.height) - (80)) / 2;
+			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>L e v e l\n\nt w e l v e\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>L e v e l\n\nt w e l v e\n\ns t a r t</color>", guiStyle2);
+			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>L</color> <color=magenta>e</color> <color=yellow>v</color> <color=cyan>e</color> <color=magenta>l</color>\n\n<color=yellow>t</color> <color=cyan>w</color> <color=magenta>e</color> <color=yellow>l</color> <color=cyan>v</color> <color=magenta>e</color>\n\n<color=yellow>s</color> <color=cyan>t</color> <color=magenta>a</color> <color=yellow>r</color> <color=yellow>t</color>", guiStyle2);
 		}
 	}
 

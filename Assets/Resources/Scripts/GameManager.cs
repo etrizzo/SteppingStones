@@ -84,8 +84,9 @@ public class GameManager : MonoBehaviour
 
 	public Vector2 scrollPosition = Vector2.zero;
 
-	int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-/*{1, 0, 0, 0, 0, 0, 0, 0, 0, 0};*/
+	int[] levelUnlockStatus = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	//int[] levelUnlockStatus = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+
 	int bambiQuopPref = 0;
 	int level = 0;
 
@@ -312,12 +313,12 @@ public class GameManager : MonoBehaviour
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 				if (levelNum < NUMLEVELS) {
+					levelUnlockStatus [levelNum] = 1;
+					PlayerPrefs.SetInt ("levelUnlockStatus" + levelNum, 1);
 					if (!sqman.successAudio.isPlaying) {
 						Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
 						Debug.Log ("ONTO LEVEL " + (level+1));
 						print ("LOADING LEVEL");
-						levelUnlockStatus [levelNum] = 1;
-						PlayerPrefs.SetInt ("levelUnlockStatus" + levelNum, 1);
 						PlayerPrefs.SetInt ("level", (level+1));
 						setLevelName ("Level"+(level+1), (level+1));
 						Application.LoadLevel (Application.loadedLevel);
@@ -801,12 +802,12 @@ public class GameManager : MonoBehaviour
 				pathAnimation ();
 
 			}
-			if (GUI.Button (new Rect (110, 30, 80, 80), restartButton, buttonStyle)) {
-				//PlayerPrefs.SetInt ("level", 0);
+			if (GUI.Button (new Rect (Screen.width-190, 30, 80, 80), restartButton, buttonStyle)) {
+				PlayerPrefs.SetInt ("level", levelNum);
 				Application.LoadLevel (Application.loadedLevel);
 
 			}
-			if (GUI.Button (new Rect (190, 30, 80, 80), menuButton, buttonStyle)) {
+			if (GUI.Button (new Rect (Screen.width -110, 30, 80, 80), menuButton, buttonStyle)) {
 				PlayerPrefs.SetInt ("level", 0);
 				Application.LoadLevel (Application.loadedLevel);
 
@@ -876,6 +877,7 @@ public class GameManager : MonoBehaviour
 				}
 				if (GUI.Button (new Rect (0, 0 + 50 * i, 256, 50), lvlbutton, buttonStyle)) {
 					if (levelUnlockStatus [i] == 1) {
+						level = i + 1;
 						setLevelName ("Level" + (i + 1), (i + 1));
 						state.mode = 1;
 					}

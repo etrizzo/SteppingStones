@@ -777,12 +777,12 @@ public class GameManager : MonoBehaviour
 				pathAnimation ();
 
 			}
-			if (GUI.Button (new Rect (110, 30, 80, 80), restartButton, buttonStyle)) {
+			if (GUI.Button (new Rect (Screen.width-190, 30, 80, 80), restartButton, buttonStyle)) {
 				PlayerPrefs.SetInt ("level", levelNum);
 				Application.LoadLevel (Application.loadedLevel);
 
 			}
-			if (GUI.Button (new Rect (190, 30, 80, 80), menuButton, buttonStyle)) {
+			if (GUI.Button (new Rect (Screen.width -110, 30, 80, 80), menuButton, buttonStyle)) {
 				PlayerPrefs.SetInt ("level", 0);
 				Application.LoadLevel (Application.loadedLevel);
 

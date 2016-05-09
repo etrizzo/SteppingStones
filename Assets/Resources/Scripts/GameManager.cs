@@ -288,12 +288,12 @@ public class GameManager : MonoBehaviour
 				gameAudio6.mute = true;
 				gameAudio7.mute = true;
 				if (levelNum < NUMLEVELS) {
+					levelUnlockStatus [levelNum] = 1;
+					PlayerPrefs.SetInt ("levelUnlockStatus" + levelNum, 1);
 					if (!sqman.successAudio.isPlaying) {
 						Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
 						Debug.Log ("ONTO LEVEL " + (level+1));
 						print ("LOADING LEVEL");
-						levelUnlockStatus [levelNum] = 1;
-						PlayerPrefs.SetInt ("levelUnlockStatus" + levelNum, 1);
 						PlayerPrefs.SetInt ("level", (level+1));
 						setLevelName ("Level"+(level+1), (level+1));
 						Application.LoadLevel (Application.loadedLevel);

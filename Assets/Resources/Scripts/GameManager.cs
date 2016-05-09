@@ -104,7 +104,7 @@ public class GameManager : MonoBehaviour
 	public float shakeCounter = 0f;
 
 	void Start () {
-			//PlayerPrefs.DeleteAll (); //to reset player prefs
+		//PlayerPrefs.DeleteAll (); //to reset player prefs
 
 		shakeAmount = .1f;
 		levelUnlockStatus [0] = 1;

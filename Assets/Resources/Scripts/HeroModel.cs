@@ -116,6 +116,7 @@ public class HeroModel : MonoBehaviour
 //			highestY = highestY 1f;
 //			print("cursquare is : " + curSquare.getPosition() + " And we're stopping there.");
 			if (!owner.gm.success) {
+				owner.sqman.noSuccessAudio.Play ();
 				resetHero ();
 			} else { //success!
 				if(owner.sqman != null){

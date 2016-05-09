@@ -1,25 +1,20 @@
-﻿11
-15
-// column heights
+﻿5
+10
+// column ground heights
+5
 0
+5
 0
-0
-0
-0
-6
-0
-0
-0
-0
-0
+5
 // start and dest heights
-7
-7
-// use queue - only rigid shapes
+6
+6
+// use queue
 1
+// block probabilities - only rigid shapes
 0
 0
 10
-// rs probabilities
-5
-5
+// rs probabilities - only |-shapes
+0
+10

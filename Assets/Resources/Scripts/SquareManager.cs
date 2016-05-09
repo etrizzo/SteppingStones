@@ -10,6 +10,8 @@ public class SquareManager : MonoBehaviour {
 	public List<RigidShape> rigidshapes;
 	public AudioSource successAudio;
 	public AudioClip successClip;
+	public AudioSource noSuccessAudio;
+	public AudioClip noSuccessClip;
 	public AudioSource conflictAudio;
 	public AudioClip conflictClip;
 	public AudioSource movOnAudio;
@@ -101,9 +103,14 @@ public class SquareManager : MonoBehaviour {
 		successAudio = this.gameObject.AddComponent<AudioSource> ();
 		successAudio.loop = false;
 		successAudio.playOnAwake = false;
-		successAudio.time = 1.0f;
-		successClip = Resources.Load<AudioClip> ("Audio/Victory Shorter");
+		successClip = Resources.Load<AudioClip> ("Audio/Victory7s");
 		successAudio.clip = successClip;
+
+		noSuccessAudio = this.gameObject.AddComponent<AudioSource> ();
+		noSuccessAudio.loop = false;
+		noSuccessAudio.playOnAwake = false;
+		noSuccessClip = Resources.Load<AudioClip> ("Audio/No Victory!");
+		noSuccessAudio.clip = noSuccessClip;
 
 		conflictAudio = this.gameObject.AddComponent<AudioSource> ();
 		conflictAudio.loop = false;

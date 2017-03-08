@@ -1,5 +1,5 @@
 ﻿10
-6
+7
 // ground heights
 1
 3

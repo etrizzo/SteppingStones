@@ -6,7 +6,7 @@ public class Square : MonoBehaviour {
 	private float counter = 0;
 	private float speed = 5; // Need a "GOOOT TTAA GUCKDSBLJKAF,.JH;  FAST" button
 	public SquareModel model;
-	private int color;		//0-c,1-m,2-y,-1-k
+	private int color = -1;		//0-c,1-m,2-y,-1-k
 	private Vector2 pos;
 	private bool ground;
 //	private bool inqueue;
@@ -132,6 +132,7 @@ public class Square : MonoBehaviour {
 
 	public void setAnchor(){
 		anchor = true;
+		this.model.mat.color = Color.white;
 	}
 
 	public IEnumerator tempHighlight() {

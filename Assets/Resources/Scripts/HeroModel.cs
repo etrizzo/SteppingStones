@@ -40,7 +40,7 @@ public class HeroModel : MonoBehaviour
 		mat.shader = Shader.Find("Sprites/Default"); 
 
 		if (owner.gm.bambiQwop) {
-			mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonich");
+			mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonich-s");
 		} else {
 			mat.mainTexture = Resources.Load<Texture2D> ("Textures/hero");
 		}
@@ -122,7 +122,7 @@ public class HeroModel : MonoBehaviour
 						owner.sqman.success = true;
 					}
 				if (owner.gm.bambiQwop) {
-					mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonichVictory");
+					mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonichVictory-s");
 					owner.gm.saved = true;
 				} else {
 					mat.mainTexture = Resources.Load<Texture2D> ("Textures/heroSuccess");

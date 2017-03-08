@@ -9,6 +9,8 @@ public class SquareManager : MonoBehaviour {
 	public GameObject rsFolder;
 	public List<RigidShape> rigidshapes;
 	public AudioSource successAudio;
+	public AudioSource qwopSuccessAudio;
+	public AudioClip qwopSuccessClip;
 	public AudioClip successClip;
 	public AudioSource conflictAudio;
 	public AudioClip conflictClip;
@@ -47,6 +49,14 @@ public class SquareManager : MonoBehaviour {
 	public bool success = false;
 
 	GUIStyle guiStyle2;
+	GUIStyle guiStyle3;
+	GUIStyle guiStyle4;
+
+	int lastColor = -1;
+	int lastType = -1;
+	int blocksPlaced = 0;
+	float textTime = 0f;
+	float speed = 1f;
 
 
 //	float randFreq = .2;
@@ -72,16 +82,44 @@ public class SquareManager : MonoBehaviour {
 		initQueue ();		//initialize queue w/ 3 initial blocks
 		initSound ();
 		//getHeight ();
+		if (gm.bambiQwop) {
+			speed = .2f;
+		}
 
 	}
 
 	public void initStyles(){
-		guiStyle2 = new GUIStyle ();
+		guiStyle2 = new GUIStyle ();		//"YOU WIN" style
 		guiStyle2.fontSize = 120;
 		guiStyle2.alignment = TextAnchor.MiddleCenter;
 		guiStyle2.font = (Font)Resources.Load ("Fonts/blockyo");
 		guiStyle2.richText = true;
 		guiStyle2.normal.textColor = new Color (1f, 1f, 1f, .6f);
+
+
+
+		guiStyle3 = new GUIStyle ();			//Loading Next Level style
+		guiStyle3.fontSize = 30;
+		if (gm.web) {
+			guiStyle3.fontSize = 20;
+		}
+		guiStyle3.alignment = TextAnchor.MiddleCenter;
+		guiStyle3.font = (Font)Resources.Load ("Fonts/blockyo");
+		guiStyle3.richText = true;
+		guiStyle3.normal.textColor = new Color (1f, 1f, 1f, .6f);
+
+
+		guiStyle4 = new GUIStyle ();
+		guiStyle4.fontSize = 80;
+		if (gm.web) {
+			guiStyle4.fontSize = 50;
+		}
+		guiStyle4.alignment = TextAnchor.MiddleCenter;
+		guiStyle4.font = (Font)Resources.Load ("Fonts/grid");
+		guiStyle4.richText = true;
+		guiStyle4.normal.textColor = new Color (1f, 1f, 1f, .9f);
+
+
 	}
 
 	public void clear(){
@@ -102,8 +140,17 @@ public class SquareManager : MonoBehaviour {
 		successAudio.loop = false;
 		successAudio.playOnAwake = false;
 		successAudio.time = 1.0f;
-		successClip = Resources.Load<AudioClip> ("Audio/Victory Shorter");
+		successClip = Resources.Load<AudioClip> ("Audio/Victory Shortest");
 		successAudio.clip = successClip;
+//		successAudio.pitch = 1.5f;
+
+		qwopSuccessAudio = this.gameObject.AddComponent<AudioSource> ();
+		qwopSuccessAudio.loop = false;
+		qwopSuccessAudio.playOnAwake = false;
+		qwopSuccessClip = Resources.Load<AudioClip> ("Audio/Victory NoStart");
+		qwopSuccessAudio.clip = qwopSuccessClip;
+		qwopSuccessAudio.pitch = 1.5f;
+
 
 		conflictAudio = this.gameObject.AddComponent<AudioSource> ();
 		conflictAudio.loop = false;
@@ -153,23 +200,42 @@ public class SquareManager : MonoBehaviour {
 	private void getHeight (){
 		int tallest = 0;
 		foreach (Square s in squares) {
-			if ((int)s.getPosition ().y > tallest) {
-				tallest = (int)s.getPosition ().y;
+			if (((int)s.getPosition ().y > tallest)){
+				if (s.rigid != null){ 
+					if (!s.rigid.growing && !s.rigid.falling) {
+						tallest = (int)s.getPosition ().y;
+					}
+				} else if (!s.falling) {
+					tallest = (int)s.getPosition ().y;
+				}
 			}
+			print ("tallest : " + tallest);
 		}
 		height = tallest;
 	}
 
 	public int getColor(int type){
-		if (type <= 1) {
-			return Random.Range (0, 3);
-		} 
-		return 3;
+		int tries = 0;
+//		if (type <= 1) {
+			int c = Random.Range (0, 3);
+			while (c == lastColor && tries < 2) {
+				c = Random.Range (0, 3);
+				tries++;
+			}
+			lastColor = c;
+			return c;
+//		} 
+//		return 3;
 	}
 
 	////-normal, 1-movable, 2-erase, 3-bomb, 4-rainbow, 5-shape
 	public int getSquareType(){		
+		int tries = 0;
 		int r = Random.Range(0,10);
+		while (r == lastType && tries < 2) {
+			r = Random.Range (0, 10);
+			tries++;
+		}
 		return q [r];
 	}
 
@@ -177,14 +243,29 @@ public class SquareManager : MonoBehaviour {
 	public void initQueue(){
 		if (q != null) {
 			queue = new Queue<Square> ();
+			Square s1;
+			Square s2;
+			Square s3;
 			//initialize first 3 blocks
-			Square s1 = addSquare (qpos1, false);
-			Square s2 = addSquare (qpos2, false);
-			Square s3 = addSquare (qpos3, false);
+			if (gm.levelNum == 1) {		//predefined queue for level 1 - 3 different colored squares
+				s1 = addSquare (qpos1, false, 0);
+				s2 = addSquare (qpos2, false, 1);
+				s3 = addSquare (qpos3, false, 2);
+			} if (gm.levelNum == 7) {		//predefined queue for level 7 - alternating | shape and - shape
+				s1 = addSquare (qpos1, false, 0, 2, 1);
+				s2 = addSquare (qpos2, false, 1, 2, 0);
+				s3 = addSquare (qpos3, false, 2, 2, 1);
+			}
+			else {
+				s1 = addSquare (qpos1, false);
+				s2 = addSquare (qpos2, false);
+				s3 = addSquare (qpos3, false);
+			}
 
 			queue.Enqueue (s1);
 			queue.Enqueue (s2);
 			queue.Enqueue (s3);
+			blocksPlaced = 0;
 		}
 
 	}
@@ -201,15 +282,15 @@ public class SquareManager : MonoBehaviour {
 				if (moving == null && q != null) {			//if not moving a movable block, try to place from queue
 						bool place = true;
 						Square next = queue.Peek ();
-						if (next.isAnchor ()) {
+						if (next.isAnchor ()) {		//if placing an anchor (growing rigid shape)
 							place = false;
-							switch (next.rigid.shapeType) {
-							case 0: // _
-								if (next.rigid.checkValidGrow (pos, 0, 5)) {	//TODO: figure out for different shapes 
+							switch (next.rigid.shapeType) {		//check that there is enough space for the shape to grow
+							case 0: // - shape
+								if (next.rigid.checkValidGrow (pos, 0, 5)) {	 
 									place = true;
 								}
 								break;
-							case 1: // l
+							case 1: // | shape
 								if (next.rigid.checkValidGrow (pos, 5, 0)) {
 									place = true;
 								}
@@ -237,6 +318,7 @@ public class SquareManager : MonoBehaviour {
 								// Place it like normal if it's not an anchor
 
 							}
+							
 						}
 
 					} else {						//if placing a movable block, place the moving block
@@ -256,7 +338,7 @@ public class SquareManager : MonoBehaviour {
 
 
 					}
-				
+				blocksPlaced++;
 			} else {		//if clicking on an existing block
 				if (atPos != null) {
 					if (atPos.getType () == 1) {
@@ -334,25 +416,7 @@ public class SquareManager : MonoBehaviour {
 
 
 	}
-	//checks to see if the square above pos needs to be settled
-	public void chainSettleBeginning(Vector2 pos){
-		Square s = board [(int)pos.x, (int)pos.y];
-		//		print (s + " is chain settling" + s.isFalling());
-		if (pos.y < BOARDSIZEY - 1) {
-			for (int i = 1; i < BOARDSIZEY - pos.y; i++) {
-				Square above = board [(int)pos.x, (int)pos.y + 1];
-				if (above != null) {
-					if (above.rigid != null ) {
-						//						above.rigid.settleShape ();
-						above.rigid.setShapeFalling (true);
-					} else {
-						//						print ("Setting " + above + "to falling");
-						above.setFalling (true);
-					}
-				}
-			}
-		}
-	}
+
 
 	//checks to see if the square above pos needs to be settled
 	public void chainSettle(Vector2 pos){
@@ -371,36 +435,6 @@ public class SquareManager : MonoBehaviour {
 					}
 				}
 			}
-		}
-	}
-
-	public void resolveConflict (Square s, Square c){
-		Vector2 sPos = s.getPosition ();
-		Vector2 cPos = c.getPosition ();
-		board [(int)sPos.x, (int)sPos.y] = null;
-		board [(int)cPos.x, (int)cPos.y] = null;
-		if (c.rigid != null) {
-//			print ("breaking " + c.rigid);
-			breakShape (c.rigid);
-		}
-		if (s.rigid != null) {
-			//			print ("breaking " + c.rigid);
-			breakShape (s.rigid);
-		}
-
-		Destroy (c.gameObject);
-
-		s = board [(int)sPos.x, (int)(sPos.y + 1)];
-		c = board [(int)cPos.x, (int)(cPos.y + 1)];
-		resolveConflictHelper (s);
-		resolveConflictHelper (c);
-	}
-
-	public void resolveConflictHelper(Square s){
-		while (s != null) {
-			Vector2 sPos = s.getPosition ();
-			Square sAbove = board [(int)sPos.x, (int)(sPos.y + 1)];
-			s = sAbove;
 		}
 	}
 
@@ -428,7 +462,7 @@ public class SquareManager : MonoBehaviour {
 	}
 
 
-	public Square addSquare(Vector2 pos, bool isGround){
+	public Square addSquare(Vector2 pos, bool isGround, int color = -1, int type = -1, int shape = -1){
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
@@ -437,17 +471,23 @@ public class SquareManager : MonoBehaviour {
 		if (isGround) {
 			square.init (pos, -1, true);
 		} else {
-			int type = getSquareType ();
+			if (type == -1) {
+				type = getSquareType ();
+			}
 			//hardcode normal square for first square
 			/*if (firstSquare) {
 				type = 0;
 				firstSquare = false;
 			}*/
-			square.init (pos, getColor (type), false, type);
+			if (color != -1) {
+				square.init (pos, color, false, type);
+			} else {
+				square.init (pos, getColor (type), false, type);
+			}
 			square.addSqman (this);
 
 			if (type == 2) {
-				RigidShape rs = makeRigidShape(square);
+				RigidShape rs = makeRigidShape(square, shape);
 			}
 		}
 
@@ -458,14 +498,14 @@ public class SquareManager : MonoBehaviour {
 
 	}
 
-	public RigidShape makeRigidShape(Square square){
+	public RigidShape makeRigidShape(Square square, int shape = -1){
 		GameObject rsObject = new GameObject ();
 		RigidShape rs = rsObject.AddComponent<RigidShape> ();
 		rs.transform.parent = rsFolder.transform;
 		rs.transform.position = square.transform.position;
 		rigidshapes.Add (rs);
 		rs.name = "Rigid Shape " + rigidshapes.Count;
-		rs.init (square, board, this); // initeedededddd
+		rs.init (square, board, this, shape); // initeedededddd
 		return rs;
 	}
 
@@ -528,7 +568,11 @@ public class SquareManager : MonoBehaviour {
 
 	private void playSuccess(){
 		gm.success = true;
-		successAudio.Play ();
+		if (gm.bambiQwop) {
+			qwopSuccessAudio.Play ();
+		} else {
+			successAudio.Play ();
+		}
 	}
 
 	public bool destinationClose() {
@@ -656,6 +700,124 @@ public class SquareManager : MonoBehaviour {
 			GUI.Label (new Rect (xpos, ypos, 110, 60), "<color=black>Y o u\n\nW i n</color>", guiStyle2);
 			GUI.Label (new Rect (xpos, ypos, 90, 40), "<color=black>Y o u\n\nW i n</color>", guiStyle2);
 			GUI.Label (new Rect (xpos, ypos, 100, 50), "<color=cyan>Y</color> <color=magenta>o</color> <color=yellow>u</color>\n\n<color=cyan>w</color> <color=magenta>i</color> <color=yellow>n</color>", guiStyle2);
+			string text = "L o a d i n g    N e x t \n\nL e v e l";
+			if (gm.levelNum == 11) {
+				text = "C o n g r a t u l a t i o n s";
+			} 
+				if (gm.rand == 0) {
+					GUI.Label (new Rect (xpos + 10, ypos + 250, 110, 60), "<color=cyan>" + text + "</color>", guiStyle3);
+				} else {
+					GUI.Label (new Rect (xpos + 10, ypos + 250, 110, 60), "<color=magenta>" + text + "</color>", guiStyle3);
+				}
+
+				if (gm.rand2 == 0) {
+					if (gm.rand != 0) {
+						GUI.Label (new Rect (xpos + 10, ypos + 250, 100, 50), "<color=cyan>" + text + "</color>", guiStyle3);
+					} else {
+						GUI.Label (new Rect (xpos + 10, ypos + 250, 100, 50), "<color=yellow>" + text + "</color>", guiStyle3);
+					}
+				} else {
+					if (gm.rand != 1) {
+						GUI.Label (new Rect (xpos + 10, ypos + 250, 100, 50), "<color=magenta>" + text + "</color>", guiStyle3);
+					} else {
+						GUI.Label (new Rect (xpos + 10, ypos + 250, 100, 50), "<color=yellow>" + text + "</color>", guiStyle3);
+					}
+				}
+
+//			GUI.Label (new Rect (xpos + 10, ypos + 250, 100, 50), "<color=yellow>" + text + "</color>", guiStyle3);
+				GUI.Label (new Rect (xpos + 10, ypos + 250, 105, 55), "<color=black>" + text + "</color>", guiStyle3);
+
+		}
+
+
+
+		if (gm.levelNum == 1) {
+
+			if (blocksPlaced >= 2) {
+				float x = 110;
+				float y = 40;
+				textTime += Time.unscaledDeltaTime;
+				if (textTime < speed / 2) {
+					GUI.Label (new Rect (110, 40, 105, 55), "<color=black><-</color>", guiStyle4);
+				} else {
+					GUI.Label (new Rect (100, 40, 105, 55), "<color=black><-</color>", guiStyle4);
+					if (textTime > speed) {
+						textTime = 0;
+					}
+				}
+			} else {
+				if (gm.web) {
+					GUI.Label (new Rect (385, 50, 105, 55), "<color=black>\t        CLICK TO  \n \tPLACE BLOCKS\n\t\tV</color>", guiStyle4);
+
+				} else {
+					GUI.Label (new Rect (570, 40, 105, 55), "<color=black>\tc l i c k    t o               | \np l a c e   b l o c k s   v</color>", guiStyle4);
+
+				}
+//				if (gm.web) {
+//					GUI.Label (new Rect (450, 50, 105, 55), "<color=black>c l i c k    t o               | \np l a c e   b l o c k s   v</color>", guiStyle4);
+//
+//				} else {
+//					GUI.Label (new Rect (570, 40, 105, 55), "<color=black>c l i c k    t o               | \np l a c e   b l o c k s   v</color>", guiStyle4);
+//		
+//				}
+			}
+		}
+
+
+
+		if (gm.levelNum == 5) {
+			if (!solved) {
+				if (gm.web) {
+					GUI.Label (new Rect (385, 50, 105, 55), "<color=black>\tSOME BLOCKS\n \t\tGROW     </color>", guiStyle4);
+
+				} else {
+					GUI.Label (new Rect (570, 40, 105, 55), "<color=black>\tSOME BLOCKS\n\n \t\tGROW   </color>", guiStyle4);
+
+				}
+
+//				if (gm.web) {
+//					GUI.Label (new Rect (450, 50, 105, 55), "<color=black>\ts o m e     b l o c k s\n\n \t\tg r o w    </color>", guiStyle4);
+//
+//				} else {
+//					GUI.Label (new Rect (570, 40, 105, 55), "<color=black>\ts o m e     b l o c k s\n\n \t\tg r o w    </color>", guiStyle4);
+//
+//				}
+			}
+
+		}
+
+		if (gm.levelNum == 6) {
+			if (!solved) {
+				if (gm.web) {
+					GUI.Label (new Rect (400, 50, 105, 55), "<color=black>\t        BUILD A\n \t\tBRIDGE        </color>", guiStyle4);
+
+				} else {
+					GUI.Label (new Rect (570, 40, 105, 55), "<color=black>\t        BUILD A\n \t\tBRIDGE        </color>", guiStyle4);
+
+				}
+
+//				if (gm.web) {
+//					GUI.Label (new Rect (450, 50, 105, 55), "<color=black>\t b u i l d    a\n\n \t\tb r i d g e    </color>", guiStyle4);
+//
+//				} else {
+//					GUI.Label (new Rect (570, 40, 105, 55), "<color=black>\t b u i l d    a\n\n \t\tb r i d g e    </color>", guiStyle4);
+//
+//				}
+			}
+
+		}
+
+		if (gm.levelNum == 9) {
+			if (!solved) {
+				if (gm.web) {
+					GUI.Label (new Rect (450, 50, 105, 55), "<color=black>\t   MOVE THE\n \t       + BLOCKS   </color>", guiStyle4);
+
+				} else {
+					GUI.Label (new Rect (570, 40, 105, 55), "<color=black>\t   m o v e    t h e\n\n \t      +    b l o c k s    </color>", guiStyle4);
+
+				}
+			}
+
 		}
 //
 //		if (GUI.Button (new Rect (30, 30, 100, 40), "Test your path.")) {

@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-
+	public bool web = true; 
 	public SquareManager sqman;
 	public AudioSource menuAudio;
 	public AudioClip menuClip;
@@ -27,6 +27,15 @@ public class GameManager : MonoBehaviour
 	public AudioClip gameClip6;
 	public AudioSource gameAudio7;
 	public AudioClip gameClip7;
+
+	public AudioClip qwopgameClip1;
+	public AudioClip qwopgameClip2;
+	public AudioClip qwopgameClip3;
+	public AudioClip qwopgameClip4;
+	public AudioClip qwopgameClip5;
+	public AudioClip qwopgameClip6;
+	public AudioClip qwopgameClip7;
+
 	public int w;
 	public int h;
 	Square[,] board;
@@ -34,7 +43,9 @@ public class GameManager : MonoBehaviour
 	int[] q;
 	int[] rsq;
 	string levelName;
-	int levelNum;
+	public int levelNum;
+	public int rand;
+	public int rand2;
 
 	public bool bambiQwop;
 
@@ -71,6 +82,7 @@ public class GameManager : MonoBehaviour
 	GUIStyle guiStyle;
 	GUIStyle guiStyle2;
 	GUIStyle guiStyle3;
+	GUIStyle guiStyle4;
 	GUIContent lvlbutton;
 	GUIStyleState lvlButtonHover;
 
@@ -147,6 +159,9 @@ public class GameManager : MonoBehaviour
 
 		guiStyle = new GUIStyle ();
 		guiStyle.fontSize = 30;
+		if (web) {
+			guiStyle.fontSize = 20;
+		}
 		guiStyle.alignment = TextAnchor.MiddleCenter;
 		guiStyle.font = (Font)Resources.Load ("Fonts/blockyo");
 		guiStyle.richText = true;
@@ -155,6 +170,9 @@ public class GameManager : MonoBehaviour
 		//HOME MENU
 		guiStyle2 = new GUIStyle ();
 		guiStyle2.fontSize = 80;
+		if (web) {
+			guiStyle2.fontSize = 60;
+		}
 		guiStyle2.alignment = TextAnchor.MiddleCenter;
 		guiStyle2.font = (Font)Resources.Load ("Fonts/blockyo");
 		guiStyle2.richText = true;
@@ -162,10 +180,24 @@ public class GameManager : MonoBehaviour
 
 		guiStyle3 = new GUIStyle ();
 		guiStyle3.fontSize = 45;
+		if (web) {
+			guiStyle3.fontSize = 30;
+		}
 		guiStyle3.alignment = TextAnchor.MiddleCenter;
 		guiStyle3.font = (Font)Resources.Load ("Fonts/blockyo");
 		guiStyle3.richText = true;
 		guiStyle3.normal.textColor = new Color (1f, 1f, 1f, .9f);
+
+
+		guiStyle4 = new GUIStyle ();
+		guiStyle4.fontSize = 45;
+		if (web) {
+			guiStyle4.fontSize = 30;
+		}
+		guiStyle4.alignment = TextAnchor.MiddleCenter;
+		guiStyle4.font = (Font)Resources.Load ("Fonts/BMblock");
+		guiStyle4.richText = true;
+		guiStyle4.normal.textColor = new Color (1f, 1f, 1f, .9f);
 
 		GUI.depth = 10;
 		lvlbutton = new GUIContent ();
@@ -245,7 +277,46 @@ public class GameManager : MonoBehaviour
 		gameAudio7.clip = gameClip7;
 		gameAudio7.Play ();
 		gameAudio7.mute = true;
+
+
+
+
+		qwopgameClip1 = Resources.Load<AudioClip> ("Audio/BambiQwop Layers/Layer 1");
+		qwopgameClip2 = Resources.Load<AudioClip> ("Audio/BambiQwop Layers/Layer 2");
+		qwopgameClip3 = Resources.Load<AudioClip> ("Audio/BambiQwop Layers/Layer 3");
+		qwopgameClip4 = Resources.Load<AudioClip> ("Audio/BambiQwop Layers/Layer 4");
+		qwopgameClip5 = Resources.Load<AudioClip> ("Audio/BambiQwop Layers/Layer 5");
+		qwopgameClip6 = Resources.Load<AudioClip> ("Audio/BambiQwop Layers/Layer 6");
+		qwopgameClip7 = Resources.Load<AudioClip> ("Audio/BambiQwop Layers/Layer 7");
+
+
+		loadBambiSounds ();
+
+
 	}
+
+	private void loadBambiSounds(){		//updates sound clips for bambiqwop mode
+		if (bambiQwop) {
+			gameAudio1.clip = qwopgameClip1;
+			gameAudio2.clip = qwopgameClip2;
+			gameAudio3.clip = qwopgameClip3;
+			gameAudio4.clip = qwopgameClip4;
+			gameAudio5.clip = qwopgameClip5;
+			gameAudio6.clip = qwopgameClip6;
+			gameAudio7.clip = qwopgameClip7;
+
+		} else {
+			gameAudio1.clip = gameClip1;
+			gameAudio2.clip = gameClip2;
+			gameAudio3.clip = gameClip3;
+			gameAudio4.clip = gameClip4;
+			gameAudio5.clip = gameClip5;
+			gameAudio6.clip = gameClip6;
+			gameAudio7.clip = gameClip7;
+		}
+
+	}
+
 
 	private void clearBoard ()
 	{
@@ -315,7 +386,7 @@ public class GameManager : MonoBehaviour
 				if (levelNum < NUMLEVELS) {
 					levelUnlockStatus [levelNum] = 1;
 					PlayerPrefs.SetInt ("levelUnlockStatus" + levelNum, 1);
-					if (!sqman.successAudio.isPlaying) {
+					if (!(sqman.successAudio.isPlaying || sqman.qwopSuccessAudio.isPlaying)) {
 						Debug.Log ("LEVEL " + levelNum + "UNLOCKD");
 						Debug.Log ("ONTO LEVEL " + (level+1));
 						print ("LOADING LEVEL");
@@ -397,15 +468,28 @@ public class GameManager : MonoBehaviour
 				saved = false;
 			} else {
 				if (bambiQwop && !success) {
-					if (wave > 3) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi2");
-						wave = -1;
-					} else if (wave > 2) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi3");
-					} else if (wave > 1) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi2");
-					} else if (wave > 0) {
-						destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi1");
+					if (sqman.upset) {
+						if (wave > 3) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi?2");
+							wave = -1;
+						} else if (wave > 2) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi?3");
+						} else if (wave > 1) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi?2");
+						} else if (wave > 0) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi?1");
+						}
+					} else {
+						if (wave > 3) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi2");
+							wave = -1;
+						} else if (wave > 2) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi3");
+						} else if (wave > 1) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi2");
+						} else if (wave > 0) {
+							destination.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/bambi1");
+						}
 					}
 				} else {
 					if (!sqman.destinationClose () && sqman.upset && !success) {
@@ -463,6 +547,8 @@ public class GameManager : MonoBehaviour
 
 	public void initBoard ()
 	{
+		rand = UnityEngine.Random.Range (0, 2);
+		rand2 = UnityEngine.Random.Range (0, 2);
 		Debug.Log ("MAEK BORD");
 		TextAsset temp = Resources.Load<TextAsset> ("Levels/" + getLevelName ()) as TextAsset;
 		byte[] byteArray = System.Text.Encoding.UTF8.GetBytes (temp.text);
@@ -546,8 +632,14 @@ public class GameManager : MonoBehaviour
 		this.cam = Camera.main;
 		int height = (int)(h / 2);
 		int width = (int)(w / 2);
-		cam.orthographicSize = height + 2;
-		cam.transform.position = new Vector3 (width - 1, height - 1, -10);
+
+		if (web) {
+			cam.orthographicSize = height + 3;
+			cam.transform.position = new Vector3 (width - 1, height - 1, -12);
+		} else {
+			cam.orthographicSize = height + 2;
+			cam.transform.position = new Vector3 (width - 1, height - 1, -10);
+		}
 
 		dist = (transform.position - cam.transform.position).z;
 		x_coord = Camera.main.ViewportToWorldPoint (new Vector3 (1, 0, dist)).x;
@@ -569,7 +661,7 @@ public class GameManager : MonoBehaviour
 	}
 
 
-	//		board = new Square[BOARDSIZEX, BOARDSIZEY];
+	//		board = new Square[BOARDSIZYEX, BOARDSIZEY];
 	//		//initialize level w/ ground squares (read from text file?)
 	//		for (int i = 0; i < BOARDSIZEX; i++) {
 	//			Square s = addSquare (new Vector2(i,0), true);
@@ -855,12 +947,15 @@ public class GameManager : MonoBehaviour
 			xpos = ((Screen.width) - 256) / 2;
 			ypos = ((Screen.height / 2));
 
-			Texture bambiTexture = Resources.Load<Texture2D> ("Textures/bambi");
+			Texture bambiTexture = Resources.Load<Texture2D> ("Textures/bambi-s");
 			bambiQwop = GUILayout.Toggle (bambiQwop, bambiTexture);
 			if (bambiQwop) {
 				PlayerPrefs.SetInt ("bambiQWOP", 1);
+				loadBambiSounds();
 			} else {
 				PlayerPrefs.SetInt ("bambiQWOP", 0);
+				loadBambiSounds ();
+
 			}
 
 

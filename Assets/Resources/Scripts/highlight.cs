@@ -39,8 +39,8 @@ public class Highlight : MonoBehaviour {
 	}
 
 	public void init(Queue<Square> q, SquareManager sqm) {
-		defaultColor = makeTransparent(new Color(0.2F, 0.3F, 0.4F));
-		redTransparent = makeTransparent(Color.red, 0.5f);
+		defaultColor = makeTransparent(new Color(0.2F, 0.3F, 0.4F), 0.1f);
+		redTransparent = makeTransparent(Color.red, 0.15f);
 		sqman = sqm;
 		board = sqman.board;
 		lastMousePos = new Vector2 (-1, 1);
@@ -81,6 +81,9 @@ public class Highlight : MonoBehaviour {
 
 		if(sqman.gm.success){
 			made.model.mat.color = Color.clear;
+			foreach (Square s in rigidShapes) {
+				s.model.mat.color = Color.clear;
+			}
 		}
 			
 	}
@@ -92,7 +95,7 @@ public class Highlight : MonoBehaviour {
 
 	}
 
-	Color makeTransparent(Color color, float transparency = 0.3f) {
+	Color makeTransparent(Color color, float transparency = 0.15f) {
 		return new Color (color.r, color.g, color.b, transparency);
 	}
 
@@ -100,7 +103,14 @@ public class Highlight : MonoBehaviour {
 //		color = checkHighlightConflicts ();
 		made.transform.position = new Vector3 (mouse.x, mouse.y, -1);
 //		checkConflictAndColor (made);
-		Square next = sqman.queue.Peek ();
+		Square next = new Square();
+		if (sqman.moving == null) {
+			if (sqman.queue != null) {
+				next = sqman.queue.Peek ();
+			}
+		} else { 
+			next = sqman.moving;
+		}
 		int type = next.getType ();
 		// 0-c,1-m,2-y,-1-k
 		switch (next.getColor()) {
@@ -113,9 +123,13 @@ public class Highlight : MonoBehaviour {
 		case 2:
 			color = makeTransparent (Color.yellow);
 			break;
+		default:
+			color = makeTransparent (defaultColor);
+			break;
 		}
 
 		if (type == 2) {
+			made.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileBlank");
 //			if (color == defaultColor) {
 //			}
 			// Maybe make a delegate to run all of this code for all the 4 blocks????
@@ -144,6 +158,11 @@ public class Highlight : MonoBehaviour {
 			}
 
 		} else {
+			if (type == 1) {
+				made.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileMovable");
+			} else {
+				made.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/tileBlank");
+			}
 			for (int i = 0; i < EXTRASHAPES; i++) {
 				rigidShapes [i].transform.position = new Vector3 (mouse.x + i + 1, rigidYOffset, -1);
 //				rigidShapes[i].model.mat.color = Color.clear;
@@ -166,16 +185,21 @@ public class Highlight : MonoBehaviour {
 	}
 
 	bool movableBlock(float pos_x, float pos_y) {
-		Square s = board [(int)pos_x, (int)pos_y];
-		if (s != null){
-			return s.type == 1;
+		if (insideBoard(pos_x, pos_y)){
+			Square s = board [(int)pos_x, (int)pos_y];
+			if (s != null){
+				return s.type == 1;
+			}
 		}
 		return false;
 	}
 
 	Color getRigidHighlightColor(int i) {
 		if (getHighlightColor() != redTransparent) {
-			Square next = sqman.queue.Peek ();
+			Square next = new Square();
+			if (sqman.queue != null) {
+				next = sqman.queue.Peek ();
+			}
 			if (i % 2 == 0) {
 				return makeTransparent(next.rigid.color2);
 			} else {
@@ -189,8 +213,14 @@ public class Highlight : MonoBehaviour {
 
 	Color getHighlightColor () {
 		Color retColor = defaultColor;
-
-		Square next = sqman.queue.Peek ();
+		Square next = new Square();
+		if (sqman.moving == null) {
+			if (sqman.queue != null) {
+				next = sqman.queue.Peek ();
+			}
+		} else { 
+			next = sqman.moving;
+		}
 		int type = next.getType ();
 		// 0-c,1-m,2-y,-1-k
 		switch (next.getColor()) {
@@ -202,6 +232,9 @@ public class Highlight : MonoBehaviour {
 			break;
 		case 2:
 			retColor = makeTransparent (Color.yellow);
+			break;
+		default:
+			retColor = makeTransparent (defaultColor);
 			break;
 		}
 		if (next.type == 2) {

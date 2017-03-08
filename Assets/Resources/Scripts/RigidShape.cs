@@ -33,22 +33,46 @@ public class RigidShape : MonoBehaviour {
 
 	public bool falling = false;
 
-	public void init(Square a, Square[,] b, SquareManager sm) {
+	public static int lastType = -1;
+	public static int lastC2 = -1;
+
+	public void init(Square a, Square[,] b,  SquareManager sm, int shape = -1) {
 		if (sm.gm.bambiQwop) {
 			speed = 30;
 		}
 
 		anchor = a;
 		anchor.rigid = this;
+		c1 = a.getColor ();
 		anchor.setAnchor ();
 		anchor.setFalling (false);
 		board = b;
 		this.sm = sm;
-		shapeType = generateTypeProbability();
-		c1 = getColorInt ();
+		if (shape == -1) {
+			shapeType = generateTypeProbability ();
+		} else {
+			shapeType = shape;
+			lastType = shape;
+		}
 		c2 = getColorInt ();
-		while (c1 == c2) {
-			c2 = getColorInt ();
+		if (sm.gm.levelNum == 11) {
+			if (lastC2 == -1) {
+				while (c1 == c2) {
+					c2 = getColorInt ();
+
+				}
+				lastC2 = c2;
+			}
+			c2 = lastC2;
+			while (c1 == c2) {
+				c1 = getColorInt ();
+
+			}
+		} else {
+			while (c1 == c2) {
+				c2 = getColorInt ();
+			
+			}
 		}
 		color1 = getColor (c1);
 		color2 = getColor(c2);
@@ -104,8 +128,16 @@ public class RigidShape : MonoBehaviour {
 
 
 	private int generateTypeProbability() {
+		print (" Last type: " + lastType);
 		// Should be adjusted depending on level????????????????????????????????????????????????
+		int tries = 0;
 		int r = Random.Range(0,10);
+		while (sm.rsq [r] == lastType && tries < 2) {
+			print("trying again: last type is " +lastType + " currently: " + r +" (tries: " + tries + ")");
+			r = Random.Range (0, 10);
+			tries++;
+		}
+		lastType = sm.rsq [r];
 		return sm.rsq [r];
 	}
 
@@ -348,7 +380,7 @@ public class RigidShape : MonoBehaviour {
 	}
 
 	public int getColorInt(){
-		return Random.Range (0, 3);
+			return Random.Range (0, 3);
 	}
 
 

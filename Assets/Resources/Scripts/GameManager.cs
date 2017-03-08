@@ -606,8 +606,8 @@ public class GameManager : MonoBehaviour
 			sq = addSquare (new Vector2 (float.Parse (s [0]), float.Parse (s [1])), int.Parse (s [2]), false, int.Parse (s [3]));
 			sq.setColor (int.Parse (s [2]));
 			sq.setType (int.Parse (s [3]));
-//			Square sq = new Square ();
-//			sq.init (new Vector2 (float.Parse (s [0]), float.Parse (s [1])), int.Parse (s [2]), false,  int.Parse (s [3]));
+			//			Square sq = new Square ();
+			//			sq.init (new Vector2 (float.Parse (s [0]), float.Parse (s [1])), int.Parse (s [2]), false,  int.Parse (s [3]));
 		}
 
 
@@ -654,7 +654,7 @@ public class GameManager : MonoBehaviour
 	{
 		for (int i = 0; i <= height; i++) {
 			Square s = addGround (new Vector2 (x, i), true); 
-//			print (s == null);
+			//			print (s == null);
 			s.init (new Vector2 (x, i), -1, true);
 			board [x, i] = s;
 		}
@@ -731,7 +731,7 @@ public class GameManager : MonoBehaviour
 		square.init (new Vector2 ((float)w, (float)height), 4, false);
 
 		square.name = "Destination";
-//		sqman.destination = square;
+		//		sqman.destination = square;
 		square.model.mat.mainTexture = Resources.Load<Texture2D> ("Textures/window1");
 
 		GameObject towerTopObject1 = new GameObject ();
@@ -810,10 +810,10 @@ public class GameManager : MonoBehaviour
 		GameObject squareObject = new GameObject ();
 		Square square = squareObject.AddComponent<Square> ();
 
-//		square.transform.parent = groundSquareFolder.transform;
+		//		square.transform.parent = groundSquareFolder.transform;
 		square.transform.position = new Vector3 (pos.x, pos.y, 0);
 		square.init (pos, color, isGround, type);
-//		print ("Adding to inBoardSquares " + square);
+		//		print ("Adding to inBoardSquares " + square);
 		inBoardSquares.Add (square);
 		square.name = "Square " + groundSquares.Count;
 		board [(int)pos.x, (int)pos.y] = square;
@@ -837,8 +837,8 @@ public class GameManager : MonoBehaviour
 	{
 		squarePath.Reverse ();
 		printPath ();
-//		Time.timeScale = .01f;
-//		Time.fixedDeltaTime = .01f;
+		//		Time.timeScale = .01f;
+		//		Time.fixedDeltaTime = .01f;
 		Debug.Log ("pathAnimation");
 		//heroAnimation(squarePath);
 		//Time.timeScale = 1f;
@@ -854,7 +854,7 @@ public class GameManager : MonoBehaviour
 		}
 		print (path);
 	}
-			
+
 
 	//	void heroAnimation(List<Square> squarePath){
 	//		int counter = 0;
@@ -959,7 +959,7 @@ public class GameManager : MonoBehaviour
 			}
 
 
-	/***********************MENU BUTTONS**************************/
+			/***********************MENU BUTTONS**************************/
 			scrollPosition = GUI.BeginScrollView (new Rect (xpos, ypos, 270, 200), scrollPosition, new Rect (0, 0, 220, (50 * NUMLEVELS))); 
 
 
@@ -1019,7 +1019,7 @@ public class GameManager : MonoBehaviour
 
 		sqman.destination = destination;
 		sqman.beginning = beginning;
-//		sqman.addBoardSquares (inBoardSquares);
+		//		sqman.addBoardSquares (inBoardSquares);
 
 		hero.addSquareManager(this.sqman);
 

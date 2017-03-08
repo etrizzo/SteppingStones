@@ -64,18 +64,18 @@ public class HeroModel : MonoBehaviour
 				first = false;
 			}
 			moveAlong ();
-//		}
+			//		}
 		} else { 		//Jumping in Place when it is not moving
-//			print ("JUMP! " + farthestX + ", " + highestY);
+			//			print ("JUMP! " + farthestX + ", " + highestY);
 			counter += Time.deltaTime * speed;
 			if (counter >= 2) {
 				counter = 0;
 			}
 			if (counter >= 1) {
-//				transform.position = new Vector3 (farthestX, highestY+.05f, 0);
+				//				transform.position = new Vector3 (farthestX, highestY+.05f, 0);
 				transform.localPosition = new Vector3 (0, .05f, 0);
 			} else if (counter >= 0) {
-//				transform.position = new Vector3 (farthestX, highestY, 0);
+				//				transform.position = new Vector3 (farthestX, highestY, 0);
 				transform.localPosition = new Vector3 (0, 0, 0);
 			}
 		}
@@ -84,43 +84,43 @@ public class HeroModel : MonoBehaviour
 	public void moveAlong(){	//List<Square> squarePath
 		if (clock >= farthestX) {
 			updateSquareInfo ();
-//			if (canMove) {
-//				print ("updating position to : " + (clock + .5f) + ", " + highestY);
-//				print (" or actually... " + (curSquare.getPosition ().x + .5f) + " , " + (curSquare.getPosition ().y + .5f));
-//
-//
-//			}
+			//			if (canMove) {
+			//				print ("updating position to : " + (clock + .5f) + ", " + highestY);
+			//				print (" or actually... " + (curSquare.getPosition ().x + .5f) + " , " + (curSquare.getPosition ().y + .5f));
+			//
+			//
+			//			}
 		}
 		print ("moving to : " + farthestX + ", " + highestY);
 		owner.transform.position = new Vector3 (farthestX, highestY, 0);
-			
 
 
 
-//		foreach (Square sq in owner.gm.squarePath) {
-//			//Vector2 nextPos = sq.getPosition ();
-//			//hero.model.nextMove (nextPos);
-//
-//			//while (clock < nextPos.x+1) {
-//				//transform.position = new Vector3 (clock, 1, 0);
-//			//}
-//			Debug.Log ("I am looking at square: " + sq.name + " and the clock is at: " + clock + "canMove is set to: " + canMove);
-//		}
+
+		//		foreach (Square sq in owner.gm.squarePath) {
+		//			//Vector2 nextPos = sq.getPosition ();
+		//			//hero.model.nextMove (nextPos);
+		//
+		//			//while (clock < nextPos.x+1) {
+		//				//transform.position = new Vector3 (clock, 1, 0);
+		//			//}
+		//			Debug.Log ("I am looking at square: " + sq.name + " and the clock is at: " + clock + "canMove is set to: " + canMove);
+		//		}
 	}
 
 	void updateSquareInfo(){
 		sqcounter++;
 		if (sqcounter >= (owner.gm.squarePath.Count)) {
-//			Debug.Log ("sq = count.... so farthest x is: " + farthestX + " highest y is: " + highestY);
-//			farthestX = farthestX + .5f;
-//			highestY = highestY 1f;
-//			print("cursquare is : " + curSquare.getPosition() + " And we're stopping there.");
+			//			Debug.Log ("sq = count.... so farthest x is: " + farthestX + " highest y is: " + highestY);
+			//			farthestX = farthestX + .5f;
+			//			highestY = highestY 1f;
+			//			print("cursquare is : " + curSquare.getPosition() + " And we're stopping there.");
 			if (!owner.gm.success) {
 				resetHero ();
 			} else { //success!
 				if(owner.sqman != null){
-						owner.sqman.success = true;
-					}
+					owner.sqman.success = true;
+				}
 				if (owner.gm.bambiQwop) {
 					mat.mainTexture = Resources.Load<Texture2D> ("Textures/sonichVictory-s");
 					owner.gm.saved = true;
@@ -149,11 +149,11 @@ public class HeroModel : MonoBehaviour
 			curSquare = owner.gm.squarePath [sqcounter];
 			Vector2 pos = curSquare.getPosition ();
 			print ("Counter " + sqcounter + ", Cursquare: " + curSquare.getPosition()); 
-//			farthestX = pos.x + 1; // may have to change
+			//			farthestX = pos.x + 1; // may have to change
 			farthestX = pos.x + .5f;
-//			highestY = pos.y + .5f;
+			//			highestY = pos.y + .5f;
 			highestY =pos.y + .5f;
-//			Debug.Log("on square: " + curSquare.name + " farthest x is: " + farthestX + " highest y is: " + highestY);
+			//			Debug.Log("on square: " + curSquare.name + " farthest x is: " + farthestX + " highest y is: " + highestY);
 		}
 
 	}
@@ -174,17 +174,17 @@ public class HeroModel : MonoBehaviour
 	public void nextMove(Vector2 nextPos, Vector2 pos){
 		float xpos = transform.position.x;
 		float ypos = transform.position.y;
-//		while (xpos < nextPos.x) {			
-//			xpos = xpos + (Time.deltaTime / moveSpeed);
-//			owner.transform.position = new Vector3 (xpos, ypos, 0);
-//			//pos.x = xpos;
-//		}
-//
-//		while (pos.y < nextPos.y+1) {		
-//			ypos = pos.y + (Time.deltaTime / moveSpeed);
-//			transform.position = new Vector3 (xpos, ypos, 0);
-//			pos.y = ypos;
-//		}
+		//		while (xpos < nextPos.x) {			
+		//			xpos = xpos + (Time.deltaTime / moveSpeed);
+		//			owner.transform.position = new Vector3 (xpos, ypos, 0);
+		//			//pos.x = xpos;
+		//		}
+		//
+		//		while (pos.y < nextPos.y+1) {		
+		//			ypos = pos.y + (Time.deltaTime / moveSpeed);
+		//			transform.position = new Vector3 (xpos, ypos, 0);
+		//			pos.y = ypos;
+		//		}
 		transform.position = new Vector3 (xpos, ypos, 0);
 		Debug.Log ("xpos is: "+xpos + "ypos is: " +ypos);
 
